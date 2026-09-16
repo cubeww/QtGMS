@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPalette>
 #include <QPainter>
 #include <QPushButton>
@@ -46,7 +47,13 @@ public:
         setDragDropMode(QAbstractItemView::DragDrop); setDefaultDropAction(Qt::MoveAction);
     }
     std::function<void(QTreeWidgetItem *, QTreeWidgetItem *, int, bool)> moveRequested;
+    bool isLeftClick() const { return m_leftClick; }
 protected:
+    void mouseReleaseEvent(QMouseEvent *event) override {
+        m_leftClick = event->button() == Qt::LeftButton;
+        QTreeWidget::mouseReleaseEvent(event);
+        m_leftClick = false;
+    }
     void startDrag(Qt::DropActions) override {
         auto *item = currentItem();
         if (!item || !(item->flags() & Qt::ItemIsDragEnabled) || item->data(0, ResourceTypeRole).toInt() >= static_cast<int>(ResourceType::Macro)) return;
@@ -82,6 +89,7 @@ protected:
     }
 private:
     QPersistentModelIndex m_dragged;
+    bool m_leftClick = false;
 };
 
 struct ResourceCategory {
@@ -235,6 +243,12 @@ ResourceBrowser::ResourceBrowser(QWidget *parent)
     connect(m_nextButton, &QPushButton::clicked, this, [this] { findMatch(1); });
     connect(m_searchEdit, &QLineEdit::returnPressed, this, [this] { findMatch(1); });
     connect(m_resourceTree, &QTreeWidget::itemActivated, this, [this] { activateCurrentResource(); });
+    connect(m_resourceTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item) {
+        if (!static_cast<ResourceTreeWidget *>(m_resourceTree)->isLeftClick()
+            || item->data(0, ItemKindRole).toInt() != static_cast<int>(ResourceItemKind::Resource)) return;
+        emit resourceClicked(static_cast<ResourceType>(item->data(0, ResourceTypeRole).toInt()),
+            item->data(0, FilePathRole).toString());
+    });
     createActions();
     static_cast<ResourceTreeWidget *>(m_resourceTree)->moveRequested = [this](QTreeWidgetItem *source, QTreeWidgetItem *parent, int row, bool copy) {
         ResourceTreeRequest request; request.command = copy ? ResourceTreeCommand::Duplicate : ResourceTreeCommand::Move;

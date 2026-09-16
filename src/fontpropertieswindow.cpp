@@ -25,8 +25,10 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-FontPropertiesWindow::FontPropertiesWindow(FontDocument *document, const QStringList &textureGroups, QWidget *parent)
-    : ResourceEditorWindow(parent), m_document(document), m_family(new QComboBox), m_antiAlias(new QComboBox), m_textureGroup(new QComboBox),
+FontPropertiesWindow::FontPropertiesWindow(FontDocument *document, const QStringList &textureGroups,
+    const std::function<bool(QString &, QString &)> &codeCharacters, QWidget *parent)
+    : ResourceEditorWindow(parent), m_document(document), m_codeCharacters(codeCharacters),
+      m_family(new QComboBox), m_antiAlias(new QComboBox), m_textureGroup(new QComboBox),
       m_size(new QSpinBox), m_bold(new QCheckBox(tr("Bold"))), m_italic(new QCheckBox(tr("Italic"))),
       m_highQuality(new QCheckBox(tr("High Quality"))), m_includeTTF(new QCheckBox(tr("Include in Asset Package"))),
       m_ranges(new QListWidget), m_sample(new QPlainTextEdit), m_characters(new QPlainTextEdit), m_fontStatus(new QLabel)
@@ -129,7 +131,7 @@ void FontPropertiesWindow::updateCharacters()
 }
 void FontPropertiesWindow::addRange()
 {
-    FontRangeDialog dialog(this); if (dialog.exec() != QDialog::Accepted) return;
+    FontRangeDialog dialog(m_codeCharacters, this); if (dialog.exec() != QDialog::Accepted) return;
     FontState state = m_document->state();
     for (const FontRange &range : dialog.ranges()) if (!state.ranges.contains(range)) state.ranges.append(range);
     m_document->edit(state, tr("Add font ranges"));

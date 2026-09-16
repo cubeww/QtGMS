@@ -2,6 +2,7 @@
 #define QTGMS_FONTPROPERTIESWINDOW_H
 
 #include "resourceeditorwindow.h"
+#include <functional>
 
 class FontDocument;
 class QCheckBox;
@@ -15,7 +16,8 @@ class FontPropertiesWindow : public ResourceEditorWindow
 {
     Q_OBJECT
 public:
-    explicit FontPropertiesWindow(FontDocument *document, const QStringList &textureGroups, QWidget *parent = nullptr);
+    explicit FontPropertiesWindow(FontDocument *document, const QStringList &textureGroups,
+        const std::function<bool(QString &, QString &)> &codeCharacters, QWidget *parent = nullptr);
     void setTextureGroups(const QStringList &groups);
     bool save() override;
     QString filePath() const override;
@@ -29,6 +31,7 @@ private:
     void addRange();
     void showTexture();
     FontDocument *m_document;
+    std::function<bool(QString &, QString &)> m_codeCharacters;
     QComboBox *m_family;
     QComboBox *m_antiAlias;
     QComboBox *m_textureGroup;

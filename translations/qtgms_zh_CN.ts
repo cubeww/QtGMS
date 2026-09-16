@@ -1152,10 +1152,6 @@ The font texture could not be restored: %1
             <translation>从代码</translation>
         </message>
         <message>
-            <source>Project string scanning is not available yet.</source>
-            <translation>尚不支持扫描工程字符串。</translation>
-        </message>
-        <message>
             <source>From File</source>
             <translation>从文件</translation>
         </message>
@@ -1182,6 +1178,18 @@ The font texture could not be restored: %1
         <message>
             <source>GameMaker 1.4 font ranges support character values from 0 to 65535.</source>
             <translation>GameMaker 1.4 字体支持 0 到 65535 的字符值。</translation>
+        </message>
+        <message>
+            <source>Collect characters from strings in the project code.</source>
+            <translation>从工程代码的字符串中收集字符。</translation>
+        </message>
+        <message>
+            <source>Cannot Scan Project Code</source>
+            <translation>无法扫描工程代码</translation>
+        </message>
+        <message>
+            <source>No string characters were found in the project code.</source>
+            <translation>工程代码中未找到字符串字符。</translation>
         </message>
     </context>
     <context>
@@ -3485,9 +3493,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>关于 QtGMS</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.1
+            <source>QtGMS 0.1.2
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.1
+            <translation>QtGMS 0.1.2
 GameMaker Studio 风格的编辑器。</translation>
         </message>
         <message>
@@ -5273,6 +5281,18 @@ Alt：不吸附
         <message>
             <source>Language changes take effect the next time you start QtGMS.</source>
             <translation>语言更改将在下次启动 QtGMS 时生效。</translation>
+        </message>
+        <message>
+            <source>Room Editor</source>
+            <translation>房间编辑器</translation>
+        </message>
+        <message>
+            <source>Select the placement object by clicking the resource tree</source>
+            <translation>单击资源树中的对象，切换当前要摆放的对象</translation>
+        </message>
+        <message>
+            <source>Applies immediately to the most recently active room editor.</source>
+            <translation>立即应用于最近使用的房间编辑器。</translation>
         </message>
     </context>
     <context>
@@ -8592,10 +8612,6 @@ Line %2, column %3: %4</source>
             <translation>独立碰撞遮罩</translation>
         </message>
         <message>
-            <source>Sprite Mask: %1</source>
-            <translation>精灵遮罩：%1</translation>
-        </message>
-        <message>
             <source>Image</source>
             <translation>图像</translation>
         </message>
@@ -8660,10 +8676,6 @@ Line %2, column %3: %4</source>
             <translation>菱形</translation>
         </message>
         <message>
-            <source>Rotated Rectangle</source>
-            <translation>旋转矩形</translation>
-        </message>
-        <message>
             <source>&amp;OK</source>
             <translation>确定(&amp;O)</translation>
         </message>
@@ -8671,9 +8683,37 @@ Line %2, column %3: %4</source>
             <source>Change collision mask</source>
             <translation>更改碰撞遮罩</translation>
         </message>
+        <message>
+            <source>Mask Properties: %1</source>
+            <translation>遮罩属性：%1</translation>
+        </message>
+        <message>
+            <source>Width: %1   Height: %2</source>
+            <translation>宽度：%1   高度：%2</translation>
+        </message>
+        <message>
+            <source>Number of subimages: %1</source>
+            <translation>子图像数量：%1</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation>缩小</translation>
+        </message>
+        <message>
+            <source>Actual Size</source>
+            <translation>实际大小</translation>
+        </message>
+        <message>
+            <source>Zoom In</source>
+            <translation>放大</translation>
+        </message>
     </context>
     <context>
         <name>SpritePropertiesWindow</name>
+        <message>
+            <source>Modified</source>
+            <translation>已修改</translation>
+        </message>
         <message>
             <source>Precise collision checking</source>
             <translation>精确碰撞检测</translation>

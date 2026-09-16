@@ -114,6 +114,10 @@ static bool stageDroppedMedia(ResourceType type, const QString &source, const QS
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
+    if (event->type() == QEvent::WindowActivate) {
+        auto *room = qobject_cast<RoomPropertiesWindow *>(watched);
+        if (room && room->parentWidget() == this) m_lastRoomEditor = room;
+    }
     if (event->type() != QEvent::DragEnter && event->type() != QEvent::DragMove && event->type() != QEvent::Drop)
         return EditorWindow::eventFilter(watched, event);
     auto *widget = qobject_cast<QWidget *>(watched);

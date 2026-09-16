@@ -200,6 +200,9 @@ RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *proj
     sideLayout->addWidget(sideSplitter, 1);
     const QStringList tabNames = {tr("objects"), tr("settings"), tr("tiles"), tr("backgrounds"), tr("views"), tr("physics")};
     const QList<QWidget *> pages = {createObjectsPage(), createSettingsPage(order), createTilesPage(), createBackgroundsPage(), createViewsPage(), createPhysicsPage()};
+    connect(m_pages, &QStackedWidget::currentChanged, this, [this](int index) {
+        m_canvas->setViewsPageActive(index == 4);
+    });
     QList<QPushButton *> tabButtons;
     for (int i = 0; i < tabNames.size(); ++i) {
         auto *button = new QPushButton(tabNames.at(i));
@@ -310,6 +313,13 @@ void RoomPropertiesWindow::refreshSelection()
 {
     const QStringList ids = m_canvas->selectedIds(); m_selectionCount = ids.size(); m_selectedId = ids.isEmpty() ? QString() : ids.first();
     refresh();
+}
+void RoomPropertiesWindow::selectPlacementObject(const QString &name)
+{
+    const int index = m_objectChoice->findData(name);
+    if (index < 0) return;
+    m_canvas->finishInteraction();
+    m_objectChoice->setCurrentIndex(index);
 }
 void RoomPropertiesWindow::refreshObjectPreview()
 {

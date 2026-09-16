@@ -1,6 +1,7 @@
 #include "editorstandarddialogs.h"
 #include "fontrangedialog.h"
 #include "textfiledocument.h"
+#include <QApplication>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -13,7 +14,8 @@
 #include <QSpinBox>
 #include <algorithm>
 
-FontRangeDialog::FontRangeDialog(QWidget *parent) : EditorDialog(parent), m_first(new QSpinBox(this)),
+FontRangeDialog::FontRangeDialog(const std::function<bool(QString &, QString &)> &codeCharacters, QWidget *parent)
+    : EditorDialog(parent), m_codeCharacters(codeCharacters), m_first(new QSpinBox(this)),
     m_last(new QSpinBox(this)), m_characters(new QPlainTextEdit(this))
 {
     setWindowTitle(tr("Font Range")); resize(330, 280);
@@ -29,7 +31,9 @@ FontRangeDialog::FontRangeDialog(QWidget *parent) : EditorDialog(parent), m_firs
         connect(button, &QPushButton::clicked, this, [this, first, last] { m_first->setValue(first); m_last->setValue(last); updateCharacters(); });
     }
     layout->addWidget(group, 0, 0, 2, 1);
-    auto *code = new QPushButton(tr("From Code"), this); code->setEnabled(false); code->setToolTip(tr("Project string scanning is not available yet."));
+    auto *code = new QPushButton(tr("From Code"), this);
+    code->setToolTip(tr("Collect characters from strings in the project code."));
+    connect(code, &QPushButton::clicked, this, &FontRangeDialog::loadCodeCharacters);
     auto *file = new QPushButton(tr("From File"), this); layout->addWidget(code, 0, 1); layout->addWidget(file, 1, 1);
     layout->addWidget(m_characters, 2, 0, 1, 2); m_characters->setToolTip(tr("Type or paste the characters to include."));
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this); layout->addWidget(buttons, 3, 0, 1, 2);
@@ -48,6 +52,18 @@ void FontRangeDialog::updateCharacters()
     for (int code = m_first->value(); code <= m_last->value() && text.size() < 4096; ++code)
         if (QChar(static_cast<ushort>(code)).isPrint()) text.append(QChar(static_cast<ushort>(code)));
     m_characters->setPlainText(text); m_fromText = false;
+}
+void FontRangeDialog::loadCodeCharacters()
+{
+    QString characters, error;
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    const bool success = m_codeCharacters(characters, error);
+    QApplication::restoreOverrideCursor();
+    if (!success) { EditorMessageBox::critical(this, tr("Cannot Scan Project Code"), error); return; }
+    m_characters->setPlainText(characters);
+    m_fromText = true;
+    if (characters.isEmpty())
+        EditorMessageBox::information(this, tr("From Code"), tr("No string characters were found in the project code."));
 }
 void FontRangeDialog::loadCharacters()
 {

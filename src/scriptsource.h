@@ -2,6 +2,7 @@
 #define QTGMS_SCRIPTSOURCE_H
 
 #include <QString>
+#include <QStringList>
 #include <QVector>
 
 struct ScriptSection
@@ -18,6 +19,7 @@ public:
     static bool hasDefinitions(const QString &source);
     static QVector<ScriptSection> sections(const QString &source, const QString &resourceName);
     static QString combine(const QVector<ScriptSection> &sections, bool definitions);
+    static QStringList stringLiterals(const QString &source);
 };
 
 #endif

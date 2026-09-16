@@ -41,6 +41,7 @@ private:
     QSpinBox *m_yOrigin;
     QCheckBox *m_precise;
     QCheckBox *m_separate;
+    QLabel *m_modifiedMaskLabel;
     QCheckBox *m_horizontal;
     QCheckBox *m_vertical;
     QCheckBox *m_for3D;

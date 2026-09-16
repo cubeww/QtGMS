@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QSettings>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -36,6 +37,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : EditorDialog(parent)
     hint->setWordWrap(true);
     form->addRow(hint);
     generalLayout->addWidget(generalGroup);
+    auto *roomGroup = new QGroupBox(tr("Room Editor"));
+    auto *roomLayout = new QVBoxLayout(roomGroup);
+    auto *selectRoomObject = new QCheckBox(tr("Select the placement object by clicking the resource tree"));
+    selectRoomObject->setChecked(QSettings().value(QStringLiteral("roomEditor/selectObjectFromTree"), true).toBool());
+    roomLayout->addWidget(selectRoomObject);
+    auto *roomHint = new QLabel(tr("Applies immediately to the most recently active room editor."));
+    roomHint->setWordWrap(true); roomLayout->addWidget(roomHint);
+    generalLayout->addWidget(roomGroup);
     generalLayout->addStretch();
     tabs->addTab(generalPage, tr("General"));
 
@@ -115,6 +124,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : EditorDialog(parent)
     layout->addWidget(buttons);
     connect(buttons, &QDialogButtonBox::accepted, this, [=] {
         EditorLanguage::setSelectedLanguage(languageCombo->currentData().toString());
+        QSettings().setValue(QStringLiteral("roomEditor/selectObjectFromTree"), selectRoomObject->isChecked());
         CodeEditorOptions options;
         options.fontFamily = fontCombo->currentFont().family(); options.fontPixelSize = fontSize->value();
         options.indentSize = indentSize->value(); options.completionDelay = completionDelay->value();

@@ -261,6 +261,11 @@ QTabBar::tab:disabled {
     color: #777777;
 }
 
+QLabel#spriteMaskModified {
+    color: #800000;
+    font-weight: bold;
+}
+
 QTabBar::close-button {
     image: url(:/images/code/tabclose.svg);
     width: 12px;

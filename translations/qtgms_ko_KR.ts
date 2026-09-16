@@ -1152,10 +1152,6 @@ The font texture could not be restored: %1
             <translation>코드에서</translation>
         </message>
         <message>
-            <source>Project string scanning is not available yet.</source>
-            <translation>프로젝트 문자열 검색은 아직 지원하지 않습니다.</translation>
-        </message>
-        <message>
             <source>From File</source>
             <translation>파일에서</translation>
         </message>
@@ -1182,6 +1178,18 @@ The font texture could not be restored: %1
         <message>
             <source>GameMaker 1.4 font ranges support character values from 0 to 65535.</source>
             <translation>GameMaker 1.4 글꼴은 0~65535의 문자 값을 지원합니다.</translation>
+        </message>
+        <message>
+            <source>Collect characters from strings in the project code.</source>
+            <translation>프로젝트 코드의 문자열에서 문자를 수집합니다.</translation>
+        </message>
+        <message>
+            <source>Cannot Scan Project Code</source>
+            <translation>프로젝트 코드를 검색할 수 없음</translation>
+        </message>
+        <message>
+            <source>No string characters were found in the project code.</source>
+            <translation>프로젝트 코드에서 문자열 문자를 찾지 못했습니다.</translation>
         </message>
     </context>
     <context>
@@ -3485,9 +3493,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS 정보</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.1
+            <source>QtGMS 0.1.2
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.1
+            <translation>QtGMS 0.1.2
 GameMaker Studio 스타일 편집기.</translation>
         </message>
         <message>
@@ -5273,6 +5281,18 @@ Alt: 맞춤 해제
         <message>
             <source>Language changes take effect the next time you start QtGMS.</source>
             <translation>언어 변경은 다음 QtGMS 시작 시 적용됩니다.</translation>
+        </message>
+        <message>
+            <source>Room Editor</source>
+            <translation>룸 편집기</translation>
+        </message>
+        <message>
+            <source>Select the placement object by clicking the resource tree</source>
+            <translation>리소스 트리를 클릭하여 배치할 오브젝트 선택</translation>
+        </message>
+        <message>
+            <source>Applies immediately to the most recently active room editor.</source>
+            <translation>가장 최근에 사용한 룸 편집기에 즉시 적용합니다.</translation>
         </message>
     </context>
     <context>
@@ -8592,10 +8612,6 @@ Line %2, column %3: %4</source>
             <translation>개별 충돌 마스크</translation>
         </message>
         <message>
-            <source>Sprite Mask: %1</source>
-            <translation>스프라이트 마스크: %1</translation>
-        </message>
-        <message>
             <source>Image</source>
             <translation>이미지</translation>
         </message>
@@ -8660,10 +8676,6 @@ Line %2, column %3: %4</source>
             <translation>마름모</translation>
         </message>
         <message>
-            <source>Rotated Rectangle</source>
-            <translation>회전 사각형</translation>
-        </message>
-        <message>
             <source>&amp;OK</source>
             <translation>확인(&amp;O)</translation>
         </message>
@@ -8671,9 +8683,37 @@ Line %2, column %3: %4</source>
             <source>Change collision mask</source>
             <translation>충돌 마스크 변경</translation>
         </message>
+        <message>
+            <source>Mask Properties: %1</source>
+            <translation>마스크 속성: %1</translation>
+        </message>
+        <message>
+            <source>Width: %1   Height: %2</source>
+            <translation>너비: %1   높이: %2</translation>
+        </message>
+        <message>
+            <source>Number of subimages: %1</source>
+            <translation>하위 이미지 수: %1</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation>축소</translation>
+        </message>
+        <message>
+            <source>Actual Size</source>
+            <translation>실제 크기</translation>
+        </message>
+        <message>
+            <source>Zoom In</source>
+            <translation>확대</translation>
+        </message>
     </context>
     <context>
         <name>SpritePropertiesWindow</name>
+        <message>
+            <source>Modified</source>
+            <translation>수정됨</translation>
+        </message>
         <message>
             <source>Precise collision checking</source>
             <translation>정밀 충돌 검사</translation>

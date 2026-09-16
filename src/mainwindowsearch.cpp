@@ -13,6 +13,7 @@
 #include "shaderdocument.h"
 #include "shadereditorwindow.h"
 #include "scripteditorwindow.h"
+#include "scriptsource.h"
 #include "textfiledocument.h"
 #include "timelinedocument.h"
 #include "timelinepropertieswindow.h"
@@ -21,6 +22,7 @@
 #include <QProgressDialog>
 #include <QTextDocument>
 #include <QTimer>
+#include <algorithm>
 
 static void appendSearchSource(QVector<ScriptSearchSource> &sources, ScriptSearchSource source,
                                const QString &text, const QString &field)
@@ -53,6 +55,7 @@ static void appendActionSearchSources(QVector<ScriptSearchSource> &sources, cons
             const auto &value = arguments.at(argument);
             const int kind = ActionXml::text(value, QStringLiteral("kind")).toInt();
             source.code = codeAction || kind == 0;
+            source.literalString = !codeAction && (kind == 1 || kind == 2);
             appendSearchSource(sources, source, ActionXml::text(value, ActionXml::argumentTag(kind)),
                                QStringLiteral("argument%1").arg(argument));
         }
@@ -156,6 +159,39 @@ static ResourceEditorWindow *searchResourceEditor(const QHash<QString, QPointer<
         if (editor && editor->property("resourceType").toInt() == int(type)
             && editor->filePath().compare(path, Qt::CaseInsensitive) == 0) return editor;
     return nullptr;
+}
+
+bool MainWindow::collectFontCharacters(QString &characters, QString &error)
+{
+    characters.clear();
+    error.clear();
+    QSet<uint> unique;
+    const auto collect = [&](ResourceType type, const QString &path, const QString &name) {
+        const auto sources = resourceSearchSources(m_project, type, path, name,
+            searchResourceEditor(m_resourceEditors, type, path), error);
+        if (!error.isEmpty()) { error = path + QStringLiteral(": ") + error; return false; }
+        for (const auto &source : sources) {
+            QStringList strings;
+            if (source.code || (source.literalString
+                && (source.text.startsWith(QLatin1Char('"')) || source.text.startsWith(QLatin1Char('\'')))))
+                strings = ScriptSource::stringLiterals(source.text);
+            else if (source.literalString)
+                strings.append(source.text);
+            for (const auto &text : strings)
+                for (uint character : text.toUcs4()) unique.insert(character);
+        }
+        return true;
+    };
+    for (ResourceType type : {ResourceType::Script, ResourceType::Object, ResourceType::Room, ResourceType::Timeline})
+        for (const auto &resource : ActionXml::resourceList(m_project, type))
+            if (!collect(type, resource.filePath, resource.name)) return false;
+    if (!collect(ResourceType::Macro, m_project.filePath(), QString())) return false;
+    for (const auto &configuration : m_project.configurations())
+        if (!collect(ResourceType::Macro, configuration.filePath, QString())) return false;
+    auto values = unique.values();
+    std::sort(values.begin(), values.end());
+    for (uint character : values) characters += QString::fromUcs4(&character, 1);
+    return true;
 }
 
 void MainWindow::searchScripts()

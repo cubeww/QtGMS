@@ -34,6 +34,7 @@ protected:
 private:
     void refresh();
     void refreshResources();
+    void refreshEventIcons();
     void refreshActions();
     void applyProperties();
     void editEvent(bool change, bool duplicate = false);

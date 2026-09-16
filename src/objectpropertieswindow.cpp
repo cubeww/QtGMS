@@ -29,6 +29,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMimeData>
+#include <QPainter>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSpinBox>
@@ -39,6 +40,7 @@
 #include <QToolButton>
 #include <QTextBrowser>
 #include <QVBoxLayout>
+#include <QtMath>
 #include <algorithm>
 #include <limits>
 #include <cmath>
@@ -110,6 +112,7 @@ ObjectPropertiesWindow::ObjectPropertiesWindow(ObjectDocument *document, Project
     auto *splitter = new QSplitter; splitter->setHandleWidth(3); splitter->setChildrenCollapsible(false);
     auto *events = new QWidget; auto *eventLayout = new QVBoxLayout(events); eventLayout->setContentsMargins(4, 9, 4, 8); eventLayout->setSpacing(5);
     eventLayout->addWidget(new QLabel(tr("Events:"))); eventLayout->addWidget(m_events, 1); m_events->setMinimumWidth(155);
+    m_events->setIconSize(QSize(36, 16));
     auto *addEvent = new QPushButton(tr("Add Event")); addEvent->setFixedHeight(23); eventLayout->addWidget(addEvent);
     auto *eventButtons = new QHBoxLayout; auto *removeEvent = new QPushButton(tr("Delete")); auto *changeEvent = new QPushButton(tr("Change")); removeEvent->setFixedSize(71, 23); changeEvent->setFixedSize(73, 23); eventButtons->addWidget(removeEvent); eventButtons->addStretch(); eventButtons->addWidget(changeEvent); eventLayout->addLayout(eventButtons);
     splitter->addWidget(events); splitter->addWidget(m_actionEditor); splitter->setSizes({198, 435}); splitter->setStretchFactor(0, 0);
@@ -196,8 +199,38 @@ void ObjectPropertiesWindow::refresh()
         auto *item = new QListWidgetItem(ObjectEventDialog::eventName(event), m_events); item->setSizeHint(QSize(0, 20));
         item->setIcon(ObjectEventDialog::eventIcon(event));
     }
+    refreshEventIcons();
     if (m_events->count()) m_events->setCurrentRow(qBound(0, row, m_events->count() - 1));
     m_refreshing = false; refreshActions();
+}
+void ObjectPropertiesWindow::refreshEventIcons()
+{
+    QHash<QString, QString> thumbnails;
+    for (const auto &object : ActionXml::resourceList(*m_project, ResourceType::Object))
+        thumbnails.insert(object.name, object.thumbnailPath);
+    const auto events = ActionXml::elements(m_document->xml().documentElement().firstChildElement(QStringLiteral("events")), QStringLiteral("event"));
+    const qreal ratio = m_events->devicePixelRatioF();
+    for (int row = 0; row < events.size() && row < m_events->count(); ++row) {
+        const auto &event = events.at(row);
+        if (event.attribute(QStringLiteral("eventtype")).toInt() != 4) continue;
+        const QString target = event.attribute(QStringLiteral("ename"));
+        QIcon spriteIcon;
+        if (target == m_document->name()) spriteIcon = m_sprite->itemIcon(m_sprite->currentIndex());
+        else if (!thumbnails.value(target).isEmpty()) spriteIcon = QIcon(thumbnails.value(target));
+        if (spriteIcon.isNull()) spriteIcon = QIcon(QStringLiteral(":/images/object.png"));
+        QPixmap image(qCeil(36 * ratio), qCeil(16 * ratio));
+        image.setDevicePixelRatio(ratio); image.fill(Qt::transparent);
+        QPainter painter(&image);
+        ObjectEventDialog::eventIcon(event).paint(&painter, QRect(0, 0, 16, 16));
+        spriteIcon.paint(&painter, QRect(20, 0, 16, 16));
+        painter.end();
+        QIcon icon(image);
+        icon.addPixmap(image, QIcon::Selected);
+        auto *item = m_events->item(row);
+        item->setText(target);
+        item->setToolTip(ObjectEventDialog::eventName(event));
+        item->setIcon(icon);
+    }
 }
 QDomElement ObjectPropertiesWindow::selectedEvent(QDomDocument &xml) const
 {
@@ -272,6 +305,7 @@ void ObjectPropertiesWindow::closeEvent(QCloseEvent *event)
 void ObjectPropertiesWindow::updateResources()
 {
     refreshResources(); m_spritePreview->setPixmap(m_sprite->itemIcon(m_sprite->currentIndex()).pixmap(17, 17));
+    refreshEventIcons();
 }
 void ObjectPropertiesWindow::setSpriteName(const QString &name)
 {

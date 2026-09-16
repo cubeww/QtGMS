@@ -10,7 +10,9 @@ struct RoomEntity {
     QString id;
     bool tile = false;
     qint64 order = 0;
+    QDomDocument xmlDocument;
     QDomElement xml;
+    void setXml(const QDomElement &element);
     RoomEntity copy() const;
 };
 class RoomEntityCommand;

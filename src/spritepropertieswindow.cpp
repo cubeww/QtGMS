@@ -24,6 +24,7 @@ SpritePropertiesWindow::SpritePropertiesWindow(SpriteDocument *document, const Q
     : ResourceEditorWindow(parent), m_document(document), m_preview(new ImageCanvas), m_dimensions(new QLabel),
       m_count(new QLabel), m_frameLabel(new QLabel), m_xOrigin(new QSpinBox), m_yOrigin(new QSpinBox),
       m_precise(new QCheckBox(tr("Precise collision checking"))), m_separate(new QCheckBox(tr("Separate collision masks"))),
+      m_modifiedMaskLabel(new QLabel(tr("Modified"))),
       m_horizontal(new QCheckBox(tr("Tile: Horizontal"))), m_vertical(new QCheckBox(tr("Tile: Vertical"))),
       m_for3D(new QCheckBox(tr("Used for 3D"))), m_textureGroup(new QComboBox)
 {
@@ -78,6 +79,10 @@ SpritePropertiesWindow::SpritePropertiesWindow(SpriteDocument *document, const Q
     settings->setFixedWidth(collision->x() + columnWidth + 6);
     m_precise->setGeometry(8, 20, checkWidth, 18);
     m_separate->setGeometry(8, 43, checkWidth, 18);
+    m_modifiedMaskLabel->setParent(collision);
+    m_modifiedMaskLabel->setObjectName(QStringLiteral("spriteMaskModified"));
+    m_modifiedMaskLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    m_modifiedMaskLabel->setGeometry(8, 65, columnWidth - 24, 18);
     auto *mask = new QPushButton(tr("&Modify Mask"), collision); mask->setGeometry(16, 86, 121, 25);
     auto *texture = new QGroupBox(tr("Texture Settings")); place(texture, 174, 135, columnWidth, 154);
     m_horizontal->setParent(texture); m_horizontal->setGeometry(8, 19, 137, 18);
@@ -152,6 +157,8 @@ void SpritePropertiesWindow::refresh()
     m_nextFrameButton->setVisible(m_frameIndex + 1 < count);
     m_xOrigin->setValue(state.origin.x()); m_yOrigin->setValue(state.origin.y());
     m_precise->setChecked(state.collisionKind == 0); m_separate->setChecked(state.separateMasks);
+    m_separate->setEnabled(m_precise->isChecked());
+    m_modifiedMaskLabel->setVisible(state.collisionKind > 1 || state.alphaTolerance != 0 || state.boundingBoxMode != 0);
     m_horizontal->setChecked(state.tileHorizontal); m_vertical->setChecked(state.tileVertical); m_for3D->setChecked(state.for3D);
     const auto isPowerOfTwo = [](int value) { return value > 0 && (value & (value - 1)) == 0; };
     m_for3D->setEnabled(isPowerOfTwo(state.size.width()) && isPowerOfTwo(state.size.height()));

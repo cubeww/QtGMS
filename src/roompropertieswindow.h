@@ -26,6 +26,7 @@ public:
     QString filePath() const override;
     void relocate(const QString &oldDirectory, const QString &newDirectory) override;
     void updateResources();
+    void selectPlacementObject(const QString &name);
     void showCode(const QString &id, int offset, int length);
 signals:
     void openResourceRequested(ResourceType type, const QString &path);

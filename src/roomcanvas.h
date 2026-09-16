@@ -15,6 +15,7 @@ public:
     RoomCanvas(RoomDocument *document, RoomAssets *assets, QWidget *parent = nullptr);
     ~RoomCanvas() override;
     void setMode(Mode mode);
+    void setViewsPageActive(bool active);
     void setObject(const QString &name);
     void setTile(const QString &name, const QRect &source, int depth);
     void setDeleteUnderlying(bool enabled) { m_deleteUnderlying = enabled; }
@@ -72,6 +73,7 @@ private:
     QPointF snapped(QPointF position, Qt::KeyboardModifiers modifiers) const;
     RoomGraphicsItem *itemAtRoom(const QPoint &position) const;
     void placeAt(QPointF position);
+    void appendUnderlyingRemovals(QVector<RoomEntity> &changes);
     void updateItemVisibility();
     bool itemVisible(RoomGraphicsItem *item) const;
     RoomDocument *m_document;
@@ -86,6 +88,7 @@ private:
     int m_snapX = 32, m_snapY = 32;
     bool m_deleteUnderlying = false, m_panning = false, m_space = false;
     bool m_hideOtherTileLayers = false;
+    bool m_viewsPageActive = false;
     bool m_grid = true, m_showObjects = true, m_showTiles = true, m_showBackgrounds = true, m_showForegrounds = true, m_showViews = false;
     QPointF m_panAnchor;
     Qt::MouseButton m_panButton = Qt::NoButton;

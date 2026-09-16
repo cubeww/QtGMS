@@ -33,6 +33,7 @@ struct ScriptSearchSource {
     QString instanceId, macroName;
     int macroColumn = 1;
     bool code = true;
+    bool literalString = false;
 };
 
 struct ScriptSearchMatch {

@@ -1,6 +1,30 @@
 #include "scriptsource.h"
 #include <QRegularExpression>
 
+QStringList ScriptSource::stringLiterals(const QString &source)
+{
+    QStringList result;
+    for (int position = 0; position < source.size();) {
+        if (source.midRef(position, 2) == QLatin1String("//")) {
+            const int end = source.indexOf(QLatin1Char('\n'), position + 2);
+            position = end < 0 ? source.size() : end + 1;
+        } else if (source.midRef(position, 2) == QLatin1String("/*")) {
+            const int end = source.indexOf(QStringLiteral("*/"), position + 2);
+            position = end < 0 ? source.size() : end + 2;
+        } else if (source.at(position) == QLatin1Char('"') || source.at(position) == QLatin1Char('\'')) {
+            // GML 1.4 strings can span lines and do not interpret backslash escapes.
+            const QChar quote = source.at(position++);
+            const int end = source.indexOf(quote, position);
+            if (end < 0) break;
+            result.append(source.mid(position, end - position));
+            position = end + 1;
+        } else {
+            ++position;
+        }
+    }
+    return result;
+}
+
 bool ScriptSource::hasDefinitions(const QString &source)
 {
     // GMS 1.4 enables multi-script files when the first line is #define.

@@ -7,7 +7,16 @@
 #include <QUuid>
 #include <algorithm>
 
-RoomEntity RoomEntity::copy() const { RoomEntity result = *this; result.xml = xml.cloneNode(true).toElement(); return result; }
+void RoomEntity::setXml(const QDomElement &element)
+{
+    // Detached clones still belong to their source document. Keep an independent
+    // owner alive when room settings or undo snapshots replace that document.
+    QDomDocument document;
+    if (!element.isNull()) document.appendChild(document.importNode(element, true));
+    xml = document.documentElement();
+    xmlDocument = document;
+}
+RoomEntity RoomEntity::copy() const { RoomEntity result = *this; result.setXml(xml); return result; }
 class RoomEntityCommand : public QUndoCommand
 {
 public:
@@ -80,7 +89,7 @@ bool RoomDocument::load(const QString &path, QString &error)
             RoomEntity record; record.tile = tile; record.order = order++;
             record.id = (tile ? QStringLiteral("t:") : QStringLiteral("i:")) + element.attribute(tile ? QStringLiteral("id") : QStringLiteral("name"));
             if (records.contains(record.id)) { error = tr("Duplicate room instance or tile identifier: %1").arg(record.id); return false; }
-            record.xml = element.cloneNode(true).toElement(); records.insert(record.id, record); container.removeChild(element);
+            record.setXml(element); records.insert(record.id, record); container.removeChild(element);
         }
     }
     m_settings = xml; m_entities = records; m_nextOrder = order; m_source = bytes; m_path = QFileInfo(path).absoluteFilePath(); m_undo.clear(); return true;
@@ -98,7 +107,7 @@ RoomEntity RoomDocument::createEntity(bool tile)
         name = tile ? QString::number(hex.toUInt(nullptr, 16) & 0x7fffffff) : QStringLiteral("inst_") + hex;
         record.id = (tile ? QStringLiteral("t:") : QStringLiteral("i:")) + name;
     } while (m_entities.contains(record.id));
-    QDomDocument xml; record.xml = xml.createElement(tile ? QStringLiteral("tile") : QStringLiteral("instance")); xml.appendChild(record.xml);
+    record.xml = record.xmlDocument.createElement(tile ? QStringLiteral("tile") : QStringLiteral("instance")); record.xmlDocument.appendChild(record.xml);
     record.xml.setAttribute(tile ? QStringLiteral("id") : QStringLiteral("name"), name);
     if (tile) record.xml.setAttribute(QStringLiteral("name"), QStringLiteral("inst_") + QUuid::createUuid().toString().mid(1, 8).toUpper());
     record.xml.setAttribute(QStringLiteral("locked"), 0); record.xml.setAttribute(QStringLiteral("scaleX"), 1); record.xml.setAttribute(QStringLiteral("scaleY"), 1);

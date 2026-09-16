@@ -14,6 +14,7 @@ class QMenu;
 class CompilePanel;
 class ResourceBrowser;
 class ResourceEditorWindow;
+class RoomPropertiesWindow;
 class ActionLibraryManager;
 class GameRunner;
 
@@ -60,9 +61,11 @@ private:
     bool closeResourceEditors();
     bool saveResources();
     void searchScripts();
+    bool collectFontCharacters(QString &characters, QString &error);
     void openSearchMatch(const ScriptSearchMatch &match);
 
     Project m_project;
+    QPointer<RoomPropertiesWindow> m_lastRoomEditor;
     ResourceBrowser *m_resourceBrowser;
     CompilePanel *m_compilePanel;
     QComboBox *m_configurationCombo;

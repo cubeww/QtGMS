@@ -293,6 +293,12 @@ void RoomCanvas::setTile(const QString &name, const QRect &source, int depth)
     if (layerChanged && m_hideOtherTileLayers) updateItemVisibility();
     refreshPlacementVisual();
 }
+void RoomCanvas::setViewsPageActive(bool active)
+{
+    if (m_viewsPageActive == active) return;
+    m_viewsPageActive = active;
+    viewport()->update();
+}
 void RoomCanvas::setMode(Mode mode)
 {
     finishInteraction();
@@ -374,10 +380,18 @@ void RoomCanvas::drawForeground(QPainter *painter, const QRectF &rect)
         }
     }
     painter->drawRect(m_room);
-    if (m_showViews && ActionXml::text(m_settings.documentElement(), QStringLiteral("enableViews")).toInt()) {
-        pen.setColor(QColor(255, 190, 40)); painter->setPen(pen);
-        for (QDomElement view : ActionXml::elements(m_settings.documentElement().firstChildElement(QStringLiteral("views")), QStringLiteral("view")))
-            if (view.attribute(QStringLiteral("visible")).toInt()) painter->drawRect(QRectF(roomNumber(view, QStringLiteral("xview")), roomNumber(view, QStringLiteral("yview")), roomNumber(view, QStringLiteral("wview")), roomNumber(view, QStringLiteral("hview"))));
+    if ((m_showViews || m_viewsPageActive) && ActionXml::text(m_settings.documentElement(), QStringLiteral("enableViews")).toInt()) {
+        pen.setJoinStyle(Qt::MiterJoin);
+        for (QDomElement view : ActionXml::elements(m_settings.documentElement().firstChildElement(QStringLiteral("views")), QStringLiteral("view"))) {
+            if (!view.attribute(QStringLiteral("visible")).toInt()) continue;
+            const QRectF bounds(roomNumber(view, QStringLiteral("xview")), roomNumber(view, QStringLiteral("yview")),
+                                roomNumber(view, QStringLiteral("wview")), roomNumber(view, QStringLiteral("hview")));
+            // A white center line leaves a black outline on both sides at any zoom.
+            pen.setColor(Qt::black); pen.setWidth(3); painter->setPen(pen);
+            painter->drawRect(bounds);
+            pen.setColor(Qt::white); pen.setWidth(1); painter->setPen(pen);
+            painter->drawRect(bounds);
+        }
     }
     painter->restore();
     drawEditingOverlay(painter, rect);
@@ -412,12 +426,34 @@ void RoomCanvas::placeAt(QPointF position)
         xml.setAttribute(QStringLiteral("bgName"), m_tileBackground); xml.setAttribute(QStringLiteral("xo"), m_tileSource.x()); xml.setAttribute(QStringLiteral("yo"), m_tileSource.y());
         xml.setAttribute(QStringLiteral("w"), m_tileSource.width()); xml.setAttribute(QStringLiteral("h"), m_tileSource.height()); xml.setAttribute(QStringLiteral("depth"), m_tileDepth);
     } else xml.setAttribute(QStringLiteral("objName"), m_object);
-    QVector<RoomEntity> changes;
-    if (m_deleteUnderlying) for (auto *raw : scene()->items(position, Qt::IntersectsItemBoundingRect)) {
-        auto *item = static_cast<RoomGraphicsItem *>(raw); if (item->tile != tile || item->locked) continue;
-        RoomEntity removed = m_document->entity(item->id); removed.xml = QDomElement(); changes.append(removed);
+    QVector<RoomEntity> changes{record};
+    appendUnderlyingRemovals(changes);
+    m_document->editEntities(changes, tr("Add room item")); selectIds({record.id});
+}
+void RoomCanvas::appendUnderlyingRemovals(QVector<RoomEntity> &changes)
+{
+    if (!m_deleteUnderlying || m_mode == Mode::Inspect) return;
+    // Protect every item in the operation, including items moved as a group.
+    QSet<QString> protectedIds;
+    for (const RoomEntity &record : changes) protectedIds.insert(record.id);
+    const int placementCount = changes.size();
+    for (int index = 0; index < placementCount; ++index) {
+        const RoomEntity &record = changes.at(index);
+        if (record.xml.isNull()) continue;
+        const bool tile = record.tile;
+        const int depth = record.xml.attribute(QStringLiteral("depth")).toInt();
+        const QPointF position(roomNumber(record.xml, QStringLiteral("x")), roomNumber(record.xml, QStringLiteral("y")));
+        // Include hidden and transparent items; deletion is independent of display settings.
+        for (auto *item : m_items) {
+            if (item->tile != tile || item->locked || protectedIds.contains(item->id)) continue;
+            if (tile && item->depth != depth) continue;
+            if (item->pos() != position) continue;
+            RoomEntity removed = m_document->entity(item->id);
+            removed.xml = QDomElement();
+            changes.append(removed);
+            protectedIds.insert(item->id);
+        }
     }
-    changes.append(record); m_document->editEntities(changes, tr("Add room item")); selectIds({record.id});
 }
 void RoomCanvas::mousePressEvent(QMouseEvent *event)
 {
@@ -512,8 +548,11 @@ void RoomCanvas::finishInteraction()
     QVector<RoomEntity> changes;
     for (const QString &id : m_dragPositions.keys()) {
         RoomEntity record = m_document->entity(id); if (record.xml.isNull() || !m_items.contains(id)) continue;
-        const QPointF point = m_items.value(id)->pos(); record.xml.setAttribute(QStringLiteral("x"), point.x()); record.xml.setAttribute(QStringLiteral("y"), point.y()); changes.append(record);
+        const QPointF point = m_items.value(id)->pos();
+        if (point == m_dragPositions.value(id)) continue;
+        record.xml.setAttribute(QStringLiteral("x"), point.x()); record.xml.setAttribute(QStringLiteral("y"), point.y()); changes.append(record);
     }
+    appendUnderlyingRemovals(changes);
     m_dragPositions.clear(); m_document->editEntities(changes, tr("Move room items")); emit selectionChanged();
 }
 void RoomCanvas::mouseDoubleClickEvent(QMouseEvent *event)
@@ -593,10 +632,11 @@ void RoomCanvas::pasteSelection()
     for (QDomElement element = xml.documentElement().firstChildElement(); !element.isNull(); element = element.nextSiblingElement()) {
         if (element.tagName() != QStringLiteral("instance") && element.tagName() != QStringLiteral("tile")) continue;
         RoomEntity record = m_document->createEntity(element.tagName() == QStringLiteral("tile")); const QString key = record.tile ? QStringLiteral("id") : QStringLiteral("name"), name = record.xml.attribute(key), instanceName = record.xml.attribute(QStringLiteral("name"));
-        record.xml = element.cloneNode(true).toElement(); record.xml.setAttribute(key, name); record.xml.setAttribute(QStringLiteral("name"), instanceName); record.xml.setAttribute(QStringLiteral("locked"), 0);
+        record.setXml(element); record.xml.setAttribute(key, name); record.xml.setAttribute(QStringLiteral("name"), instanceName); record.xml.setAttribute(QStringLiteral("locked"), 0);
         record.xml.setAttribute(QStringLiteral("x"), roomNumber(element, QStringLiteral("x")) + m_snapX); record.xml.setAttribute(QStringLiteral("y"), roomNumber(element, QStringLiteral("y")) + m_snapY);
         ids.append(record.id); records.append(record);
     }
+    appendUnderlyingRemovals(records);
     m_document->editEntities(records, tr("Paste room items")); selectIds(ids);
 }
 void RoomCanvas::keyPressEvent(QKeyEvent *event)

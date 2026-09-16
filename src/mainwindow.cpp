@@ -56,6 +56,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QSignalBlocker>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QToolBar>
 
@@ -111,6 +112,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_gameRunner, &GameRunner::message, m_compilePanel, &CompilePanel::appendMessage);
     updateProject();
     connect(m_resourceBrowser, &ResourceBrowser::resourceActivated, this, &MainWindow::openResource);
+    connect(m_resourceBrowser, &ResourceBrowser::resourceClicked, this, [this](ResourceType type, const QString &path) {
+        if (type != ResourceType::Object || !m_lastRoomEditor || !m_lastRoomEditor->isVisible()
+            || m_lastRoomEditor->isMinimized()
+            || !QSettings().value(QStringLiteral("roomEditor/selectObjectFromTree"), true).toBool()) return;
+        for (const auto &resource : ActionXml::resourceList(m_project, ResourceType::Object)) {
+            if (resource.filePath.compare(path, Qt::CaseInsensitive) != 0) continue;
+            m_lastRoomEditor->selectPlacementObject(resource.name);
+            break;
+        }
+    });
     connect(this, &EditorWindow::resourceNameActivated, this, [this](const QString &name) {
         for (ResourceType type : {ResourceType::Sprite, ResourceType::Sound, ResourceType::Background,
                                  ResourceType::Path, ResourceType::Script, ResourceType::Shader, ResourceType::Font,
@@ -372,7 +383,9 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
         } else delete document;
     } else if (type == ResourceType::Font) {
         auto *document = new FontDocument;
-        if (document->load(filePath, configIndex, error)) window = new FontPropertiesWindow(document, textureGroups, this);
+        if (document->load(filePath, configIndex, error))
+            window = new FontPropertiesWindow(document, textureGroups,
+                [this](QString &characters, QString &scanError) { return collectFontCharacters(characters, scanError); }, this);
         else delete document;
     } else if (type == ResourceType::Shader) {
         auto *document = new ShaderDocument;
@@ -848,7 +861,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.1.1\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.1.2\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

@@ -37,6 +37,7 @@ public:
 signals:
     void treeCommandRequested(const ResourceTreeRequest &request);
     void resourceActivated(ResourceType type, const QString &filePath);
+    void resourceClicked(ResourceType type, const QString &filePath);
     void createResourceRequested(ResourceType type);
     void removeResourceRequested(ResourceType type, const QString &filePath);
     void renameResourceRequested(ResourceType type, const QString &filePath, const QString &name);

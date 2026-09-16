@@ -1152,10 +1152,6 @@ The font texture could not be restored: %1
             <translation>コードから</translation>
         </message>
         <message>
-            <source>Project string scanning is not available yet.</source>
-            <translation>プロジェクトの文字列スキャンは未対応です。</translation>
-        </message>
-        <message>
             <source>From File</source>
             <translation>ファイルから</translation>
         </message>
@@ -1182,6 +1178,18 @@ The font texture could not be restored: %1
         <message>
             <source>GameMaker 1.4 font ranges support character values from 0 to 65535.</source>
             <translation>GameMaker 1.4 の文字範囲は 0 ～ 65535 です。</translation>
+        </message>
+        <message>
+            <source>Collect characters from strings in the project code.</source>
+            <translation>プロジェクトのコード内の文字列から文字を収集します。</translation>
+        </message>
+        <message>
+            <source>Cannot Scan Project Code</source>
+            <translation>プロジェクトのコードをスキャンできません</translation>
+        </message>
+        <message>
+            <source>No string characters were found in the project code.</source>
+            <translation>プロジェクトのコード内に文字列の文字が見つかりませんでした。</translation>
         </message>
     </context>
     <context>
@@ -3485,9 +3493,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS について</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.1
+            <source>QtGMS 0.1.2
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.1
+            <translation>QtGMS 0.1.2
 GameMaker Studio スタイルのエディター。</translation>
         </message>
         <message>
@@ -5273,6 +5281,18 @@ Alt: スナップなし
         <message>
             <source>Language changes take effect the next time you start QtGMS.</source>
             <translation>言語の変更は次回の QtGMS 起動時に反映されます。</translation>
+        </message>
+        <message>
+            <source>Room Editor</source>
+            <translation>ルームエディター</translation>
+        </message>
+        <message>
+            <source>Select the placement object by clicking the resource tree</source>
+            <translation>リソースツリーのクリックで配置するオブジェクトを選択</translation>
+        </message>
+        <message>
+            <source>Applies immediately to the most recently active room editor.</source>
+            <translation>最後に使用したルームエディターにすぐに適用します。</translation>
         </message>
     </context>
     <context>
@@ -8592,10 +8612,6 @@ Line %2, column %3: %4</source>
             <translation>個別の衝突マスク</translation>
         </message>
         <message>
-            <source>Sprite Mask: %1</source>
-            <translation>スプライトマスク: %1</translation>
-        </message>
-        <message>
             <source>Image</source>
             <translation>画像</translation>
         </message>
@@ -8660,10 +8676,6 @@ Line %2, column %3: %4</source>
             <translation>ひし形</translation>
         </message>
         <message>
-            <source>Rotated Rectangle</source>
-            <translation>回転長方形</translation>
-        </message>
-        <message>
             <source>&amp;OK</source>
             <translation>OK(&amp;O)</translation>
         </message>
@@ -8671,9 +8683,37 @@ Line %2, column %3: %4</source>
             <source>Change collision mask</source>
             <translation>衝突マスクを変更</translation>
         </message>
+        <message>
+            <source>Mask Properties: %1</source>
+            <translation>マスクのプロパティ: %1</translation>
+        </message>
+        <message>
+            <source>Width: %1   Height: %2</source>
+            <translation>幅: %1   高さ: %2</translation>
+        </message>
+        <message>
+            <source>Number of subimages: %1</source>
+            <translation>サブイメージ数: %1</translation>
+        </message>
+        <message>
+            <source>Zoom Out</source>
+            <translation>縮小</translation>
+        </message>
+        <message>
+            <source>Actual Size</source>
+            <translation>実際のサイズ</translation>
+        </message>
+        <message>
+            <source>Zoom In</source>
+            <translation>拡大</translation>
+        </message>
     </context>
     <context>
         <name>SpritePropertiesWindow</name>
+        <message>
+            <source>Modified</source>
+            <translation>変更済み</translation>
+        </message>
         <message>
             <source>Precise collision checking</source>
             <translation>精密な衝突判定</translation>
