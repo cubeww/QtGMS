@@ -9,6 +9,7 @@ class QToolBar;
 class QLabel;
 class QTextDocument;
 class QHBoxLayout;
+class QTabBar;
 
 // Embeddable editor surface: no resource type, project or file-system knowledge.
 class CodeEditorPanel : public QWidget
@@ -23,9 +24,14 @@ public:
     void setFooterWidget(QWidget *widget);
     void setLineCommentPrefix(const QString &prefix);
     void setFormatDescription(const QString &description);
-    void setCompactStatus();
+    void setCodeTab(const QString &name);
+    QTabBar *codeTabs() const { return m_codeTabs; }
     void selectRange(int offset, int length);
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 private:
+    void setCompactStatus();
+    void updateFontDescription();
     void updatePosition();
     CodeEditor *m_editor;
     CodeFindPanel *m_findPanel;
@@ -34,7 +40,9 @@ private:
     QLabel *m_formatLabel;
     QLabel *m_modeLabel;
     QLabel *m_signatureLabel;
+    QWidget *m_statusWidget;
     QHBoxLayout *m_statusLayout;
+    QTabBar *m_codeTabs = nullptr;
     bool m_compactStatus = false;
     QString m_lineCommentPrefix;
 };

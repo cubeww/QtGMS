@@ -198,7 +198,7 @@ bool Project::writeResourceTree(ResourceType type, const QList<ResourceNode> &no
     }
     Project updated; ProjectLoader loader;
     if (!loader.load(m_filePath, updated, error)) { transaction.rollback(error); return false; }
-    updated.m_temporaryDirectory = m_temporaryDirectory; *this = updated;
+    updated.m_temporaryDirectory = m_temporaryDirectory; updated.m_imported = m_imported; *this = updated;
     transaction.finish(error); return true;
 }
 

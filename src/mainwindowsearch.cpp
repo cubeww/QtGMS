@@ -12,6 +12,7 @@
 #include "roompropertieswindow.h"
 #include "shaderdocument.h"
 #include "shadereditorwindow.h"
+#include "scripteditorwindow.h"
 #include "textfiledocument.h"
 #include "timelinedocument.h"
 #include "timelinepropertieswindow.h"
@@ -257,7 +258,7 @@ void MainWindow::openSearchMatch(const ScriptSearchMatch &match)
     auto *editor = searchResourceEditor(m_resourceEditors, source.type, source.path);
     if (!editor) return;
     if (source.type == ResourceType::Script) {
-        if (auto *panel = editor->findChild<CodeEditorPanel *>()) panel->selectRange(match.offset, match.length);
+        if (auto *script = qobject_cast<ScriptEditorWindow *>(editor)) script->selectCode(match.offset, match.length);
     } else if (auto *shader = qobject_cast<ShaderEditorWindow *>(editor)) {
         shader->selectCode(target.stage, match.offset, match.length);
     } else if (auto *object = qobject_cast<ObjectPropertiesWindow *>(editor)) {

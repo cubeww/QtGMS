@@ -260,7 +260,7 @@ bool Project::removeResource(ResourceType type, const QString &path, QString &er
     }
     Project updated; ProjectLoader loader;
     if (!loader.load(m_filePath, updated, error)) { rollback(); return false; }
-    updated.m_temporaryDirectory = m_temporaryDirectory; *this = updated;
+    updated.m_temporaryDirectory = m_temporaryDirectory; updated.m_imported = m_imported; *this = updated;
     if (!staging.remove()) error = QObject::tr("The resource was deleted, but temporary files could not be cleaned up: %1").arg(staging.path());
     // Only remove empty extension directories; shared files always remain in place.
     if (type == ResourceType::Extension) {

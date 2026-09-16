@@ -27,7 +27,6 @@ protected:
     void changeEvent(QEvent *event) override;
     void resetCode(const QString &code);
     void closeEvent(QCloseEvent *event) override;
-    bool eventFilter(QObject *watched, QEvent *event) override;
     QTextDocument *m_document;
     CodeEditorPanel *m_codePanel;
 private:
@@ -36,7 +35,6 @@ private:
     void accept();
     void importCode();
     void exportCode();
-    void updateFontDescription();
     QString m_contextName;
     QString m_originalCode;
     bool m_accepted = false;

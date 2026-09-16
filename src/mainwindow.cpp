@@ -30,6 +30,7 @@
 #include "soundpropertieswindow.h"
 #include "textfiledocument.h"
 #include "scripteditorwindow.h"
+#include "gmlsymbols.h"
 #include "codesnippeteditorwindow.h"
 #include "shaderdocument.h"
 #include "shadereditorwindow.h"
@@ -115,6 +116,15 @@ MainWindow::MainWindow(QWidget *parent)
                                  ResourceType::Path, ResourceType::Script, ResourceType::Shader, ResourceType::Font,
                                  ResourceType::Timeline, ResourceType::Object, ResourceType::Room, ResourceType::Macro}) {
             for (const auto &resource : ActionXml::resourceList(m_project, type)) {
+                if (type == ResourceType::Script) {
+                    for (const auto &script : GmlSymbols::instance().scriptItems(resource.name, resource.filePath)) {
+                        if (script.name != name) continue;
+                        openResource(type, resource.filePath);
+                        if (auto *window = qobject_cast<ScriptEditorWindow *>(m_resourceEditors.value(resourceEditorKey(type, resource.filePath)).data()))
+                            window->selectScript(name);
+                        return;
+                    }
+                }
                 if (resource.name == name) {
                     openResource(type, type == ResourceType::Macro ? m_project.filePath() : resource.filePath);
                     return;
@@ -171,7 +181,7 @@ bool MainWindow::saveProject()
         return true;
     }
     QFileDialog dialog(this, tr("Save As"),
-        QDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).filePath(QStringLiteral("Project1.project.gmx")),
+        QDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)).filePath(QFileInfo(m_project.filePath()).fileName()),
         tr("GameMaker Studio Projects (*.project.gmx)"));
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setFileMode(QFileDialog::AnyFile);
@@ -219,7 +229,7 @@ bool MainWindow::prepareToCloseProject()
     bool hasSettingsChanges = m_settingsEdited;
     for (const auto &window : m_resourceEditors)
         if (auto *settings = qobject_cast<GameSettingsWindow *>(window.data())) hasSettingsChanges = hasSettingsChanges || settings->isModified();
-    if (m_project.isTemporary() && (m_project.resourceCount() > 0 || hasUnsavedMacros || hasInformationChanges || hasSettingsChanges)) {
+    if (m_project.isTemporary() && (m_project.isImported() || m_project.resourceCount() > 0 || hasUnsavedMacros || hasInformationChanges || hasSettingsChanges)) {
         const auto answer = EditorMessageBox::question(this, tr("Save Project"), tr("Save this project before closing it?"),
             EditorMessageBox::Save | EditorMessageBox::Discard | EditorMessageBox::Cancel, EditorMessageBox::Save);
         if (answer == EditorMessageBox::Cancel) return false;
@@ -560,6 +570,7 @@ void MainWindow::updateProjectActions()
     m_saveAction->setEnabled(m_project.isOpen());
     m_saveAllAction->setEnabled(m_project.isOpen());
     m_saveAsAction->setEnabled(m_project.isTemporary());
+    m_exportProjectAction->setEnabled(m_project.isOpen());
     updateBuildActions();
 }
 
@@ -671,8 +682,9 @@ void MainWindow::createMenusAndToolbar()
         QStringLiteral("open"), QKeySequence(Qt::CTRL | Qt::Key_O));
     openAction->setEnabled(true);
     connect(openAction, &QAction::triggered, this, &MainWindow::openProject);
-    addUnavailableAction(fileMenu, tr("&Import Project..."), QString(),
-        QKeySequence(Qt::CTRL | Qt::Key_I));
+    QAction *importAction = fileMenu->addAction(tr("&Import Project..."));
+    importAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I));
+    connect(importAction, &QAction::triggered, this, &MainWindow::importProject);
     m_recentProjectsMenu = fileMenu->addMenu(tr("&Recent Projects"));
     m_recentProjectsMenu->setToolTipsVisible(true);
     connect(m_recentProjectsMenu, &QMenu::aboutToShow, this, &MainWindow::refreshRecentProjects);
@@ -688,7 +700,8 @@ void MainWindow::createMenusAndToolbar()
     connect(m_saveAsAction, &QAction::triggered, this, [this] { saveProject(); });
     m_saveAllAction = addUnavailableAction(fileMenu, tr("Sa&ve All"));
     connect(m_saveAllAction, &QAction::triggered, this, [this] { saveProject(); });
-    addUnavailableAction(fileMenu, tr("Export Project..."));
+    m_exportProjectAction = fileMenu->addAction(tr("Export Project..."));
+    connect(m_exportProjectAction, &QAction::triggered, this, &MainWindow::exportProject);
     fileMenu->addSeparator();
     m_buildAction = fileMenu->addAction(QIcon(QStringLiteral(":/images/build.png")), tr("&Build"));
     m_buildAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_B));
@@ -835,7 +848,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.1.0\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.1.1\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

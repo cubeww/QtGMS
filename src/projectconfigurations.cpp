@@ -184,7 +184,7 @@ bool Project::saveConfigurations(const QList<ConfigurationEdit> &edits, QString 
     }
     Project updated; ProjectLoader loader;
     if (!loader.load(m_filePath, updated, error)) { rollback(); return false; }
-    updated.m_temporaryDirectory = m_temporaryDirectory; *this = updated;
+    updated.m_temporaryDirectory = m_temporaryDirectory; updated.m_imported = m_imported; *this = updated;
     // Only remove empty directories after the file transaction has succeeded.
     for (const auto &directory : assetDirectories) {
         if (!inside(directory)) continue;

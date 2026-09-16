@@ -13,7 +13,6 @@
 #include <QPlainTextDocumentLayout>
 #include <QSaveFile>
 #include <QShortcut>
-#include <QTabBar>
 #include <QTextDocument>
 #include <QToolBar>
 
@@ -43,15 +42,13 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     connect(&GmlSymbols::instance(), &GmlSymbols::scriptSignaturesChanged, codeEditor, [this, codeEditor] {
         if (m_project) codeEditor->setCompletionItems(GmlSymbols::completionItems(*m_project));
     }, Qt::QueuedConnection);
-    m_codePanel->setCompactStatus();
+    m_codePanel->setCodeTab(tabName);
     m_codePanel->setLineCommentPrefix(QStringLiteral("//"));
-    m_codePanel->editor()->setFrameShape(QFrame::Box);
-    m_codePanel->editor()->setLineWidth(1);
     setWindowTitle(title);
     editorMenuBar()->hide(); resize(786, 492); setMinimumSize(500, 250);
     setCentralWidget(m_codePanel);
 
-    QToolBar *toolbar = m_codePanel->toolBar(); toolbar->setFixedHeight(28);
+    QToolBar *toolbar = m_codePanel->toolBar();
     QAction *first = toolbar->actions().first();
     auto *ok = new QAction(QIcon(QStringLiteral(":/images/editor/ok.png")), tr("OK, Save changes"), this);
     ok->setShortcut(QKeySequence::Save);
@@ -71,11 +68,6 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     check->setEnabled(false);
     connect(completion, &QAction::triggered, m_codePanel->editor(), &CodeEditor::requestCompletion);
 
-    auto *tabs = new QTabBar; tabs->addTab(tabName); tabs->setExpanding(false); tabs->setFixedHeight(21);
-    m_codePanel->setHeaderWidget(tabs);
-    auto *messages = new QFrame; messages->setFrameStyle(QFrame::Box | QFrame::Plain); messages->setFixedHeight(22);
-    m_codePanel->setFooterWidget(messages);
-    m_codePanel->editor()->installEventFilter(this); updateFontDescription();
     auto *cancel = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     connect(cancel, &QShortcut::activated, this, [this] { close(); });
 }
@@ -141,11 +133,4 @@ void CodeSnippetEditorWindow::exportCode()
     QSaveFile file(path); const QByteArray bytes = m_document->toPlainText().toUtf8();
     if (!file.open(QIODevice::WriteOnly) || file.write(bytes) != bytes.size() || !file.commit())
         EditorMessageBox::critical(this, tr("Cannot Save Code"), file.errorString());
-}
-void CodeSnippetEditorWindow::updateFontDescription()
-{ m_codePanel->setFormatDescription(tr("%1 pt").arg(qRound(m_codePanel->editor()->font().pixelSize() * 72.0 / 96.0))); }
-bool CodeSnippetEditorWindow::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == m_codePanel->editor() && event->type() == QEvent::FontChange) updateFontDescription();
-    return EditorWindow::eventFilter(watched, event);
 }

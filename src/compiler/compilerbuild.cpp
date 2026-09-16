@@ -1,6 +1,7 @@
 #include "compilerbuild.h"
 #include "builddirectory.h"
 #include "actionxml.h"
+#include "scriptsource.h"
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
@@ -166,6 +167,7 @@ void CompilerBuild::load()
         environment.macros.insert(macro.name, macro.value);
     for (const auto &macro : config.macros)
         environment.macros.insert(macro.name, macro.value);
+    QSet<QString> scriptNames;
     for (ResourceType type : { ResourceType::Sprite, ResourceType::Sound, ResourceType::Background, ResourceType::Path,
              ResourceType::Script, ResourceType::Shader, ResourceType::Font, ResourceType::Timeline,
              ResourceType::Object, ResourceType::Room, ResourceType::Extension, ResourceType::IncludedFile }) {
@@ -177,9 +179,26 @@ void CompilerBuild::load()
                 entry.document = xml(node.filePath, &entry.sourceBytes);
                 entry.xml = entry.document.documentElement();
             }
-            environment.constants.insert(node.name, resources[type].size());
-            if (type == ResourceType::Script)
-                environment.functions.insert(node.name);
+            if (type != ResourceType::Script)
+                environment.constants.insert(node.name, resources[type].size());
+            if (type == ResourceType::Script) {
+                const auto sections = ScriptSource::sections(QString::fromUtf8(read(node.filePath)), node.name);
+                // Only the #define names are callable for a multi-script file.
+                for (const auto &section : sections) {
+                    if (!QRegularExpression(QStringLiteral("^[A-Za-z_][A-Za-z0-9_]*$")).match(section.name).hasMatch()
+                        || scriptNames.contains(section.name))
+                        throw CompileError(node.name + ": invalid or duplicate script name: " + section.name);
+                    CompilerResource script;
+                    script.node = node;
+                    script.node.name = section.name;
+                    script.embeddedSource = section.code.trimmed().isEmpty() ? QStringLiteral("exit;") : section.code;
+                    environment.constants.insert(section.name, resources[type].size());
+                    environment.functions.insert(section.name);
+                    scriptNames.insert(section.name);
+                    resources[type].append(script);
+                }
+                continue;
+            }
             resources[type].append(entry);
         }
     }

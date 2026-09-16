@@ -1,6 +1,7 @@
 #include "gmlsymbols.h"
 #include "project.h"
 #include "textfiledocument.h"
+#include "scriptsource.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
@@ -63,10 +64,18 @@ GmlSymbols::GmlSymbols()
     }
 }
 
+static QString scriptHeaders(const QString &source)
+{
+    QString result;
+    for (const auto &section : ScriptSource::sections(source, QString()))
+        result += section.name + QLatin1Char('\n') + section.code.section(QLatin1Char('\n'), 0, 0) + QLatin1Char('\n');
+    return result;
+}
+
 void GmlSymbols::watchScript(TextFileDocument *document)
 {
     if (m_openScripts.contains(document)) return;
-    m_openScripts.insert(document, document->textDocument()->firstBlock().text());
+    m_openScripts.insert(document, scriptHeaders(document->textDocument()->toPlainText()));
     connect(document, &TextFileDocument::saved, document, [this, document] {
         m_scriptHeaders.remove(document->filePath());
     });
@@ -74,7 +83,7 @@ void GmlSymbols::watchScript(TextFileDocument *document)
     // before that child is torn down, rather than keeping its owner captured
     // by a connection whose context is the application-wide symbol catalogue.
     connect(document->textDocument(), &QTextDocument::contentsChanged, document, [this, document] {
-        const QString header = document->textDocument()->firstBlock().text();
+        const QString header = scriptHeaders(document->textDocument()->toPlainText());
         if (m_openScripts.value(document) == header) return;
         m_openScripts[document] = header;
         emit scriptSignaturesChanged();
@@ -86,12 +95,12 @@ void GmlSymbols::watchScript(TextFileDocument *document)
     emit scriptSignaturesChanged();
 }
 
-QString GmlSymbols::scriptSignature(const QString &name, const QString &path)
+QVector<CodeCompletionItem> GmlSymbols::scriptItems(const QString &name, const QString &path)
 {
-    QString header;
+    QString source;
     bool open = false;
     for (auto it = m_openScripts.constBegin(); it != m_openScripts.constEnd(); ++it) {
-        if (it.key()->filePath() == path) { header = it.value(); open = true; break; }
+        if (it.key()->filePath() == path) { source = it.key()->textDocument()->toPlainText(); open = true; break; }
     }
     if (!open) {
         const QFileInfo info(path);
@@ -101,29 +110,36 @@ QString GmlSymbols::scriptSignature(const QString &name, const QString &path)
             QFile file(path);
             if (file.open(QIODevice::ReadOnly)) {
                 QTextStream stream(&file); stream.setCodec("UTF-8"); stream.setAutoDetectUnicode(true);
-                cached.text = stream.readLine(4096);
-                // A declaration must fit on the first line; never read the script body.
-                if (cached.text.size() == 4096) cached.text.clear();
+                cached.text = stream.readAll();
             }
         }
-        header = cached.text;
+        source = cached.text;
     }
     static const QRegularExpression Declaration(QStringLiteral("^\\s*///\\s*[A-Za-z_][A-Za-z_0-9]*\\s*(\\([^\\r\\n]*\\))\\s*$"));
-    const auto match = Declaration.match(header);
-    // Resource renaming intentionally leaves code alone. Bind the declaration's
-    // parameters to the actual resource name, including after a rename or copy.
-    return match.hasMatch() ? name + match.captured(1) : name;
+    QVector<CodeCompletionItem> result;
+    for (const auto &section : ScriptSource::sections(source, name)) {
+        const auto match = Declaration.match(section.code.section(QLatin1Char('\n'), 0, 0));
+        CodeCompletionItem item;
+        item.name = section.name;
+        item.kind = CodeCompletionItem::Kind::Script;
+        item.detail = match.hasMatch() ? section.name + match.captured(1) : section.name;
+        result.append(item);
+    }
+    return result;
 }
 
 static void appendCompletionResources(const QList<ResourceNode> &nodes, QVector<CodeCompletionItem> &items)
 {
     for (const auto &node : nodes) {
         if (node.isGroup) { appendCompletionResources(node.children, items); continue; }
+        if (node.type == ResourceType::Script) {
+            items += GmlSymbols::instance().scriptItems(node.name, node.filePath);
+            continue;
+        }
         CodeCompletionItem item; item.name = node.name;
         item.kind = node.type == ResourceType::Script ? CodeCompletionItem::Kind::Script
                   : node.type == ResourceType::Macro ? CodeCompletionItem::Kind::Constant : CodeCompletionItem::Kind::Resource;
         item.detail = node.type == ResourceType::Macro ? node.value : node.name;
-        if (node.type == ResourceType::Script) item.detail = GmlSymbols::instance().scriptSignature(node.name, node.filePath);
         items.append(item);
     }
 }

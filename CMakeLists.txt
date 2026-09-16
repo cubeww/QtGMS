@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(QtGMS VERSION 0.1.0 LANGUAGES CXX)
+project(QtGMS VERSION 0.1.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,6 +30,8 @@ set_target_properties(qtgmsxxhash PROPERTIES AUTOMOC OFF C_STANDARD 99)
 target_include_directories(qtgmsxxhash PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/xxhash")
 
 add_library(qtgmscompiler STATIC
+    src/scriptsource.cpp
+    src/scriptsource.h
     src/compiler/builddirectory.cpp
     src/compiler/datawriter.cpp
     src/compiler/gmlparser.cpp
@@ -91,6 +93,18 @@ add_executable(QtGMS WIN32
     src/configurationmanager.cpp
     src/configurationmanager.h
     src/projectstorage.cpp
+    src/projectexportjob.cpp
+    src/projectexportjob.h
+    src/sevenzipwriter.cpp
+    src/sevenzipwriter.h
+    src/mainwindowexport.cpp
+    src/mainwindowprojectimport.cpp
+    src/projectimportjob.cpp
+    src/projectimportjob.h
+    src/projectarchivedialog.cpp
+    src/projectarchivedialog.h
+    src/sevenziparchive.cpp
+    src/sevenziparchive.h
     src/project.h
     src/projectloader.cpp
     src/projectloader.h

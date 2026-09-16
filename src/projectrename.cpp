@@ -202,5 +202,5 @@ bool Project::renameResource(ResourceType type, const QString &path, const QStri
     }
     Project updated; ProjectLoader loader;
     if (!loader.load(m_filePath, updated, error)) { rollback(); return false; }
-    updated.m_temporaryDirectory = m_temporaryDirectory; *this = updated; return true;
+    updated.m_temporaryDirectory = m_temporaryDirectory; updated.m_imported = m_imported; *this = updated; return true;
 }

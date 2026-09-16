@@ -19,7 +19,7 @@ public:
     static GmlSymbols &instance();
     static QVector<CodeCompletionItem> completionItems(const Project &project);
     void watchScript(TextFileDocument *document);
-    QString scriptSignature(const QString &name, const QString &path);
+    QVector<CodeCompletionItem> scriptItems(const QString &name, const QString &path);
     QSet<QString> keywords;
     QSet<QString> constants;
     QSet<QString> variables;

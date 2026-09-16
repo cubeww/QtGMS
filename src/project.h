@@ -50,6 +50,7 @@ class Project
 public:
     bool isOpen() const { return !m_filePath.isEmpty(); }
     bool isTemporary() const { return !m_temporaryDirectory.isNull(); }
+    bool isImported() const { return m_imported; }
     static bool createTemporary(Project &project, QString &error);
     bool saveTemporaryAs(const QString &filePath, QString &error);
     const QString &filePath() const { return m_filePath; }
@@ -80,11 +81,13 @@ public:
 
 private:
     friend class ProjectLoader;
+    friend class ProjectImportJob;
     bool writeResourceTree(ResourceType type, const QList<ResourceNode> &nodes, const QMap<QString, QDomElement> &newEntries, QString &error);
 
     QString m_filePath;
     QByteArray m_sourceBytes;
     QSharedPointer<QTemporaryDir> m_temporaryDirectory;
+    bool m_imported = false;
     QString m_informationFilePath;
     QMap<ResourceType, QList<ResourceNode>> m_resources;
     QList<ProjectConfiguration> m_configurations;

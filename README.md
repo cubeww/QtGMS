@@ -6,9 +6,11 @@ A Qt rewrite of the **GameMaker: Studio 1.4.9999** editor.
 
 ## Highlights
 
+- **Start creating immediately:** Double-click `QtGMS.exe` and start making your game—no project wizard required.
 - **Familiar workflow:** Classic layouts, resource editors, menus, and shortcuts that feel at home to GameMaker Studio 1.4 users.
 - **Fast compiler:** An efficient C++ compiler that caches converted assets to speed up subsequent builds.
 - **Better code editing:** Smart indentation and fuzzy autocompletion for a smoother GML editing experience.
+- **High-DPI support:** Scales with your display settings while keeping text crisp and clear.
 - **Broad Windows compatibility:** Designed to run from **Windows XP to Windows 11**.
 
 ## Limitations

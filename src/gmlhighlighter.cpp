@@ -33,7 +33,8 @@ GmlHighlighter::GmlHighlighter(QTextDocument *document) : QSyntaxHighlighter(doc
 void GmlHighlighter::setResources(const Project &project)
 {
     QSet<QString> scripts, resources;
-    collectGmlResourceNames(project.resources(ResourceType::Script), scripts);
+    for (const auto &item : GmlSymbols::completionItems(project))
+        if (item.kind == CodeCompletionItem::Kind::Script) scripts.insert(item.name);
     for (ResourceType type : {ResourceType::Sprite, ResourceType::Sound, ResourceType::Background,
                              ResourceType::Path, ResourceType::Shader, ResourceType::Font,
                              ResourceType::Timeline, ResourceType::Object, ResourceType::Room})

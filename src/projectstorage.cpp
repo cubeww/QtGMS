@@ -115,9 +115,10 @@ bool Project::saveTemporaryAs(const QString &filePath, QString &error)
     const QDir destination = QFileInfo(target).absoluteDir();
     if (!destination.exists()) { error = QObject::tr("Choose an existing project directory."); return false; }
     const QString sourcePath = QFileInfo(m_filePath).absolutePath();
+    const QString temporaryPath = m_temporaryDirectory->path();
     const QString parentPath = QFileInfo(destination.absolutePath()).canonicalFilePath();
-    if (parentPath.compare(sourcePath, Qt::CaseInsensitive) == 0
-        || parentPath.startsWith(sourcePath + QLatin1Char('/'), Qt::CaseInsensitive)) {
+    if (parentPath.compare(temporaryPath, Qt::CaseInsensitive) == 0
+        || parentPath.startsWith(temporaryPath + QLatin1Char('/'), Qt::CaseInsensitive)) {
         error = QObject::tr("Choose a location outside the temporary project directory."); return false;
     }
     QFile manifest(m_filePath);

@@ -457,6 +457,10 @@
     <context>
         <name>CodeEditorPanel</name>
         <message>
+            <source>%1 pt</source>
+            <translation>%1 pt</translation>
+        </message>
+        <message>
             <source>Undo</source>
             <translation>撤销</translation>
         </message>
@@ -633,10 +637,6 @@
         <message>
             <source>Cannot Save Code</source>
             <translation>无法保存代码</translation>
-        </message>
-        <message>
-            <source>%1 pt</source>
-            <translation>%1 pt</translation>
         </message>
     </context>
     <context>
@@ -3081,6 +3081,58 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>Import Project</source>
+            <translation>导入工程</translation>
+        </message>
+        <message>
+            <source>Cannot Import Project</source>
+            <translation>无法导入工程</translation>
+        </message>
+        <message>
+            <source>Only GMZ projects can currently be imported.</source>
+            <translation>目前仅支持导入 GMZ 工程。</translation>
+        </message>
+        <message>
+            <source>Reading GMZ package...</source>
+            <translation>正在读取 GMZ 工程包…</translation>
+        </message>
+        <message>
+            <source>Imported temporary project: %1</source>
+            <translation>已导入为临时工程：%1</translation>
+        </message>
+        <message>
+            <source>Use Save As to choose a permanent location for this project.</source>
+            <translation>请使用“另存为”为此工程选择保存位置。</translation>
+        </message>
+        <message>
+            <source>Collecting project files...</source>
+            <translation>正在收集工程文件…</translation>
+        </message>
+        <message>
+            <source>Finishing export...</source>
+            <translation>正在完成导出…</translation>
+        </message>
+        <message>
+            <source>Export Project</source>
+            <translation>导出工程</translation>
+        </message>
+        <message>
+            <source>GameMaker Compressed Projects (*.gmz)</source>
+            <translation>GameMaker 压缩工程 (*.gmz)</translation>
+        </message>
+        <message>
+            <source>Choose a filename ending in .gmz.</source>
+            <translation>请选择以 .gmz 结尾的文件名。</translation>
+        </message>
+        <message>
+            <source>Project exported to: %1</source>
+            <translation>工程已导出至：%1</translation>
+        </message>
+        <message>
+            <source>Export Failed</source>
+            <translation>导出失败</translation>
+        </message>
+        <message>
             <source>Open Project</source>
             <translation>打开工程</translation>
         </message>
@@ -3433,9 +3485,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>关于 QtGMS</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.0
+            <source>QtGMS 0.1.1
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.0
+            <translation>QtGMS 0.1.1
 GameMaker Studio 风格的编辑器。</translation>
         </message>
         <message>
@@ -7155,6 +7207,30 @@ layers</source>
     <context>
         <name>ScriptEditorWindow</name>
         <message>
+            <source>Create a new script</source>
+            <translation>创建新脚本</translation>
+        </message>
+        <message>
+            <source>A script named %1 already exists.</source>
+            <translation>名为 %1 的脚本已存在。</translation>
+        </message>
+        <message>
+            <source>A script or built-in symbol named %1 already exists.</source>
+            <translation>名为 %1 的脚本或内置符号已存在。</translation>
+        </message>
+        <message>
+            <source>Delete Script</source>
+            <translation>删除脚本</translation>
+        </message>
+        <message>
+            <source>Delete script %1 and its code from this file?</source>
+            <translation>从此文件中删除脚本 %1 及其代码？</translation>
+        </message>
+        <message>
+            <source>Cannot Rename Script</source>
+            <translation>无法重命名脚本</translation>
+        </message>
+        <message>
             <source>OK, Save changes</source>
             <translation>确定，保存更改</translation>
         </message>
@@ -9008,6 +9084,116 @@ Line %2, column %3: %4</source>
         <message>
             <source>Room overview</source>
             <translation>房间小地图</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectExportJob</name>
+        <message>
+            <source>Cannot export missing, linked or external project file: %1</source>
+            <translation>无法导出缺失、链接或位于工程目录外的文件：%1</translation>
+        </message>
+        <message>
+            <source>A project resource is inside the build directory: %1</source>
+            <translation>工程资源位于 build 目录中：%1</translation>
+        </message>
+        <message>
+            <source>The project contains too many files to export.</source>
+            <translation>工程文件过多，无法导出。</translation>
+        </message>
+        <message>
+            <source>Cannot export resource directory: %1</source>
+            <translation>无法导出资源目录：%1</translation>
+        </message>
+        <message>
+            <source>The export destination is a project resource. Choose another filename.</source>
+            <translation>导出目标是工程资源，请选择其他文件名。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>内存不足，无法导出工程。</translation>
+        </message>
+    </context>
+    <context>
+        <name>SevenZipWriter</name>
+        <message>
+            <source>Cannot read project file: %1</source>
+            <translation>无法读取工程文件：%1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>内存不足，无法导出工程。</translation>
+        </message>
+        <message>
+            <source>Cannot compress the project (error %1). A source file may have changed during export.</source>
+            <translation>无法压缩工程（错误 %1）。源文件可能在导出期间发生了变化。</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectArchiveDialog</name>
+        <message>
+            <source>Cancel</source>
+            <translation>取消</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation>正在取消…</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectImportJob</name>
+        <message>
+            <source>The GMZ package uses unsupported compression or encryption.</source>
+            <translation>GMZ 工程包使用了不支持的压缩或加密方式。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to unpack the GMZ package (maximum decoder allocation: 512 MiB).</source>
+            <translation>内存不足，无法解包 GMZ 工程（解码器单次分配上限为 512 MiB）。</translation>
+        </message>
+        <message>
+            <source>The GMZ package is damaged (CRC mismatch).</source>
+            <translation>GMZ 工程包已损坏（CRC 不匹配）。</translation>
+        </message>
+        <message>
+            <source>Cannot read the GMZ package (archive error %1).</source>
+            <translation>无法读取 GMZ 工程包（归档错误 %1）。</translation>
+        </message>
+        <message>
+            <source>The GMZ package contains too many files.</source>
+            <translation>GMZ 工程包包含过多文件。</translation>
+        </message>
+        <message>
+            <source>Invalid filename in the GMZ package.</source>
+            <translation>GMZ 工程包中存在无效文件名。</translation>
+        </message>
+        <message>
+            <source>Invalid, duplicate or linked path in the GMZ package: %1</source>
+            <translation>GMZ 工程包中存在无效、重复或链接路径：%1</translation>
+        </message>
+        <message>
+            <source>A GMZ package must contain one project definition.</source>
+            <translation>GMZ 工程包必须包含一个工程定义文件。</translation>
+        </message>
+        <message>
+            <source>A file occupies a directory path in the GMZ package: %1</source>
+            <translation>GMZ 工程包中的目录路径被文件占用：%1</translation>
+        </message>
+        <message>
+            <source>Cannot create the project directory: %1</source>
+            <translation>无法创建工程目录：%1</translation>
+        </message>
+        <message>
+            <source>Cannot unpack %1:
+%2</source>
+            <translation>无法解包 %1：
+%2</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>正在读取工程…</translation>
+        </message>
+        <message>
+            <source>The imported project references a file outside its directory: %1</source>
+            <translation>导入的工程引用了工程目录外的文件：%1</translation>
         </message>
     </context>
 </TS>

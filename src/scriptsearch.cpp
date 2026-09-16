@@ -22,8 +22,12 @@ ScriptSearch::ScriptSearch(const Project &project)
         ScriptSearchFilter::Room, ScriptSearchFilter::Object, ScriptSearchFilter::Path,
         ScriptSearchFilter::Font, ScriptSearchFilter::Extension };
     for (int i = 0; i < 10; ++i)
-        for (const auto &resource : ActionXml::resourceList(project, types[i]))
-            m_symbols.insert(resource.name, filters[i]);
+        for (const auto &resource : ActionXml::resourceList(project, types[i])) {
+            if (types[i] == ResourceType::Script) {
+                for (const auto &script : GmlSymbols::instance().scriptItems(resource.name, resource.filePath))
+                    m_symbols.insert(script.name, ScriptSearchFilter::Script);
+            } else m_symbols.insert(resource.name, filters[i]);
+        }
 }
 
 void ScriptSearch::addConstant(const QString &name)

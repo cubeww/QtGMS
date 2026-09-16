@@ -457,6 +457,10 @@
     <context>
         <name>CodeEditorPanel</name>
         <message>
+            <source>%1 pt</source>
+            <translation>%1 pt</translation>
+        </message>
+        <message>
             <source>Undo</source>
             <translation>元に戻す</translation>
         </message>
@@ -633,10 +637,6 @@
         <message>
             <source>Cannot Save Code</source>
             <translation>コードの保存に失敗</translation>
-        </message>
-        <message>
-            <source>%1 pt</source>
-            <translation>%1 pt</translation>
         </message>
     </context>
     <context>
@@ -3081,6 +3081,58 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>Import Project</source>
+            <translation>プロジェクトをインポート</translation>
+        </message>
+        <message>
+            <source>Cannot Import Project</source>
+            <translation>プロジェクトをインポートできません</translation>
+        </message>
+        <message>
+            <source>Only GMZ projects can currently be imported.</source>
+            <translation>現在インポートできるのは GMZ プロジェクトのみです。</translation>
+        </message>
+        <message>
+            <source>Reading GMZ package...</source>
+            <translation>GMZ パッケージを読み込み中...</translation>
+        </message>
+        <message>
+            <source>Imported temporary project: %1</source>
+            <translation>一時プロジェクトとしてインポートしました: %1</translation>
+        </message>
+        <message>
+            <source>Use Save As to choose a permanent location for this project.</source>
+            <translation>「名前を付けて保存」でプロジェクトの保存先を選択してください。</translation>
+        </message>
+        <message>
+            <source>Collecting project files...</source>
+            <translation>プロジェクトファイルを収集中...</translation>
+        </message>
+        <message>
+            <source>Finishing export...</source>
+            <translation>エクスポートを完了中...</translation>
+        </message>
+        <message>
+            <source>Export Project</source>
+            <translation>プロジェクトをエクスポート</translation>
+        </message>
+        <message>
+            <source>GameMaker Compressed Projects (*.gmz)</source>
+            <translation>GameMaker 圧縮プロジェクト (*.gmz)</translation>
+        </message>
+        <message>
+            <source>Choose a filename ending in .gmz.</source>
+            <translation>.gmz で終わるファイル名を指定してください。</translation>
+        </message>
+        <message>
+            <source>Project exported to: %1</source>
+            <translation>プロジェクトのエクスポート先: %1</translation>
+        </message>
+        <message>
+            <source>Export Failed</source>
+            <translation>エクスポートに失敗しました</translation>
+        </message>
+        <message>
             <source>Open Project</source>
             <translation>プロジェクトを開く</translation>
         </message>
@@ -3433,9 +3485,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS について</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.0
+            <source>QtGMS 0.1.1
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.0
+            <translation>QtGMS 0.1.1
 GameMaker Studio スタイルのエディター。</translation>
         </message>
         <message>
@@ -7155,6 +7207,30 @@ layers</source>
     <context>
         <name>ScriptEditorWindow</name>
         <message>
+            <source>Create a new script</source>
+            <translation>新しいスクリプトを作成</translation>
+        </message>
+        <message>
+            <source>A script named %1 already exists.</source>
+            <translation>%1 という名前のスクリプトは既に存在します。</translation>
+        </message>
+        <message>
+            <source>A script or built-in symbol named %1 already exists.</source>
+            <translation>%1 という名前のスクリプトまたは組み込みシンボルは既に存在します。</translation>
+        </message>
+        <message>
+            <source>Delete Script</source>
+            <translation>スクリプトを削除</translation>
+        </message>
+        <message>
+            <source>Delete script %1 and its code from this file?</source>
+            <translation>このファイルからスクリプト %1 とそのコードを削除しますか？</translation>
+        </message>
+        <message>
+            <source>Cannot Rename Script</source>
+            <translation>スクリプト名を変更できません</translation>
+        </message>
+        <message>
             <source>OK, Save changes</source>
             <translation>変更を保存して閉じる</translation>
         </message>
@@ -9008,6 +9084,116 @@ Line %2, column %3: %4</source>
         <message>
             <source>Room overview</source>
             <translation>ルーム全体図</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectExportJob</name>
+        <message>
+            <source>Cannot export missing, linked or external project file: %1</source>
+            <translation>存在しないファイル、リンク、またはプロジェクト外のファイルはエクスポートできません: %1</translation>
+        </message>
+        <message>
+            <source>A project resource is inside the build directory: %1</source>
+            <translation>プロジェクトのリソースが build フォルダー内にあります: %1</translation>
+        </message>
+        <message>
+            <source>The project contains too many files to export.</source>
+            <translation>プロジェクトのファイル数が多すぎるため、エクスポートできません。</translation>
+        </message>
+        <message>
+            <source>Cannot export resource directory: %1</source>
+            <translation>リソースフォルダーをエクスポートできません: %1</translation>
+        </message>
+        <message>
+            <source>The export destination is a project resource. Choose another filename.</source>
+            <translation>エクスポート先がプロジェクトのリソースと同じです。別のファイル名を選択してください。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>プロジェクトをエクスポートするためのメモリが不足しています。</translation>
+        </message>
+    </context>
+    <context>
+        <name>SevenZipWriter</name>
+        <message>
+            <source>Cannot read project file: %1</source>
+            <translation>プロジェクトファイルを読み込めません: %1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>プロジェクトをエクスポートするためのメモリが不足しています。</translation>
+        </message>
+        <message>
+            <source>Cannot compress the project (error %1). A source file may have changed during export.</source>
+            <translation>プロジェクトを圧縮できません（エラー %1）。エクスポート中に元のファイルが変更された可能性があります。</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectArchiveDialog</name>
+        <message>
+            <source>Cancel</source>
+            <translation>キャンセル</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation>キャンセル中...</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectImportJob</name>
+        <message>
+            <source>The GMZ package uses unsupported compression or encryption.</source>
+            <translation>GMZ パッケージで使用されている圧縮方式または暗号化方式はサポートされていません。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to unpack the GMZ package (maximum decoder allocation: 512 MiB).</source>
+            <translation>GMZ パッケージを展開するメモリが不足しています（デコーダーの最大割り当て: 512 MiB）。</translation>
+        </message>
+        <message>
+            <source>The GMZ package is damaged (CRC mismatch).</source>
+            <translation>GMZ パッケージが破損しています（CRC 不一致）。</translation>
+        </message>
+        <message>
+            <source>Cannot read the GMZ package (archive error %1).</source>
+            <translation>GMZ パッケージを読み込めません（アーカイブエラー %1）。</translation>
+        </message>
+        <message>
+            <source>The GMZ package contains too many files.</source>
+            <translation>GMZ パッケージのファイル数が多すぎます。</translation>
+        </message>
+        <message>
+            <source>Invalid filename in the GMZ package.</source>
+            <translation>GMZ パッケージ内のファイル名が無効です。</translation>
+        </message>
+        <message>
+            <source>Invalid, duplicate or linked path in the GMZ package: %1</source>
+            <translation>GMZ パッケージ内に無効なパス、重複したパス、またはリンクがあります: %1</translation>
+        </message>
+        <message>
+            <source>A GMZ package must contain one project definition.</source>
+            <translation>GMZ パッケージにはプロジェクト定義が 1 つ必要です。</translation>
+        </message>
+        <message>
+            <source>A file occupies a directory path in the GMZ package: %1</source>
+            <translation>GMZ パッケージ内のフォルダーパスにファイルがあります: %1</translation>
+        </message>
+        <message>
+            <source>Cannot create the project directory: %1</source>
+            <translation>プロジェクトフォルダーを作成できません: %1</translation>
+        </message>
+        <message>
+            <source>Cannot unpack %1:
+%2</source>
+            <translation>%1 を展開できません:
+%2</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>プロジェクトを読み込み中...</translation>
+        </message>
+        <message>
+            <source>The imported project references a file outside its directory: %1</source>
+            <translation>インポートしたプロジェクトがフォルダー外のファイルを参照しています: %1</translation>
         </message>
     </context>
 </TS>

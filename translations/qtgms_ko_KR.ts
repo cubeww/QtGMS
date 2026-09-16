@@ -457,6 +457,10 @@
     <context>
         <name>CodeEditorPanel</name>
         <message>
+            <source>%1 pt</source>
+            <translation>%1 pt</translation>
+        </message>
+        <message>
             <source>Undo</source>
             <translation>실행 취소</translation>
         </message>
@@ -633,10 +637,6 @@
         <message>
             <source>Cannot Save Code</source>
             <translation>코드 저장 실패</translation>
-        </message>
-        <message>
-            <source>%1 pt</source>
-            <translation>%1 pt</translation>
         </message>
     </context>
     <context>
@@ -3081,6 +3081,58 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>Import Project</source>
+            <translation>프로젝트 가져오기</translation>
+        </message>
+        <message>
+            <source>Cannot Import Project</source>
+            <translation>프로젝트를 가져올 수 없음</translation>
+        </message>
+        <message>
+            <source>Only GMZ projects can currently be imported.</source>
+            <translation>현재 GMZ 프로젝트만 가져올 수 있습니다.</translation>
+        </message>
+        <message>
+            <source>Reading GMZ package...</source>
+            <translation>GMZ 패키지 읽는 중...</translation>
+        </message>
+        <message>
+            <source>Imported temporary project: %1</source>
+            <translation>임시 프로젝트로 가져옴: %1</translation>
+        </message>
+        <message>
+            <source>Use Save As to choose a permanent location for this project.</source>
+            <translation>다른 이름으로 저장을 사용하여 프로젝트를 저장할 위치를 선택하세요.</translation>
+        </message>
+        <message>
+            <source>Collecting project files...</source>
+            <translation>프로젝트 파일 수집 중...</translation>
+        </message>
+        <message>
+            <source>Finishing export...</source>
+            <translation>내보내기 마무리 중...</translation>
+        </message>
+        <message>
+            <source>Export Project</source>
+            <translation>프로젝트 내보내기</translation>
+        </message>
+        <message>
+            <source>GameMaker Compressed Projects (*.gmz)</source>
+            <translation>GameMaker 압축 프로젝트 (*.gmz)</translation>
+        </message>
+        <message>
+            <source>Choose a filename ending in .gmz.</source>
+            <translation>.gmz로 끝나는 파일 이름을 지정하세요.</translation>
+        </message>
+        <message>
+            <source>Project exported to: %1</source>
+            <translation>프로젝트 내보내기 완료: %1</translation>
+        </message>
+        <message>
+            <source>Export Failed</source>
+            <translation>내보내기 실패</translation>
+        </message>
+        <message>
             <source>Open Project</source>
             <translation>프로젝트 열기</translation>
         </message>
@@ -3433,9 +3485,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS 정보</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.0
+            <source>QtGMS 0.1.1
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.0
+            <translation>QtGMS 0.1.1
 GameMaker Studio 스타일 편집기.</translation>
         </message>
         <message>
@@ -7155,6 +7207,30 @@ layers</source>
     <context>
         <name>ScriptEditorWindow</name>
         <message>
+            <source>Create a new script</source>
+            <translation>새 스크립트 만들기</translation>
+        </message>
+        <message>
+            <source>A script named %1 already exists.</source>
+            <translation>%1 이름의 스크립트가 이미 있습니다.</translation>
+        </message>
+        <message>
+            <source>A script or built-in symbol named %1 already exists.</source>
+            <translation>%1 이름의 스크립트 또는 내장 심볼이 이미 있습니다.</translation>
+        </message>
+        <message>
+            <source>Delete Script</source>
+            <translation>스크립트 삭제</translation>
+        </message>
+        <message>
+            <source>Delete script %1 and its code from this file?</source>
+            <translation>이 파일에서 스크립트 %1 및 해당 코드를 삭제할까요?</translation>
+        </message>
+        <message>
+            <source>Cannot Rename Script</source>
+            <translation>스크립트 이름을 변경할 수 없음</translation>
+        </message>
+        <message>
             <source>OK, Save changes</source>
             <translation>확인, 변경 사항 저장</translation>
         </message>
@@ -9008,6 +9084,116 @@ Line %2, column %3: %4</source>
         <message>
             <source>Room overview</source>
             <translation>룸 미니맵</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectExportJob</name>
+        <message>
+            <source>Cannot export missing, linked or external project file: %1</source>
+            <translation>누락된 파일, 링크 또는 프로젝트 외부 파일을 내보낼 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>A project resource is inside the build directory: %1</source>
+            <translation>프로젝트 리소스가 build 폴더 안에 있습니다: %1</translation>
+        </message>
+        <message>
+            <source>The project contains too many files to export.</source>
+            <translation>프로젝트에 파일이 너무 많아 내보낼 수 없습니다.</translation>
+        </message>
+        <message>
+            <source>Cannot export resource directory: %1</source>
+            <translation>리소스 폴더를 내보낼 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>The export destination is a project resource. Choose another filename.</source>
+            <translation>내보내기 대상이 프로젝트 리소스입니다. 다른 파일 이름을 선택하세요.</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>프로젝트를 내보낼 메모리가 부족합니다.</translation>
+        </message>
+    </context>
+    <context>
+        <name>SevenZipWriter</name>
+        <message>
+            <source>Cannot read project file: %1</source>
+            <translation>프로젝트 파일을 읽을 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to export the project.</source>
+            <translation>프로젝트를 내보낼 메모리가 부족합니다.</translation>
+        </message>
+        <message>
+            <source>Cannot compress the project (error %1). A source file may have changed during export.</source>
+            <translation>프로젝트를 압축할 수 없습니다(오류 %1). 내보내는 동안 원본 파일이 변경되었을 수 있습니다.</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectArchiveDialog</name>
+        <message>
+            <source>Cancel</source>
+            <translation>취소</translation>
+        </message>
+        <message>
+            <source>Cancelling...</source>
+            <translation>취소 중...</translation>
+        </message>
+    </context>
+    <context>
+        <name>ProjectImportJob</name>
+        <message>
+            <source>The GMZ package uses unsupported compression or encryption.</source>
+            <translation>GMZ 패키지가 지원하지 않는 압축 또는 암호화 방식을 사용합니다.</translation>
+        </message>
+        <message>
+            <source>Not enough memory to unpack the GMZ package (maximum decoder allocation: 512 MiB).</source>
+            <translation>GMZ 패키지를 풀 메모리가 부족합니다(디코더 최대 할당: 512 MiB).</translation>
+        </message>
+        <message>
+            <source>The GMZ package is damaged (CRC mismatch).</source>
+            <translation>GMZ 패키지가 손상되었습니다(CRC 불일치).</translation>
+        </message>
+        <message>
+            <source>Cannot read the GMZ package (archive error %1).</source>
+            <translation>GMZ 패키지를 읽을 수 없습니다(압축 파일 오류 %1).</translation>
+        </message>
+        <message>
+            <source>The GMZ package contains too many files.</source>
+            <translation>GMZ 패키지에 파일이 너무 많습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid filename in the GMZ package.</source>
+            <translation>GMZ 패키지의 파일 이름이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid, duplicate or linked path in the GMZ package: %1</source>
+            <translation>GMZ 패키지에 잘못되거나 중복된 경로 또는 링크가 있습니다: %1</translation>
+        </message>
+        <message>
+            <source>A GMZ package must contain one project definition.</source>
+            <translation>GMZ 패키지에는 프로젝트 정의가 하나 있어야 합니다.</translation>
+        </message>
+        <message>
+            <source>A file occupies a directory path in the GMZ package: %1</source>
+            <translation>GMZ 패키지의 폴더 경로를 파일이 차지하고 있습니다: %1</translation>
+        </message>
+        <message>
+            <source>Cannot create the project directory: %1</source>
+            <translation>프로젝트 폴더를 만들 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>Cannot unpack %1:
+%2</source>
+            <translation>%1의 압축을 풀 수 없습니다:
+%2</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>프로젝트 읽는 중...</translation>
+        </message>
+        <message>
+            <source>The imported project references a file outside its directory: %1</source>
+            <translation>가져온 프로젝트가 해당 폴더 외부의 파일을 참조합니다: %1</translation>
         </message>
     </context>
 </TS>

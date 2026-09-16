@@ -6,10 +6,12 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QEvent>
 #include <QLabel>
 #include <QMenu>
 #include <QMimeData>
 #include <QToolBar>
+#include <QTabBar>
 #include <QVBoxLayout>
 #include <QTextDocument>
 
@@ -27,7 +29,8 @@ void CodeEditorPanel::selectRange(int offset, int length)
 CodeEditorPanel::CodeEditorPanel(QTextDocument *document, QWidget *parent)
     : QWidget(parent), m_editor(new CodeEditor(this)), m_findPanel(new CodeFindPanel(m_editor, this)),
       m_toolBar(new QToolBar(this)), m_positionLabel(new QLabel(this)), m_formatLabel(new QLabel(this)),
-      m_modeLabel(new QLabel(this)), m_signatureLabel(new QLabel(this)), m_statusLayout(new QHBoxLayout)
+      m_modeLabel(new QLabel(this)), m_signatureLabel(new QLabel(this)),
+      m_statusWidget(new QWidget(this)), m_statusLayout(new QHBoxLayout(m_statusWidget))
 {
     m_editor->setDocument(document);
     // An external document keeps its own undo history and lifetime.
@@ -47,7 +50,7 @@ CodeEditorPanel::CodeEditorPanel(QTextDocument *document, QWidget *parent)
     m_signatureLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     m_signatureLabel->setMinimumWidth(0);
     m_signatureLabel->setContentsMargins(8, 0, 8, 0);
-    m_modeLabel->hide(); m_statusLayout->addWidget(m_signatureLabel, 1); m_statusLayout->addWidget(m_formatLabel); layout->addLayout(m_statusLayout);
+    m_modeLabel->hide(); m_statusLayout->addWidget(m_signatureLabel, 1); m_statusLayout->addWidget(m_formatLabel); layout->addWidget(m_statusWidget);
     connect(m_editor, &CodeEditor::signatureHelpChanged, this, [this](const QString &text, int start, int length) {
         m_signatureLabel->setToolTip(text);
         if (text.isEmpty()) { m_signatureLabel->clear(); return; }
@@ -137,17 +140,56 @@ void CodeEditorPanel::setHeaderWidget(QWidget *widget)
 void CodeEditorPanel::setFooterWidget(QWidget *widget)
 { auto *box = static_cast<QVBoxLayout *>(layout()); box->insertWidget(box->count() - 1, widget); }
 void CodeEditorPanel::setLineCommentPrefix(const QString &prefix) { m_lineCommentPrefix = prefix; }
-void CodeEditorPanel::setFormatDescription(const QString &description) { m_formatLabel->setText(description); }
+void CodeEditorPanel::setFormatDescription(const QString &description)
+{
+    if (m_codeTabs) m_formatLabel->setToolTip(description);
+    else m_formatLabel->setText(description);
+}
+void CodeEditorPanel::setCodeTab(const QString &name)
+{
+    if (!m_codeTabs) {
+        m_codeTabs = new QTabBar(this);
+        m_codeTabs->setExpanding(false);
+        m_codeTabs->setFixedHeight(21);
+        m_codeTabs->addTab(name);
+        setHeaderWidget(m_codeTabs);
+        m_editor->setFrameShape(QFrame::Box);
+        m_editor->setLineWidth(1);
+        auto *messages = new QFrame(this);
+        messages->setFrameStyle(QFrame::Box | QFrame::Plain);
+        messages->setFixedHeight(22);
+        setFooterWidget(messages);
+        setCompactStatus();
+        m_editor->installEventFilter(this);
+        updateFontDescription();
+    } else {
+        m_codeTabs->setTabText(0, name);
+    }
+}
+void CodeEditorPanel::updateFontDescription()
+{
+    const QFont font = m_editor->font();
+    const int points = font.pixelSize() > 0 ? qRound(font.pixelSize() * 72.0 / 96.0) : qRound(font.pointSizeF());
+    m_formatLabel->setText(tr("%1 pt").arg(points));
+}
+bool CodeEditorPanel::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_editor && event->type() == QEvent::FontChange) updateFontDescription();
+    return QWidget::eventFilter(watched, event);
+}
 void CodeEditorPanel::setCompactStatus()
 {
     if (m_compactStatus) return;
     m_compactStatus = true;
     m_statusLayout->removeWidget(m_formatLabel); m_statusLayout->insertWidget(2, m_formatLabel);
-    m_statusLayout->setContentsMargins(0, 1, 0, 0); m_statusLayout->setSpacing(6);
+    m_statusWidget->setObjectName(QStringLiteral("codeEditorStatus"));
+    m_statusWidget->setStyleSheet(QStringLiteral(
+        "QWidget#codeEditorStatus { background: #141414; border: 1px solid #92928a; }"));
+    m_statusLayout->setContentsMargins(2, 2, 2, 2); m_statusLayout->setSpacing(6);
     m_positionLabel->setFixedWidth(76); m_modeLabel->setFixedWidth(42); m_formatLabel->setFixedWidth(56);
     for (auto *label : {m_positionLabel, m_modeLabel, m_formatLabel, m_signatureLabel}) {
         label->setAlignment(label == m_signatureLabel ? Qt::AlignLeft | Qt::AlignVCenter : Qt::AlignCenter); label->setFixedHeight(18);
-        label->setStyleSheet(QStringLiteral("background: #141414; border: 1px solid #383838;"));
+        label->setStyleSheet(QStringLiteral("background: #212121; color: #dddddd; border: none;"));
     }
     m_modeLabel->show(); updatePosition();
 }

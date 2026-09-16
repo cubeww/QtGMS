@@ -261,6 +261,15 @@ QTabBar::tab:disabled {
     color: #777777;
 }
 
+QTabBar::close-button {
+    image: url(:/images/code/tabclose.svg);
+    width: 12px;
+    height: 12px;
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
 /* DND captions are rotated: reserve space along the tab, not across it. */
 QTabBar#actionLibraryTabBar::tab {
     padding: 4px 1px;

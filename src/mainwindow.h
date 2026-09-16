@@ -33,10 +33,12 @@ private:
     void createWorkspace();
     void createMenusAndToolbar();
     void openProject();
+    void importProject();
     void rememberProject();
     void refreshRecentProjects();
     void newProject();
     bool saveProject();
+    void exportProject();
     bool prepareToCloseProject();
     void loadProject(const QString &filePath);
     void closeProject();
@@ -68,6 +70,7 @@ private:
     QAction *m_saveAction;
     QAction *m_saveAllAction;
     QAction *m_saveAsAction;
+    QAction *m_exportProjectAction = nullptr;
     QMenu *m_recentProjectsMenu = nullptr;
     QAction *m_createPathAction;
     QAction *m_createSpriteAction;

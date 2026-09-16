@@ -2,105 +2,15 @@
 #include "actionxml.h"
 #include "extensiondocument.h"
 
-#include <7z.h>
-#include <7zCrc.h>
+#include "sevenziparchive.h"
 #include <QDir>
 #include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include <QObject>
-#include <QRegExp>
 #include <QSet>
 #include <QVector>
-#include <cstdlib>
 #include <limits>
-
-static const size_t MaxDecoderAllocation = 512 * 1024 * 1024;
-
-static void *allocateArchiveMemory(ISzAllocPtr, size_t size)
-{
-    return size <= MaxDecoderAllocation ? std::malloc(size) : nullptr;
-}
-
-static void freeArchiveMemory(ISzAllocPtr, void *memory)
-{
-    std::free(memory);
-}
-
-static const ISzAlloc ArchiveAllocator = { allocateArchiveMemory, freeArchiveMemory };
-
-struct ArchiveInput
-{
-    ISeekInStream stream;
-    QFile *file;
-};
-
-static SRes readArchive(ISeekInStreamPtr stream, void *buffer, size_t *size)
-{
-    const auto *input = reinterpret_cast<const ArchiveInput *>(stream);
-    const qint64 read = input->file->read(static_cast<char *>(buffer), qint64(*size));
-    *size = read < 0 ? 0 : size_t(read);
-    return read < 0 ? SZ_ERROR_READ : SZ_OK;
-}
-
-static SRes seekArchive(ISeekInStreamPtr stream, Int64 *position, ESzSeek origin)
-{
-    const auto *input = reinterpret_cast<const ArchiveInput *>(stream);
-    const qint64 base = origin == SZ_SEEK_CUR ? input->file->pos() : origin == SZ_SEEK_END ? input->file->size() : 0;
-    if ((*position < 0 && *position < -base)
-        || (*position >= 0 && *position > std::numeric_limits<qint64>::max() - base)
-        || !input->file->seek(base + *position))
-        return SZ_ERROR_READ;
-    *position = input->file->pos();
-    return SZ_OK;
-}
-
-class SevenZipArchive
-{
-public:
-    explicit SevenZipArchive(QFile &file)
-        : m_input { { readArchive, seekArchive }, &file }
-        , m_readBuffer(64 * 1024, '\0')
-    {
-        static const bool crcInitialized = [] {
-            CrcGenerateTable();
-            return true;
-        }();
-        Q_UNUSED(crcInitialized);
-        SzArEx_Init(&m_archive);
-        LookToRead2_CreateVTable(&m_stream, false);
-        m_stream.realStream = &m_input.stream;
-        m_stream.buf = reinterpret_cast<Byte *>(m_readBuffer.data());
-        m_stream.bufSize = size_t(m_readBuffer.size());
-        LookToRead2_INIT(&m_stream);
-    }
-
-    ~SevenZipArchive()
-    {
-        ISzAlloc_Free(&ArchiveAllocator, m_output);
-        SzArEx_Free(&m_archive, &ArchiveAllocator);
-    }
-
-    SRes open() { return SzArEx_Open(&m_archive, &m_stream.vt, &ArchiveAllocator, &ArchiveAllocator); }
-    const CSzArEx &directory() const { return m_archive; }
-    SRes extract(UInt32 index, const char *&data, size_t &size)
-    {
-        size_t offset = 0;
-        const SRes result = SzArEx_Extract(&m_archive, &m_stream.vt, index, &m_blockIndex, &m_output, &m_outputSize,
-            &offset, &size, &ArchiveAllocator, &ArchiveAllocator);
-        data = m_output ? reinterpret_cast<const char *>(m_output + offset) : "";
-        return result;
-    }
-
-private:
-    ArchiveInput m_input;
-    QByteArray m_readBuffer;
-    CLookToRead2 m_stream;
-    CSzArEx m_archive;
-    UInt32 m_blockIndex = UInt32(-1);
-    Byte *m_output = nullptr;
-    size_t m_outputSize = 0;
-};
 
 static QString archiveError(SRes status)
 {
@@ -111,20 +21,6 @@ static QString archiveError(SRes status)
     if (status == SZ_ERROR_CRC)
         return QObject::tr("The extension package is damaged (CRC mismatch).");
     return QObject::tr("Cannot read the GMEZ extension package (archive error %1).").arg(status);
-}
-
-static bool validArchivePath(const QString &path)
-{
-    if (!ExtensionDocument::validFileName(path))
-        return false;
-    for (const QChar character : path)
-        if (character.unicode() < 32)
-            return false;
-    static const QRegExp reserved(QStringLiteral("(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\\..*)?"), Qt::CaseInsensitive);
-    for (const QString &part : path.split(QLatin1Char('/')))
-        if (part.endsWith(QLatin1Char('.')) || part.endsWith(QLatin1Char(' ')) || reserved.exactMatch(part))
-            return false;
-    return true;
 }
 
 bool ExtensionPackage::load(const QString &path, QString &error)
@@ -169,7 +65,7 @@ bool ExtensionPackage::load(const QString &path, QString &error)
         if (SzArEx_IsDir(&directory, i) && name.endsWith(QLatin1Char('/')))
             name.chop(1);
         const UInt32 attributes = SzBitWithVals_Check(&directory.Attribs, i) ? directory.Attribs.Vals[i] : 0;
-        if (!validArchivePath(name) || names.contains(name.toCaseFolded()) || (attributes & 0x400)
+        if (!SevenZipArchive::validPath(name) || names.contains(name.toCaseFolded()) || (attributes & 0x400)
             || ((attributes >> 16) & 0170000) == 0120000) {
             error = QObject::tr("Invalid, duplicate or linked path in the extension package: %1").arg(name);
             return false;
@@ -226,7 +122,7 @@ bool ExtensionPackage::load(const QString &path, QString &error)
     const QDir content(QFileInfo(resource).absoluteDir().filePath(name));
     const auto validateFile = [&](QString reference, bool required) {
         reference.replace(QLatin1Char('\\'), QLatin1Char('/'));
-        if (!validArchivePath(reference)) {
+        if (!SevenZipArchive::validPath(reference)) {
             error = QObject::tr("Invalid extension file reference: %1").arg(reference);
             return false;
         }
