@@ -1,0 +1,8 @@
+QtGMS uses dynamically linked Qt 5.6.3 libraries and plugins.
+Copyright (C) The Qt Company Ltd. and other Qt contributors.
+
+lgpl.html contains the LGPL licenses and Qt LGPL Exception from the
+Qt 5.6.3 SDK documentation. licenses.html and qtsvglicense.html contain
+additional third-party notices from the same SDK documentation.
+
+Qt source archives: https://download.qt.io/archive/qt/5.6/5.6.3/single/

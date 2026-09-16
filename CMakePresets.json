@@ -1,0 +1,24 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "windows-xp",
+      "displayName": "Windows XP / Qt 5.6.3 / MinGW 4.9.2 (32-bit)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/windows-xp",
+      "environment": {
+        "PATH": "$env{QTGMS_MINGW_DIR}/bin;$env{QTGMS_QT_DIR}/bin;$penv{PATH}"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "$env{QTGMS_QT_DIR}",
+        "CMAKE_CXX_COMPILER": "$env{QTGMS_MINGW_DIR}/bin/g++.exe",
+        "CMAKE_RC_COMPILER": "$env{QTGMS_MINGW_DIR}/bin/windres.exe"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "windows-xp", "configurePreset": "windows-xp" },
+    { "name": "deploy-windows-xp", "configurePreset": "windows-xp", "targets": ["deploy"] }
+  ]
+}

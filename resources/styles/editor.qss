@@ -1,0 +1,288 @@
+QMainWindow {
+    background: #383838;
+}
+
+QWidget#windowTitleBar QToolButton {
+    background: #232323;
+    border-top: 1px solid #656565;
+    border-left: 1px solid #656565;
+    border-right: 1px solid #111111;
+    border-bottom: 1px solid #111111;
+    padding: 0;
+}
+
+QWidget#windowTitleBar QToolButton:hover {
+    background: #383838;
+    border-color: #688f36;
+}
+
+QWidget#windowTitleBar QToolButton:pressed {
+    background: #181818;
+    border-top-color: #111111;
+    border-left-color: #111111;
+    border-right-color: #656565;
+    border-bottom-color: #656565;
+}
+
+QMainWindow::separator {
+    width: 3px;
+    height: 3px;
+    background: #212121;
+    border: none;
+}
+
+QMenuBar {
+    background: #141414;
+    color: #62952b;
+    padding: 1px 4px;
+}
+
+QMenuBar::item {
+    padding: 2px 4px;
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+QMenuBar::item:selected,
+QMenuBar::item:pressed {
+    color: #62952b;
+    border-color: #92928a;
+    background: #383838;
+}
+
+QMenu {
+    background: #3a3a3a;
+    color: #ffffff;
+    border: 1px solid #f0f0f0;
+    padding: 1px;
+    icon-size: 16px;
+}
+
+QMenu::item {
+    height: 16px;
+    padding: 3px 28px 3px 24px;
+}
+
+QMenu::item:selected:enabled {
+    color: #ffffff;
+    background: #3a4057;
+}
+
+QMenu::item:disabled {
+    color: #858585;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #f0f0f0;
+    margin: 3px 5px;
+}
+
+QToolBar {
+    background: #383838;
+    border: 1px solid #92928a;
+    spacing: 0px;
+    padding: 0px 2px;
+}
+
+QToolBar QToolButton {
+    min-width: 21px;
+    min-height: 23px;
+    padding: 0;
+    border: 1px solid transparent;
+}
+
+QToolBar QToolButton:hover {
+    border: 1px solid #8f9d7d;
+    background: #4d583e;
+}
+
+QToolBar QToolButton:pressed {
+    background: #26381b;
+}
+
+QToolBar QComboBox {
+    background: #141414;
+    color: #dddddd;
+    border: 2px inset #777773;
+    padding-left: 3px;
+    min-height: 17px;
+}
+
+QComboBox QAbstractItemView {
+    background: #141414;
+    alternate-background-color: #141414;
+    color: #dddddd;
+    border: 1px solid #777773;
+    selection-background-color: #0078d7;
+    selection-color: white;
+}
+
+QToolBar QComboBox:disabled,
+QComboBox QAbstractItemView::item:disabled {
+    color: #808080;
+}
+
+QLineEdit {
+    background: #141414;
+    color: #dddddd;
+    border: 1px solid #666666;
+    padding: 0px 2px;
+    min-height: 17px;
+}
+
+QLineEdit:disabled {
+    border: 1px solid #77776f;
+}
+
+QScrollArea#actionParameters {
+    border: 1px solid #666666;
+}
+
+QListView {
+    border: 1px solid #a5a59b;
+}
+
+QGraphicsView#roomCanvas {
+    border: 1px solid #a5a59b;
+}
+
+QWidget#roomProperties QSpinBox, QWidget#roomProperties QDoubleSpinBox,
+QWidget#pathProperties QSpinBox, QWidget#pathProperties QDoubleSpinBox,
+QWidget#gameInformation QDoubleSpinBox {
+    background: #141414;
+    color: #dddddd;
+    border: 1px solid #666666;
+    padding: 0px 2px;
+}
+
+QFrame#workspace {
+    background: #383838;
+    border: 1px solid #a5a59b;
+}
+
+QTreeWidget#resourceTree {
+    background: #212121;
+    border: 1px solid #a5a59b;
+    padding-top: 1px;
+    show-decoration-selected: 0;
+}
+
+QTreeWidget#resourceTree::item {
+    height: 17px;
+}
+
+QWidget#resourceSearchPanel {
+    background: #383838;
+    border: 1px solid #99998e;
+}
+
+QLabel#brandLogo {
+    background: #141414;
+}
+
+QDockWidget#compilePanel {
+    background: #383838;
+    color: #dddddd;
+    titlebar-close-icon: url(:/images/close.png);
+}
+
+QDockWidget#compilePanel::title {
+    background: #383838;
+    border: 1px solid #777773;
+    padding: 3px 5px;
+    text-align: left;
+}
+
+QDockWidget#compilePanel::close-button,
+QDockWidget#compilePanel::float-button {
+    background: #383838;
+    border: 1px solid transparent;
+    padding: 1px;
+}
+
+QDockWidget#compilePanel::close-button:hover,
+QDockWidget#compilePanel::float-button:hover {
+    background: #444444;
+    border-color: #62952b;
+}
+
+QTabWidget#compileTabs::pane {
+    background: #383838;
+    border: 1px solid #777773;
+}
+
+/* Compact original-editor tabs. Reserve the accent edge in every state so
+   selecting a tab does not move its label or change the surrounding layout. */
+QTabBar::tab {
+    background: #141414;
+    color: #dddddd;
+    border: 1px solid #414141;
+    padding: 1px 4px;
+}
+
+QTabBar::tab:top, QTabBar::tab:bottom {
+    min-height: 13px;
+}
+
+QTabBar::tab:top {
+    border-top: 2px solid #383838;
+}
+
+QTabBar::tab:top:selected {
+    border-top-color: #62952b;
+}
+
+QTabBar::tab:bottom {
+    border-bottom: 2px solid #383838;
+}
+
+QTabBar::tab:bottom:selected {
+    border-bottom-color: #62952b;
+}
+
+QTabBar::tab:left {
+    border-left: 2px solid #383838;
+}
+
+QTabBar::tab:left:selected {
+    border-left-color: #62952b;
+}
+
+QTabBar::tab:right {
+    border-right: 2px solid #383838;
+}
+
+QTabBar::tab:right:selected {
+    border-right-color: #62952b;
+}
+
+QTabBar::tab:disabled {
+    color: #777777;
+}
+
+/* DND captions are rotated: reserve space along the tab, not across it. */
+QTabBar#actionLibraryTabBar::tab {
+    padding: 4px 1px;
+}
+
+QTabBar#gameSettingsWindowsTabBar::tab {
+    padding: 6px 3px;
+}
+
+QTabWidget#compileTabs QPlainTextEdit {
+    background: #212121;
+    color: #dddddd;
+    border: none;
+}
+
+/* The original room picker uses its bracketed label without an extra arrow. */
+QToolBar QToolButton#pathRoomButton {
+    padding: 0px 4px;
+}
+
+QToolBar QToolButton#pathRoomButton::menu-indicator {
+    image: none;
+    width: 0px;
+    height: 0px;
+}

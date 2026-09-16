@@ -1,0 +1,15 @@
+if(NOT CMAKE_INSTALL_CONFIG_NAME STREQUAL "Release")
+    message(FATAL_ERROR "QtGMS packages must use the Release configuration.")
+endif()
+
+# Use the same SDK and compiler that produced the executable, even when CPack
+# is run from a shell without the preset's PATH environment.
+set(ENV{PATH} "@QtBinDirectory@;@PackageCompilerBin@;$ENV{PATH}")
+execute_process(
+    COMMAND "@QtDeployExecutable@" --release --compiler-runtime --no-translations
+        --no-system-d3d-compiler --no-angle --no-opengl-sw
+        --dir "${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}/QtGMS.exe"
+    RESULT_VARIABLE DeployResult)
+if(NOT DeployResult EQUAL 0)
+    message(FATAL_ERROR "Qt runtime deployment failed: ${DeployResult}")
+endif()

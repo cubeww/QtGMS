@@ -1,0 +1,842 @@
+{
+  "argument_relative": {
+    "global": true,
+    "writable": false
+  },
+  "argument_count": {
+    "global": true,
+    "writable": false
+  },
+  "argument": {
+    "global": true,
+    "writable": true
+  },
+  "argument0": {
+    "global": true,
+    "writable": true
+  },
+  "argument1": {
+    "global": true,
+    "writable": true
+  },
+  "argument2": {
+    "global": true,
+    "writable": true
+  },
+  "argument3": {
+    "global": true,
+    "writable": true
+  },
+  "argument4": {
+    "global": true,
+    "writable": true
+  },
+  "argument5": {
+    "global": true,
+    "writable": true
+  },
+  "argument6": {
+    "global": true,
+    "writable": true
+  },
+  "argument7": {
+    "global": true,
+    "writable": true
+  },
+  "argument8": {
+    "global": true,
+    "writable": true
+  },
+  "argument9": {
+    "global": true,
+    "writable": true
+  },
+  "argument10": {
+    "global": true,
+    "writable": true
+  },
+  "argument11": {
+    "global": true,
+    "writable": true
+  },
+  "argument12": {
+    "global": true,
+    "writable": true
+  },
+  "argument13": {
+    "global": true,
+    "writable": true
+  },
+  "argument14": {
+    "global": true,
+    "writable": true
+  },
+  "argument15": {
+    "global": true,
+    "writable": true
+  },
+  "debug_mode": {
+    "global": true,
+    "writable": false
+  },
+  "pointer_invalid": {
+    "global": true,
+    "writable": false
+  },
+  "pointer_null": {
+    "global": true,
+    "writable": false
+  },
+  "undefined": {
+    "global": true,
+    "writable": false
+  },
+  "room": {
+    "global": true,
+    "writable": true
+  },
+  "room_first": {
+    "global": true,
+    "writable": false
+  },
+  "room_last": {
+    "global": true,
+    "writable": false
+  },
+  "transition_kind": {
+    "global": true,
+    "writable": true
+  },
+  "transition_steps": {
+    "global": true,
+    "writable": true
+  },
+  "score": {
+    "global": true,
+    "writable": true
+  },
+  "lives": {
+    "global": true,
+    "writable": true
+  },
+  "health": {
+    "global": true,
+    "writable": true
+  },
+  "game_id": {
+    "global": true,
+    "writable": false
+  },
+  "game_display_name": {
+    "global": true,
+    "writable": false
+  },
+  "game_project_name": {
+    "global": true,
+    "writable": false
+  },
+  "game_save_id": {
+    "global": true,
+    "writable": false
+  },
+  "working_directory": {
+    "global": true,
+    "writable": false
+  },
+  "temp_directory": {
+    "global": true,
+    "writable": false
+  },
+  "program_directory": {
+    "global": true,
+    "writable": false
+  },
+  "instance_count": {
+    "global": true,
+    "writable": false
+  },
+  "instance_id": {
+    "global": true,
+    "writable": false
+  },
+  "room_width": {
+    "global": true,
+    "writable": true
+  },
+  "room_height": {
+    "global": true,
+    "writable": true
+  },
+  "room_caption": {
+    "global": true,
+    "writable": true
+  },
+  "room_speed": {
+    "global": true,
+    "writable": true
+  },
+  "room_persistent": {
+    "global": true,
+    "writable": true
+  },
+  "background_color": {
+    "global": true,
+    "writable": true
+  },
+  "background_showcolor": {
+    "global": true,
+    "writable": true
+  },
+  "background_colour": {
+    "global": true,
+    "writable": true
+  },
+  "background_showcolour": {
+    "global": true,
+    "writable": true
+  },
+  "background_visible": {
+    "global": true,
+    "writable": true
+  },
+  "background_foreground": {
+    "global": true,
+    "writable": true
+  },
+  "background_index": {
+    "global": true,
+    "writable": true
+  },
+  "background_x": {
+    "global": true,
+    "writable": true
+  },
+  "background_y": {
+    "global": true,
+    "writable": true
+  },
+  "background_width": {
+    "global": true,
+    "writable": false
+  },
+  "background_height": {
+    "global": true,
+    "writable": false
+  },
+  "background_htiled": {
+    "global": true,
+    "writable": true
+  },
+  "background_vtiled": {
+    "global": true,
+    "writable": true
+  },
+  "background_xscale": {
+    "global": true,
+    "writable": true
+  },
+  "background_yscale": {
+    "global": true,
+    "writable": true
+  },
+  "background_hspeed": {
+    "global": true,
+    "writable": true
+  },
+  "background_vspeed": {
+    "global": true,
+    "writable": true
+  },
+  "background_blend": {
+    "global": true,
+    "writable": true
+  },
+  "background_alpha": {
+    "global": true,
+    "writable": true
+  },
+  "view_enabled": {
+    "global": true,
+    "writable": true
+  },
+  "view_current": {
+    "global": true,
+    "writable": false
+  },
+  "view_visible": {
+    "global": true,
+    "writable": true
+  },
+  "view_xview": {
+    "global": true,
+    "writable": true
+  },
+  "view_yview": {
+    "global": true,
+    "writable": true
+  },
+  "view_wview": {
+    "global": true,
+    "writable": true
+  },
+  "view_hview": {
+    "global": true,
+    "writable": true
+  },
+  "view_angle": {
+    "global": true,
+    "writable": true
+  },
+  "view_hborder": {
+    "global": true,
+    "writable": true
+  },
+  "view_vborder": {
+    "global": true,
+    "writable": true
+  },
+  "view_hspeed": {
+    "global": true,
+    "writable": true
+  },
+  "view_vspeed": {
+    "global": true,
+    "writable": true
+  },
+  "view_object": {
+    "global": true,
+    "writable": true
+  },
+  "view_xport": {
+    "global": true,
+    "writable": true
+  },
+  "view_yport": {
+    "global": true,
+    "writable": true
+  },
+  "view_wport": {
+    "global": true,
+    "writable": true
+  },
+  "view_hport": {
+    "global": true,
+    "writable": true
+  },
+  "view_surface_id": {
+    "global": true,
+    "writable": true
+  },
+  "view_camera": {
+    "global": true,
+    "writable": true
+  },
+  "mouse_x": {
+    "global": true,
+    "writable": false
+  },
+  "mouse_y": {
+    "global": true,
+    "writable": false
+  },
+  "mouse_button": {
+    "global": true,
+    "writable": true
+  },
+  "mouse_lastbutton": {
+    "global": true,
+    "writable": true
+  },
+  "keyboard_key": {
+    "global": true,
+    "writable": true
+  },
+  "keyboard_lastkey": {
+    "global": true,
+    "writable": true
+  },
+  "keyboard_lastchar": {
+    "global": true,
+    "writable": true
+  },
+  "keyboard_string": {
+    "global": true,
+    "writable": true
+  },
+  "show_score": {
+    "global": true,
+    "writable": true
+  },
+  "show_lives": {
+    "global": true,
+    "writable": true
+  },
+  "show_health": {
+    "global": true,
+    "writable": true
+  },
+  "caption_score": {
+    "global": true,
+    "writable": true
+  },
+  "caption_lives": {
+    "global": true,
+    "writable": true
+  },
+  "caption_health": {
+    "global": true,
+    "writable": true
+  },
+  "fps": {
+    "global": true,
+    "writable": false
+  },
+  "fps_real": {
+    "global": true,
+    "writable": false
+  },
+  "current_time": {
+    "global": true,
+    "writable": false
+  },
+  "current_year": {
+    "global": true,
+    "writable": false
+  },
+  "current_month": {
+    "global": true,
+    "writable": false
+  },
+  "current_day": {
+    "global": true,
+    "writable": false
+  },
+  "current_weekday": {
+    "global": true,
+    "writable": false
+  },
+  "current_hour": {
+    "global": true,
+    "writable": false
+  },
+  "current_minute": {
+    "global": true,
+    "writable": false
+  },
+  "current_second": {
+    "global": true,
+    "writable": false
+  },
+  "event_type": {
+    "global": true,
+    "writable": false
+  },
+  "event_number": {
+    "global": true,
+    "writable": false
+  },
+  "event_object": {
+    "global": true,
+    "writable": false
+  },
+  "event_action": {
+    "global": true,
+    "writable": false
+  },
+  "error_occurred": {
+    "global": true,
+    "writable": true
+  },
+  "error_last": {
+    "global": true,
+    "writable": true
+  },
+  "gamemaker_registered": {
+    "global": true,
+    "writable": false
+  },
+  "gamemaker_pro": {
+    "global": true,
+    "writable": false
+  },
+  "application_surface": {
+    "global": true,
+    "writable": false
+  },
+  "font_texture_page_size": {
+    "global": true,
+    "writable": true
+  },
+  "os_type": {
+    "global": true,
+    "writable": false
+  },
+  "os_device": {
+    "global": true,
+    "writable": false
+  },
+  "os_browser": {
+    "global": true,
+    "writable": false
+  },
+  "os_version": {
+    "global": true,
+    "writable": false
+  },
+  "browser_width": {
+    "global": true,
+    "writable": false
+  },
+  "browser_height": {
+    "global": true,
+    "writable": false
+  },
+  "async_load": {
+    "global": true,
+    "writable": false
+  },
+  "event_data": {
+    "global": true,
+    "writable": false
+  },
+  "display_aa": {
+    "global": true,
+    "writable": false
+  },
+  "iap_data": {
+    "global": true,
+    "writable": false
+  },
+  "cursor_sprite": {
+    "global": true,
+    "writable": true
+  },
+  "delta_time": {
+    "global": true,
+    "writable": true
+  },
+  "webgl_enabled": {
+    "global": true,
+    "writable": false
+  },
+  "x": {
+    "global": false,
+    "writable": true
+  },
+  "y": {
+    "global": false,
+    "writable": true
+  },
+  "xprevious": {
+    "global": false,
+    "writable": true
+  },
+  "yprevious": {
+    "global": false,
+    "writable": true
+  },
+  "xstart": {
+    "global": false,
+    "writable": true
+  },
+  "ystart": {
+    "global": false,
+    "writable": true
+  },
+  "hspeed": {
+    "global": false,
+    "writable": true
+  },
+  "vspeed": {
+    "global": false,
+    "writable": true
+  },
+  "direction": {
+    "global": false,
+    "writable": true
+  },
+  "speed": {
+    "global": false,
+    "writable": true
+  },
+  "friction": {
+    "global": false,
+    "writable": true
+  },
+  "gravity": {
+    "global": false,
+    "writable": true
+  },
+  "gravity_direction": {
+    "global": false,
+    "writable": true
+  },
+  "object_index": {
+    "global": false,
+    "writable": false
+  },
+  "id": {
+    "global": false,
+    "writable": false
+  },
+  "alarm": {
+    "global": false,
+    "writable": true
+  },
+  "solid": {
+    "global": false,
+    "writable": true
+  },
+  "visible": {
+    "global": false,
+    "writable": true
+  },
+  "persistent": {
+    "global": false,
+    "writable": true
+  },
+  "depth": {
+    "global": false,
+    "writable": true
+  },
+  "bbox_left": {
+    "global": false,
+    "writable": false
+  },
+  "bbox_right": {
+    "global": false,
+    "writable": false
+  },
+  "bbox_top": {
+    "global": false,
+    "writable": false
+  },
+  "bbox_bottom": {
+    "global": false,
+    "writable": false
+  },
+  "sprite_index": {
+    "global": false,
+    "writable": true
+  },
+  "image_index": {
+    "global": false,
+    "writable": true
+  },
+  "image_single": {
+    "global": false,
+    "writable": true
+  },
+  "image_number": {
+    "global": false,
+    "writable": false
+  },
+  "sprite_width": {
+    "global": false,
+    "writable": false
+  },
+  "sprite_height": {
+    "global": false,
+    "writable": false
+  },
+  "sprite_xoffset": {
+    "global": false,
+    "writable": false
+  },
+  "sprite_yoffset": {
+    "global": false,
+    "writable": false
+  },
+  "image_xscale": {
+    "global": false,
+    "writable": true
+  },
+  "image_yscale": {
+    "global": false,
+    "writable": true
+  },
+  "image_angle": {
+    "global": false,
+    "writable": true
+  },
+  "image_alpha": {
+    "global": false,
+    "writable": true
+  },
+  "image_blend": {
+    "global": false,
+    "writable": true
+  },
+  "image_speed": {
+    "global": false,
+    "writable": true
+  },
+  "mask_index": {
+    "global": false,
+    "writable": true
+  },
+  "path_index": {
+    "global": false,
+    "writable": false
+  },
+  "path_position": {
+    "global": false,
+    "writable": true
+  },
+  "path_positionprevious": {
+    "global": false,
+    "writable": true
+  },
+  "path_speed": {
+    "global": false,
+    "writable": true
+  },
+  "path_scale": {
+    "global": false,
+    "writable": true
+  },
+  "path_orientation": {
+    "global": false,
+    "writable": true
+  },
+  "path_endaction": {
+    "global": false,
+    "writable": true
+  },
+  "timeline_index": {
+    "global": false,
+    "writable": true
+  },
+  "timeline_position": {
+    "global": false,
+    "writable": true
+  },
+  "timeline_speed": {
+    "global": false,
+    "writable": true
+  },
+  "timeline_running": {
+    "global": false,
+    "writable": true
+  },
+  "timeline_loop": {
+    "global": false,
+    "writable": true
+  },
+  "phy_rotation": {
+    "global": false,
+    "writable": true
+  },
+  "phy_position_x": {
+    "global": false,
+    "writable": true
+  },
+  "phy_position_y": {
+    "global": false,
+    "writable": true
+  },
+  "phy_angular_velocity": {
+    "global": false,
+    "writable": true
+  },
+  "phy_linear_velocity_x": {
+    "global": false,
+    "writable": true
+  },
+  "phy_linear_velocity_y": {
+    "global": false,
+    "writable": true
+  },
+  "phy_speed_x": {
+    "global": false,
+    "writable": true
+  },
+  "phy_speed_y": {
+    "global": false,
+    "writable": true
+  },
+  "phy_speed": {
+    "global": false,
+    "writable": false
+  },
+  "phy_angular_damping": {
+    "global": false,
+    "writable": true
+  },
+  "phy_linear_damping": {
+    "global": false,
+    "writable": true
+  },
+  "phy_bullet": {
+    "global": false,
+    "writable": true
+  },
+  "phy_fixed_rotation": {
+    "global": false,
+    "writable": true
+  },
+  "phy_active": {
+    "global": false,
+    "writable": true
+  },
+  "phy_mass": {
+    "global": false,
+    "writable": false
+  },
+  "phy_inertia": {
+    "global": false,
+    "writable": false
+  },
+  "phy_com_x": {
+    "global": false,
+    "writable": false
+  },
+  "phy_com_y": {
+    "global": false,
+    "writable": false
+  },
+  "phy_dynamic": {
+    "global": false,
+    "writable": false
+  },
+  "phy_kinematic": {
+    "global": false,
+    "writable": false
+  },
+  "phy_sleeping": {
+    "global": false,
+    "writable": false
+  },
+  "phy_position_xprevious": {
+    "global": false,
+    "writable": true
+  },
+  "phy_position_yprevious": {
+    "global": false,
+    "writable": true
+  },
+  "phy_collision_points": {
+    "global": false,
+    "writable": false
+  },
+  "phy_collision_x": {
+    "global": false,
+    "writable": false
+  },
+  "phy_collision_y": {
+    "global": false,
+    "writable": false
+  },
+  "phy_col_normal_x": {
+    "global": false,
+    "writable": false
+  },
+  "phy_col_normal_y": {
+    "global": false,
+    "writable": false
+  },
+  "layer": {
+    "global": false,
+    "writable": true
+  }
+}

@@ -1,0 +1,1126 @@
+{
+  "AlarmMenu": [
+    {
+      "caption": "Alarm 0",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "Alarm 1",
+      "children": [],
+      "id": 1
+    },
+    {
+      "caption": "Alarm 2",
+      "children": [],
+      "id": 2
+    },
+    {
+      "caption": "Alarm 3",
+      "children": [],
+      "id": 3
+    },
+    {
+      "caption": "Alarm 4",
+      "children": [],
+      "id": 4
+    },
+    {
+      "caption": "Alarm 5",
+      "children": [],
+      "id": 5
+    },
+    {
+      "caption": "Alarm 6",
+      "children": [],
+      "id": 6
+    },
+    {
+      "caption": "Alarm 7",
+      "children": [],
+      "id": 7
+    },
+    {
+      "caption": "Alarm 8",
+      "children": [],
+      "id": 8
+    },
+    {
+      "caption": "Alarm 9",
+      "children": [],
+      "id": 9
+    },
+    {
+      "caption": "Alarm 10",
+      "children": [],
+      "id": 10
+    },
+    {
+      "caption": "Alarm 11",
+      "children": [],
+      "id": 11
+    }
+  ],
+  "StepMenu": [
+    {
+      "caption": "Step",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "Begin Step",
+      "children": [],
+      "id": 1
+    },
+    {
+      "caption": "End Step",
+      "children": [],
+      "id": 2
+    }
+  ],
+  "MouseMenu": [
+    {
+      "caption": "Left button",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "Right button",
+      "children": [],
+      "id": 1
+    },
+    {
+      "caption": "Middle button",
+      "children": [],
+      "id": 2
+    },
+    {
+      "caption": "No button",
+      "children": [],
+      "id": 3
+    },
+    {
+      "caption": "Left pressed",
+      "children": [],
+      "id": 4
+    },
+    {
+      "caption": "Right pressed",
+      "children": [],
+      "id": 5
+    },
+    {
+      "caption": "Middle pressed",
+      "children": [],
+      "id": 6
+    },
+    {
+      "caption": "Left released",
+      "children": [],
+      "id": 7
+    },
+    {
+      "caption": "Right released",
+      "children": [],
+      "id": 8
+    },
+    {
+      "caption": "Middle released",
+      "children": [],
+      "id": 9
+    },
+    {
+      "caption": "Mouse enter",
+      "children": [],
+      "id": 10
+    },
+    {
+      "caption": "Mouse leave",
+      "children": [],
+      "id": 11
+    },
+    {
+      "caption": "Mouse wheel up",
+      "children": [],
+      "id": 60
+    },
+    {
+      "caption": "Mouse wheel down",
+      "children": [],
+      "id": 61
+    },
+    {
+      "caption": "Global mouse",
+      "children": [
+        {
+          "caption": "Global left button",
+          "children": [],
+          "id": 50
+        },
+        {
+          "caption": "Global right button",
+          "children": [],
+          "id": 51
+        },
+        {
+          "caption": "Global middle button",
+          "children": [],
+          "id": 52
+        },
+        {
+          "caption": "Global left pressed",
+          "children": [],
+          "id": 53
+        },
+        {
+          "caption": "Global right pressed",
+          "children": [],
+          "id": 54
+        },
+        {
+          "caption": "Global middle pressed",
+          "children": [],
+          "id": 55
+        },
+        {
+          "caption": "Global left released",
+          "children": [],
+          "id": 56
+        },
+        {
+          "caption": "Global right released",
+          "children": [],
+          "id": 57
+        },
+        {
+          "caption": "Global middle released",
+          "children": [],
+          "id": 58
+        }
+      ],
+      "id": 0
+    },
+    {
+      "caption": "Joystick 1",
+      "children": [
+        {
+          "caption": "Left",
+          "children": [],
+          "id": 16
+        },
+        {
+          "caption": "Right",
+          "children": [],
+          "id": 17
+        },
+        {
+          "caption": "Up",
+          "children": [],
+          "id": 18
+        },
+        {
+          "caption": "Down",
+          "children": [],
+          "id": 19
+        },
+        {
+          "caption": "Button 1",
+          "children": [],
+          "id": 21
+        },
+        {
+          "caption": "Button 2",
+          "children": [],
+          "id": 22
+        },
+        {
+          "caption": "Button 3",
+          "children": [],
+          "id": 23
+        },
+        {
+          "caption": "Button 4",
+          "children": [],
+          "id": 24
+        },
+        {
+          "caption": "Button 5",
+          "children": [],
+          "id": 25
+        },
+        {
+          "caption": "Button 6",
+          "children": [],
+          "id": 26
+        },
+        {
+          "caption": "Button 7",
+          "children": [],
+          "id": 27
+        },
+        {
+          "caption": "Button 8",
+          "children": [],
+          "id": 28
+        }
+      ],
+      "id": 0
+    },
+    {
+      "caption": "Joystick 2",
+      "children": [
+        {
+          "caption": "Left",
+          "children": [],
+          "id": 31
+        },
+        {
+          "caption": "Right",
+          "children": [],
+          "id": 32
+        },
+        {
+          "caption": "Up",
+          "children": [],
+          "id": 33
+        },
+        {
+          "caption": "Down",
+          "children": [],
+          "id": 34
+        },
+        {
+          "caption": "Button 1",
+          "children": [],
+          "id": 36
+        },
+        {
+          "caption": "Button 2",
+          "children": [],
+          "id": 37
+        },
+        {
+          "caption": "Button 3",
+          "children": [],
+          "id": 38
+        },
+        {
+          "caption": "Button 4",
+          "children": [],
+          "id": 39
+        },
+        {
+          "caption": "Button 5",
+          "children": [],
+          "id": 40
+        },
+        {
+          "caption": "Button 6",
+          "children": [],
+          "id": 41
+        },
+        {
+          "caption": "Button 7",
+          "children": [],
+          "id": 42
+        },
+        {
+          "caption": "Button 8",
+          "children": [],
+          "id": 43
+        }
+      ],
+      "id": 0
+    }
+  ],
+  "OtherMenu": [
+    {
+      "caption": "Outside room",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "Intersect boundary",
+      "children": [],
+      "id": 1
+    },
+    {
+      "caption": "Views",
+      "children": [
+        {
+          "caption": "Outside view 0",
+          "children": [],
+          "id": 40
+        },
+        {
+          "caption": "Outside view 1",
+          "children": [],
+          "id": 41
+        },
+        {
+          "caption": "Outside view 2",
+          "children": [],
+          "id": 42
+        },
+        {
+          "caption": "Outside view 3",
+          "children": [],
+          "id": 43
+        },
+        {
+          "caption": "Outside view 4",
+          "children": [],
+          "id": 44
+        },
+        {
+          "caption": "Outside view 5",
+          "children": [],
+          "id": 45
+        },
+        {
+          "caption": "Outside view 6",
+          "children": [],
+          "id": 46
+        },
+        {
+          "caption": "Outside view 7",
+          "children": [],
+          "id": 47
+        },
+        {
+          "caption": "Boundary view 0",
+          "children": [],
+          "id": 50
+        },
+        {
+          "caption": "Boundary view 1",
+          "children": [],
+          "id": 51
+        },
+        {
+          "caption": "Boundary view 2",
+          "children": [],
+          "id": 52
+        },
+        {
+          "caption": "Boundary view 3",
+          "children": [],
+          "id": 53
+        },
+        {
+          "caption": "Boundary view 4",
+          "children": [],
+          "id": 54
+        },
+        {
+          "caption": "Boundary view 5",
+          "children": [],
+          "id": 55
+        },
+        {
+          "caption": "Boundary view 6",
+          "children": [],
+          "id": 56
+        },
+        {
+          "caption": "Boundary view 7",
+          "children": [],
+          "id": 57
+        }
+      ],
+      "id": 0
+    },
+    {
+      "caption": "Game start",
+      "children": [],
+      "id": 2
+    },
+    {
+      "caption": "Game end",
+      "children": [],
+      "id": 3
+    },
+    {
+      "caption": "Room start",
+      "children": [],
+      "id": 4
+    },
+    {
+      "caption": "Room end",
+      "children": [],
+      "id": 5
+    },
+    {
+      "caption": "No more lives",
+      "children": [],
+      "id": 6
+    },
+    {
+      "caption": "No more health",
+      "children": [],
+      "id": 9
+    },
+    {
+      "caption": "Animation end",
+      "children": [],
+      "id": 7
+    },
+    {
+      "caption": "Animation update",
+      "children": [],
+      "id": 58
+    },
+    {
+      "caption": "Animation event",
+      "children": [],
+      "id": 59
+    },
+    {
+      "caption": "End of path",
+      "children": [],
+      "id": 8
+    },
+    {
+      "caption": "User defined",
+      "children": [
+        {
+          "caption": "User 0",
+          "children": [],
+          "id": 10
+        },
+        {
+          "caption": "User 1",
+          "children": [],
+          "id": 11
+        },
+        {
+          "caption": "User 2",
+          "children": [],
+          "id": 12
+        },
+        {
+          "caption": "User 3",
+          "children": [],
+          "id": 13
+        },
+        {
+          "caption": "User 4",
+          "children": [],
+          "id": 14
+        },
+        {
+          "caption": "User 5",
+          "children": [],
+          "id": 15
+        },
+        {
+          "caption": "User 6",
+          "children": [],
+          "id": 16
+        },
+        {
+          "caption": "User 7",
+          "children": [],
+          "id": 17
+        },
+        {
+          "caption": "User 8",
+          "children": [],
+          "id": 18
+        },
+        {
+          "caption": "User 9",
+          "children": [],
+          "id": 19
+        },
+        {
+          "caption": "User 10",
+          "children": [],
+          "id": 20
+        },
+        {
+          "caption": "User 11",
+          "children": [],
+          "id": 21
+        },
+        {
+          "caption": "User 12",
+          "children": [],
+          "id": 22
+        },
+        {
+          "caption": "User 13",
+          "children": [],
+          "id": 23
+        },
+        {
+          "caption": "User 14",
+          "children": [],
+          "id": 24
+        },
+        {
+          "caption": "User 15",
+          "children": [],
+          "id": 25
+        }
+      ],
+      "id": -1
+    }
+  ],
+  "KeyBoardMenu": [
+    {
+      "caption": "<Left>",
+      "children": [],
+      "id": 37
+    },
+    {
+      "caption": "<Right>",
+      "children": [],
+      "id": 39
+    },
+    {
+      "caption": "<Up>",
+      "children": [],
+      "id": 38
+    },
+    {
+      "caption": "<Down>",
+      "children": [],
+      "id": 40
+    },
+    {
+      "caption": "<Ctrl>",
+      "children": [],
+      "id": 17
+    },
+    {
+      "caption": "<Alt>",
+      "children": [],
+      "id": 18
+    },
+    {
+      "caption": "<Shift>",
+      "children": [],
+      "id": 16
+    },
+    {
+      "caption": "<Space>",
+      "children": [],
+      "id": 32
+    },
+    {
+      "caption": "<Enter>",
+      "children": [],
+      "id": 13
+    },
+    {
+      "caption": "Keypad",
+      "children": [
+        {
+          "caption": "Keypad 0",
+          "children": [],
+          "id": 96
+        },
+        {
+          "caption": "Keypad 1",
+          "children": [],
+          "id": 97
+        },
+        {
+          "caption": "Keypad 2",
+          "children": [],
+          "id": 98
+        },
+        {
+          "caption": "Keypad 3",
+          "children": [],
+          "id": 99
+        },
+        {
+          "caption": "Keypad 4",
+          "children": [],
+          "id": 100
+        },
+        {
+          "caption": "Keypad 5",
+          "children": [],
+          "id": 101
+        },
+        {
+          "caption": "Keypad 6",
+          "children": [],
+          "id": 102
+        },
+        {
+          "caption": "Keypad 7",
+          "children": [],
+          "id": 103
+        },
+        {
+          "caption": "Keypad 8",
+          "children": [],
+          "id": 104
+        },
+        {
+          "caption": "Keypad 9",
+          "children": [],
+          "id": 105
+        },
+        {
+          "caption": "Keypad /",
+          "children": [],
+          "id": 111
+        },
+        {
+          "caption": "Keypad *",
+          "children": [],
+          "id": 106
+        },
+        {
+          "caption": "Keypad -",
+          "children": [],
+          "id": 109
+        },
+        {
+          "caption": "Keypad +",
+          "children": [],
+          "id": 107
+        },
+        {
+          "caption": "Keypad .",
+          "children": [],
+          "id": 110
+        }
+      ],
+      "id": -1
+    },
+    {
+      "caption": "Digits",
+      "children": [
+        {
+          "caption": "0",
+          "children": [],
+          "id": 48
+        },
+        {
+          "caption": "1",
+          "children": [],
+          "id": 49
+        },
+        {
+          "caption": "2",
+          "children": [],
+          "id": 50
+        },
+        {
+          "caption": "3",
+          "children": [],
+          "id": 51
+        },
+        {
+          "caption": "4",
+          "children": [],
+          "id": 52
+        },
+        {
+          "caption": "5",
+          "children": [],
+          "id": 53
+        },
+        {
+          "caption": "6",
+          "children": [],
+          "id": 54
+        },
+        {
+          "caption": "7",
+          "children": [],
+          "id": 55
+        },
+        {
+          "caption": "8",
+          "children": [],
+          "id": 56
+        },
+        {
+          "caption": "9",
+          "children": [],
+          "id": 57
+        }
+      ],
+      "id": -1
+    },
+    {
+      "caption": "Letters",
+      "children": [
+        {
+          "caption": "A",
+          "children": [],
+          "id": 65
+        },
+        {
+          "caption": "B",
+          "children": [],
+          "id": 66
+        },
+        {
+          "caption": "C",
+          "children": [],
+          "id": 67
+        },
+        {
+          "caption": "D",
+          "children": [],
+          "id": 68
+        },
+        {
+          "caption": "E",
+          "children": [],
+          "id": 69
+        },
+        {
+          "caption": "F",
+          "children": [],
+          "id": 70
+        },
+        {
+          "caption": "G",
+          "children": [],
+          "id": 71
+        },
+        {
+          "caption": "H",
+          "children": [],
+          "id": 72
+        },
+        {
+          "caption": "I",
+          "children": [],
+          "id": 73
+        },
+        {
+          "caption": "J",
+          "children": [],
+          "id": 74
+        },
+        {
+          "caption": "K",
+          "children": [],
+          "id": 75
+        },
+        {
+          "caption": "L",
+          "children": [],
+          "id": 76
+        },
+        {
+          "caption": "M",
+          "children": [],
+          "id": 77
+        },
+        {
+          "caption": "N",
+          "children": [],
+          "id": 78
+        },
+        {
+          "caption": "O",
+          "children": [],
+          "id": 79
+        },
+        {
+          "caption": "P",
+          "children": [],
+          "id": 80
+        },
+        {
+          "caption": "Q",
+          "children": [],
+          "id": 81
+        },
+        {
+          "caption": "R",
+          "children": [],
+          "id": 82
+        },
+        {
+          "caption": "S",
+          "children": [],
+          "id": 83
+        },
+        {
+          "caption": "T",
+          "children": [],
+          "id": 84
+        },
+        {
+          "caption": "U",
+          "children": [],
+          "id": 85
+        },
+        {
+          "caption": "V",
+          "children": [],
+          "id": 86
+        },
+        {
+          "caption": "W",
+          "children": [],
+          "id": 87
+        },
+        {
+          "caption": "X",
+          "children": [],
+          "id": 88
+        },
+        {
+          "caption": "Y",
+          "children": [],
+          "id": 89
+        },
+        {
+          "caption": "Z",
+          "children": [],
+          "id": 90
+        }
+      ],
+      "id": -1
+    },
+    {
+      "caption": "Function keys",
+      "children": [
+        {
+          "caption": "F1",
+          "children": [],
+          "id": 112
+        },
+        {
+          "caption": "F2",
+          "children": [],
+          "id": 113
+        },
+        {
+          "caption": "F3",
+          "children": [],
+          "id": 114
+        },
+        {
+          "caption": "F4",
+          "children": [],
+          "id": 115
+        },
+        {
+          "caption": "F5",
+          "children": [],
+          "id": 116
+        },
+        {
+          "caption": "F6",
+          "children": [],
+          "id": 117
+        },
+        {
+          "caption": "F7",
+          "children": [],
+          "id": 118
+        },
+        {
+          "caption": "F8",
+          "children": [],
+          "id": 119
+        },
+        {
+          "caption": "F9",
+          "children": [],
+          "id": 120
+        },
+        {
+          "caption": "F10",
+          "children": [],
+          "id": 121
+        },
+        {
+          "caption": "F11",
+          "children": [],
+          "id": 122
+        },
+        {
+          "caption": "F12",
+          "children": [],
+          "id": 123
+        }
+      ],
+      "id": -1
+    },
+    {
+      "caption": "Others",
+      "children": [
+        {
+          "caption": "<Backspace>",
+          "children": [],
+          "id": 8
+        },
+        {
+          "caption": "<Escape>",
+          "children": [],
+          "id": 27
+        },
+        {
+          "caption": "<Home>",
+          "children": [],
+          "id": 36
+        },
+        {
+          "caption": "<End>",
+          "children": [],
+          "id": 35
+        },
+        {
+          "caption": "<Page up>",
+          "children": [],
+          "id": 33
+        },
+        {
+          "caption": "<Page down>",
+          "children": [],
+          "id": 34
+        },
+        {
+          "caption": "<Delete>",
+          "children": [],
+          "id": 46
+        },
+        {
+          "caption": "<Insert>",
+          "children": [],
+          "id": 45
+        }
+      ],
+      "id": -1
+    },
+    {
+      "caption": "<No key>",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "<Any key>",
+      "children": [],
+      "id": 1
+    }
+  ],
+  "WebMenu": [
+    {
+      "caption": "Image Loaded",
+      "children": [],
+      "id": 60
+    },
+    {
+      "caption": "HTTP",
+      "children": [],
+      "id": 62
+    },
+    {
+      "caption": "Dialog",
+      "children": [],
+      "id": 63
+    },
+    {
+      "caption": "IAP",
+      "children": [],
+      "id": 66
+    },
+    {
+      "caption": "Cloud",
+      "children": [],
+      "id": 67
+    },
+    {
+      "caption": "Networking",
+      "children": [],
+      "id": 68
+    },
+    {
+      "caption": "Steam",
+      "children": [],
+      "id": 69
+    },
+    {
+      "caption": "Social",
+      "children": [],
+      "id": 70
+    },
+    {
+      "caption": "Push Notification",
+      "children": [],
+      "id": 71
+    },
+    {
+      "caption": "Save / Load",
+      "children": [],
+      "id": 72
+    },
+    {
+      "caption": "Audio Recording",
+      "children": [],
+      "id": 73
+    },
+    {
+      "caption": "Audio Playback",
+      "children": [],
+      "id": 74
+    },
+    {
+      "caption": "System Event",
+      "children": [],
+      "id": 75
+    }
+  ],
+  "DrawMenu": [
+    {
+      "caption": "Draw",
+      "children": [],
+      "id": 0
+    },
+    {
+      "caption": "Draw GUI",
+      "children": [],
+      "id": 64
+    },
+    {
+      "caption": "Draw Begin",
+      "children": [],
+      "id": 72
+    },
+    {
+      "caption": "Draw End",
+      "children": [],
+      "id": 73
+    },
+    {
+      "caption": "Draw GUI Begin",
+      "children": [],
+      "id": 74
+    },
+    {
+      "caption": "Draw GUI End",
+      "children": [],
+      "id": 75
+    },
+    {
+      "caption": "PreDraw",
+      "children": [],
+      "id": 76
+    },
+    {
+      "caption": "PostDraw",
+      "children": [],
+      "id": 77
+    },
+    {
+      "caption": "Resize",
+      "children": [],
+      "id": 65
+    }
+  ]
+}

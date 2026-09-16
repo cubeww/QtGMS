@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- lgpl.qdoc -->
+  <title>GNU Lesser General Public License (LGPL) | Qt 5.6</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="index.html">Qt 5.6</a></td><td >GNU Lesser General Public License (LGPL)</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right">Qt 5.6.3 Reference Documentation</td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#lgpl-version-3">LGPL version 3</a></li>
+<li class="level1"><a href="#lgpl-version-2-1">LGPL version 2.1</a></li>
+<li class="level1"><a href="#the-qt-company-qt-lgpl-exception-version-1-1">The Qt Company Qt LGPL Exception version 1.1</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">GNU Lesser General Public License (LGPL)</h1>
+<span class="subtitle"></span>
+<!-- $$$lgpl.html-description -->
+<div class="descr"> <a name="details"></a>
+<p>Qt is available under the GNU Lesser General Public License version 3 and the GNU Lesser General Public License version 2.1&#x2e;</p>
+<p>The Qt Toolkit is Copyright (C) 2015 The Qt Company Ltd and other contributors.<br />
+ Contact: http://www.qt.io/licensing/</p>
+<p>References:</p>
+<ul>
+<li><a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU Lesser General Public License, version 2.1</a></li>
+<li><a href="http://www.gnu.org/licenses/lgpl-3.0.html">GNU Lesser General Public License, version 3</a></li>
+</ul>
+<a name="lgpl-version-3"></a>
+<h2 id="lgpl-version-3">LGPL version 3</h2>
+<pre class="cpp">
+
+                     GNU LESSER GENERAL PUBLIC LICENSE
+                         Version <span class="number">3</span><span class="operator">,</span> <span class="number">29</span> June <span class="number">2007</span>
+
+   Copyright (C) <span class="number">2007</span> Free Software Foundation<span class="operator">,</span> Inc<span class="operator">.</span> <span class="operator">&lt;</span>http:<span class="comment">//fsf.org/&gt;</span>
+   Everyone is permitted to copy and distribute verbatim copies
+   of <span class="keyword">this</span> license document<span class="operator">,</span> but changing it is <span class="keyword">not</span> allowed<span class="operator">.</span>
+
+    This version of the GNU Lesser General Public License incorporates
+  the terms and conditions of version <span class="number">3</span> of the GNU General Public
+  License<span class="operator">,</span> supplemented by the additional permissions listed below<span class="operator">.</span>
+
+    <span class="number">0.</span> Additional Definitions<span class="operator">.</span>
+
+    As used herein<span class="operator">,</span> <span class="string">&quot;this License&quot;</span> refers to version <span class="number">3</span> of the GNU Lesser
+  General Public License<span class="operator">,</span> and the <span class="string">&quot;GNU GPL&quot;</span> refers to version <span class="number">3</span> of the GNU
+  General Public License<span class="operator">.</span>
+
+    <span class="string">&quot;The Library&quot;</span> refers to a covered work governed by <span class="keyword">this</span> License<span class="operator">,</span>
+  other than an Application <span class="keyword">or</span> a Combined Work as defined below<span class="operator">.</span>
+
+    An <span class="string">&quot;Application&quot;</span> is any work that makes use of an interface provided
+  by the Library<span class="operator">,</span> but which is <span class="keyword">not</span> otherwise based on the Library<span class="operator">.</span>
+  Defining a subclass of a <span class="keyword">class</span> defined by the Library is deemed a mode
+  of <span class="keyword">using</span> an interface provided by the Library<span class="operator">.</span>
+
+    A <span class="string">&quot;Combined Work&quot;</span> is a work produced by combining <span class="keyword">or</span> linking an
+  Application with the Library<span class="operator">.</span>  The particular version of the Library
+  with which the Combined Work was made is also called the <span class="string">&quot;Linked
+  Version&quot;</span><span class="operator">.</span>
+
+    The <span class="string">&quot;Minimal Corresponding Source&quot;</span> <span class="keyword">for</span> a Combined Work means the
+  Corresponding Source <span class="keyword">for</span> the Combined Work<span class="operator">,</span> excluding any source code
+  <span class="keyword">for</span> portions of the Combined Work that<span class="operator">,</span> considered in isolation<span class="operator">,</span> are
+  based on the Application<span class="operator">,</span> and <span class="keyword">not</span> on the Linked Version<span class="operator">.</span>
+
+    The <span class="string">&quot;Corresponding Application Code&quot;</span> <span class="keyword">for</span> a Combined Work means the
+  object code and<span class="operator">/</span><span class="keyword">or</span> source code <span class="keyword">for</span> the Application<span class="operator">,</span> including any data
+  and utility programs needed <span class="keyword">for</span> reproducing the Combined Work from the
+  Application<span class="operator">,</span> but excluding the System Libraries of the Combined Work<span class="operator">.</span>
+
+    <span class="number">1.</span> Exception to Section <span class="number">3</span> of the GNU GPL<span class="operator">.</span>
+
+    You may convey a covered work under sections <span class="number">3</span> and <span class="number">4</span> of <span class="keyword">this</span> License
+  without being bound by section <span class="number">3</span> of the GNU GPL<span class="operator">.</span>
+
+    <span class="number">2.</span> Conveying Modified Versions<span class="operator">.</span>
+
+    If you modify a copy of the Library<span class="operator">,</span> and<span class="operator">,</span> in your modifications<span class="operator">,</span> a
+  facility refers to a function <span class="keyword">or</span> data to be supplied by an Application
+  that uses the facility (other than as an argument passed when the
+  facility is invoked)<span class="operator">,</span> then you may convey a copy of the modified
+  version:
+
+     a) under <span class="keyword">this</span> License<span class="operator">,</span> provided that you make a good faith effort to
+     ensure that<span class="operator">,</span> in the event an Application does <span class="keyword">not</span> supply the
+     function <span class="keyword">or</span> data<span class="operator">,</span> the facility still operates<span class="operator">,</span> and performs
+     whatever part of its purpose remains meaningful<span class="operator">,</span> <span class="keyword">or</span>
+
+     b) under the GNU GPL<span class="operator">,</span> with none of the additional permissions of
+     <span class="keyword">this</span> License applicable to that copy<span class="operator">.</span>
+
+    <span class="number">3.</span> Object Code Incorporating Material from Library Header Files<span class="operator">.</span>
+
+    The object code form of an Application may incorporate material from
+  a header file that is part of the Library<span class="operator">.</span>  You may convey such object
+  code under terms of your choice<span class="operator">,</span> provided that<span class="operator">,</span> <span class="keyword">if</span> the incorporated
+  material is <span class="keyword">not</span> limited to numerical parameters<span class="operator">,</span> data structure
+  layouts and accessors<span class="operator">,</span> <span class="keyword">or</span> small macros<span class="operator">,</span> <span class="keyword">inline</span> functions and templates
+  (ten <span class="keyword">or</span> fewer lines in length)<span class="operator">,</span> you <span class="keyword">do</span> both of the following:
+
+     a) Give prominent notice with each copy of the object code that the
+     Library is used in it and that the Library and its use are
+     covered by <span class="keyword">this</span> License<span class="operator">.</span>
+
+     b) Accompany the object code with a copy of the GNU GPL and <span class="keyword">this</span> license
+     document<span class="operator">.</span>
+
+    <span class="number">4.</span> Combined Works<span class="operator">.</span>
+
+    You may convey a Combined Work under terms of your choice that<span class="operator">,</span>
+  taken together<span class="operator">,</span> effectively <span class="keyword">do</span> <span class="keyword">not</span> restrict modification of the
+  portions of the Library contained in the Combined Work and reverse
+  engineering <span class="keyword">for</span> debugging such modifications<span class="operator">,</span> <span class="keyword">if</span> you also <span class="keyword">do</span> each of
+  the following:
+
+     a) Give prominent notice with each copy of the Combined Work that
+     the Library is used in it and that the Library and its use are
+     covered by <span class="keyword">this</span> License<span class="operator">.</span>
+
+     b) Accompany the Combined Work with a copy of the GNU GPL and <span class="keyword">this</span> license
+     document<span class="operator">.</span>
+
+     c) For a Combined Work that displays copyright notices during
+     execution<span class="operator">,</span> <span class="keyword">include</span> the copyright notice <span class="keyword">for</span> the Library among
+     these notices<span class="operator">,</span> as well as a reference directing the user to the
+     copies of the GNU GPL and <span class="keyword">this</span> license document<span class="operator">.</span>
+
+     d) Do one of the following:
+
+         <span class="number">0</span>) Convey the Minimal Corresponding Source under the terms of <span class="keyword">this</span>
+         License<span class="operator">,</span> and the Corresponding Application Code in a form
+         suitable <span class="keyword">for</span><span class="operator">,</span> and under terms that permit<span class="operator">,</span> the user to
+         recombine <span class="keyword">or</span> relink the Application with a modified version of
+         the Linked Version to produce a modified Combined Work<span class="operator">,</span> in the
+         manner specified by section <span class="number">6</span> of the GNU GPL <span class="keyword">for</span> conveying
+         Corresponding Source<span class="operator">.</span>
+
+         <span class="number">1</span>) Use a suitable shared library mechanism <span class="keyword">for</span> linking with the
+         Library<span class="operator">.</span>  A suitable mechanism is one that (a) uses at run time
+         a copy of the Library already present on the user<span class="char">'s computer
+         system, and (b) will operate properly with a modified version
+         of the Library that is interface-compatible with the Linked
+         Version.
+
+     e) Provide Installation Information, but only if you would otherwise
+     be required to provide such information under section 6 of the
+     GNU GPL, and only to the extent that such information is
+     necessary to install and execute a modified version of the
+     Combined Work produced by recombining or relinking the
+     Application with a modified version of the Linked Version. (If
+     you use option 4d0, the Installation Information must accompany
+     the Minimal Corresponding Source and Corresponding Application
+     Code. If you use option 4d1, you must provide the Installation
+     Information in the manner specified by section 6 of the GNU GPL
+     for conveying Corresponding Source.)
+
+    5. Combined Libraries.
+
+    You may place library facilities that are a work based on the
+  Library side by side in a single library together with other library
+  facilities that are not Applications and are not covered by this
+  License, and convey such a combined library under terms of your
+  choice, if you do both of the following:
+
+     a) Accompany the combined library with a copy of the same work based
+     on the Library, uncombined with any other library facilities,
+     conveyed under the terms of this License.
+
+     b) Give prominent notice with the combined library that part of it
+     is a work based on the Library, and explaining where to find the
+     accompanying uncombined form of the same work.
+
+    6. Revised Versions of the GNU Lesser General Public License.
+
+    The Free Software Foundation may publish revised and/or new versions
+  of the GNU Lesser General Public License from time to time. Such new
+  versions will be similar in spirit to the present version, but may
+  differ in detail to address new problems or concerns.
+
+    Each version is given a distinguishing version number. If the
+  Library as you received it specifies that a certain numbered version
+  of the GNU Lesser General Public License &quot;or any later version&quot;
+  applies to it, you have the option of following the terms and
+  conditions either of that published version or of any later version
+  published by the Free Software Foundation. If the Library as you
+  received it does not specify a version number of the GNU Lesser
+  General Public License, you may choose any version of the GNU Lesser
+  General Public License ever published by the Free Software Foundation.
+
+    If the Library as you received it specifies that a proxy can decide
+  whether future versions of the GNU Lesser General Public License shall
+  apply, that proxy'</span>s <span class="keyword">public</span> statement of acceptance of any version is
+  permanent authorization <span class="keyword">for</span> you to choose that version <span class="keyword">for</span> the
+  Library<span class="operator">.</span>
+
+</pre>
+<a name="lgpl-version-2-1"></a>
+<h2 id="lgpl-version-2-1">LGPL version 2.1</h2>
+<pre class="cpp">
+
+                    GNU LESSER GENERAL PUBLIC LICENSE
+                         Version <span class="number">2.1</span><span class="operator">,</span> February <span class="number">1999</span>
+
+   Copyright (C) <span class="number">1991</span><span class="operator">,</span> <span class="number">1999</span> Free Software Foundation<span class="operator">,</span> Inc<span class="operator">.</span>
+   <span class="number">51</span> Franklin Street<span class="operator">,</span> Fifth Floor<span class="operator">,</span> Boston<span class="operator">,</span> MA  <span class="number">02110</span><span class="operator">-</span><span class="number">1301</span>  USA
+   Everyone is permitted to copy and distribute verbatim copies
+   of <span class="keyword">this</span> license document<span class="operator">,</span> but changing it is <span class="keyword">not</span> allowed<span class="operator">.</span>
+
+  <span class="operator">[</span>This is the first released version of the Lesser GPL<span class="operator">.</span>  It also counts
+   as the successor of the GNU Library Public License<span class="operator">,</span> version <span class="number">2</span><span class="operator">,</span> hence
+   the version number <span class="number">2.1.</span><span class="operator">]</span>
+
+                              Preamble
+
+    The licenses <span class="keyword">for</span> most software are designed to take away your
+  freedom to share and change it<span class="operator">.</span>  By contrast<span class="operator">,</span> the GNU General Public
+  Licenses are intended to guarantee your freedom to share and change
+  free software<span class="operator">-</span><span class="operator">-</span>to make sure the software is free <span class="keyword">for</span> all its users<span class="operator">.</span>
+
+    This license<span class="operator">,</span> the Lesser General Public License<span class="operator">,</span> applies to some
+  specially designated software packages<span class="operator">-</span><span class="operator">-</span>typically libraries<span class="operator">-</span><span class="operator">-</span>of the
+  Free Software Foundation and other authors who decide to use it<span class="operator">.</span>  You
+  can use it too<span class="operator">,</span> but we suggest you first think carefully about whether
+  <span class="keyword">this</span> license <span class="keyword">or</span> the ordinary General Public License is the better
+  strategy to use in any particular <span class="keyword">case</span><span class="operator">,</span> based on the explanations below<span class="operator">.</span>
+
+    When we speak of free software<span class="operator">,</span> we are referring to freedom of use<span class="operator">,</span>
+  <span class="keyword">not</span> price<span class="operator">.</span>  Our General Public Licenses are designed to make sure that
+  you have the freedom to distribute copies of free software (and charge
+  <span class="keyword">for</span> <span class="keyword">this</span> service <span class="keyword">if</span> you wish); that you receive source code <span class="keyword">or</span> can get
+  it <span class="keyword">if</span> you want it; that you can change the software and use pieces of
+  it in <span class="keyword">new</span> free programs; and that you are informed that you can <span class="keyword">do</span>
+  these things<span class="operator">.</span>
+
+    To protect your rights<span class="operator">,</span> we need to make restrictions that forbid
+  distributors to deny you these rights <span class="keyword">or</span> to ask you to surrender these
+  rights<span class="operator">.</span>  These restrictions translate to certain responsibilities <span class="keyword">for</span>
+  you <span class="keyword">if</span> you distribute copies of the library <span class="keyword">or</span> <span class="keyword">if</span> you modify it<span class="operator">.</span>
+
+    For example<span class="operator">,</span> <span class="keyword">if</span> you distribute copies of the library<span class="operator">,</span> whether gratis
+  <span class="keyword">or</span> <span class="keyword">for</span> a fee<span class="operator">,</span> you must give the recipients all the rights that we gave
+  you<span class="operator">.</span>  You must make sure that they<span class="operator">,</span> too<span class="operator">,</span> receive <span class="keyword">or</span> can get the source
+  code<span class="operator">.</span>  If you link other code with the library<span class="operator">,</span> you must provide
+  complete object files to the recipients<span class="operator">,</span> so that they can relink them
+  with the library after making changes to the library and recompiling
+  it<span class="operator">.</span>  And you must show them these terms so they know their rights<span class="operator">.</span>
+
+    We protect your rights with a two<span class="operator">-</span>step method: (<span class="number">1</span>) we copyright the
+  library<span class="operator">,</span> and (<span class="number">2</span>) we offer you <span class="keyword">this</span> license<span class="operator">,</span> which gives you legal
+  permission to copy<span class="operator">,</span> distribute and<span class="operator">/</span><span class="keyword">or</span> modify the library<span class="operator">.</span>
+
+    To protect each distributor<span class="operator">,</span> we want to make it very clear that
+  there is no warranty <span class="keyword">for</span> the free library<span class="operator">.</span>  Also<span class="operator">,</span> <span class="keyword">if</span> the library is
+  modified by someone <span class="keyword">else</span> and passed on<span class="operator">,</span> the recipients should know
+  that what they have is <span class="keyword">not</span> the original version<span class="operator">,</span> so that the original
+  author<span class="char">'s reputation will not be affected by problems that might be
+  introduced by others.
+
+    Finally, software patents pose a constant threat to the existence of
+  any free program.  We wish to make sure that a company cannot
+  effectively restrict the users of a free program by obtaining a
+  restrictive license from a patent holder.  Therefore, we insist that
+  any patent license obtained for a version of the library must be
+  consistent with the full freedom of use specified in this license.
+
+    Most GNU software, including some libraries, is covered by the
+  ordinary GNU General Public License.  This license, the GNU Lesser
+  General Public License, applies to certain designated libraries, and
+  is quite different from the ordinary General Public License.  We use
+  this license for certain libraries in order to permit linking those
+  libraries into non-free programs.
+
+    When a program is linked with a library, whether statically or using
+  a shared library, the combination of the two is legally speaking a
+  combined work, a derivative of the original library.  The ordinary
+  General Public License therefore permits such linking only if the
+  entire combination fits its criteria of freedom.  The Lesser General
+  Public License permits more lax criteria for linking other code with
+  the library.
+
+    We call this license the &quot;Lesser&quot; General Public License because it
+  does Less to protect the user'</span>s freedom than the ordinary General
+  Public License<span class="operator">.</span>  It also provides other free software developers Less
+  of an advantage over competing non<span class="operator">-</span>free programs<span class="operator">.</span>  These disadvantages
+  are the reason we use the ordinary General Public License <span class="keyword">for</span> many
+  libraries<span class="operator">.</span>  However<span class="operator">,</span> the Lesser license provides advantages in certain
+  special circumstances<span class="operator">.</span>
+
+    For example<span class="operator">,</span> on rare occasions<span class="operator">,</span> there may be a special need to
+  encourage the widest possible use of a certain library<span class="operator">,</span> so that it becomes
+  a de<span class="operator">-</span>facto standard<span class="operator">.</span>  To achieve <span class="keyword">this</span><span class="operator">,</span> non<span class="operator">-</span>free programs must be
+  allowed to use the library<span class="operator">.</span>  A more frequent <span class="keyword">case</span> is that a free
+  library does the same job as widely used non<span class="operator">-</span>free libraries<span class="operator">.</span>  In <span class="keyword">this</span>
+  <span class="keyword">case</span><span class="operator">,</span> there is little to gain by limiting the free library to free
+  software only<span class="operator">,</span> so we use the Lesser General Public License<span class="operator">.</span>
+
+    In other cases<span class="operator">,</span> permission to use a particular library in non<span class="operator">-</span>free
+  programs enables a greater number of people to use a large body of
+  free software<span class="operator">.</span>  For example<span class="operator">,</span> permission to use the GNU C Library in
+  non<span class="operator">-</span>free programs enables many more people to use the whole GNU
+  operating system<span class="operator">,</span> as well as its variant<span class="operator">,</span> the GNU<span class="operator">/</span>Linux operating
+  system<span class="operator">.</span>
+
+    Although the Lesser General Public License is Less protective of the
+  users<span class="char">' freedom, it does ensure that the user of a program that is
+  linked with the Library has the freedom and the wherewithal to run
+  that program using a modified version of the Library.
+
+    The precise terms and conditions for copying, distribution and
+  modification follow.  Pay close attention to the difference between a
+  &quot;work based on the library&quot; and a &quot;work that uses the library&quot;.  The
+  former contains code derived from the library, whereas the latter must
+  be combined with the library in order to run.
+
+                    GNU LESSER GENERAL PUBLIC LICENSE
+     TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+    0. This License Agreement applies to any software library or other
+  program which contains a notice placed by the copyright holder or
+  other authorized party saying it may be distributed under the terms of
+  this Lesser General Public License (also called &quot;this License&quot;).
+  Each licensee is addressed as &quot;you&quot;.
+
+    A &quot;library&quot; means a collection of software functions and/or data
+  prepared so as to be conveniently linked with application programs
+  (which use some of those functions and data) to form executables.
+
+    The &quot;Library&quot;, below, refers to any such software library or work
+  which has been distributed under these terms.  A &quot;work based on the
+  Library&quot; means either the Library or any derivative work under
+  copyright law: that is to say, a work containing the Library or a
+  portion of it, either verbatim or with modifications and/or translated
+  straightforwardly into another language.  (Hereinafter, translation is
+  included without limitation in the term &quot;modification&quot;.)
+
+    &quot;Source code&quot; for a work means the preferred form of the work for
+  making modifications to it.  For a library, complete source code means
+  all the source code for all modules it contains, plus any associated
+  interface definition files, plus the scripts used to control compilation
+  and installation of the library.
+
+    Activities other than copying, distribution and modification are not
+  covered by this License; they are outside its scope.  The act of
+  running a program using the Library is not restricted, and output from
+  such a program is covered only if its contents constitute a work based
+  on the Library (independent of the use of the Library in a tool for
+  writing it).  Whether that is true depends on what the Library does
+  and what the program that uses the Library does.
+
+    1. You may copy and distribute verbatim copies of the Library'</span>s
+  complete source code as you receive it<span class="operator">,</span> in any medium<span class="operator">,</span> provided that
+  you conspicuously and appropriately publish on each copy an
+  appropriate copyright notice and disclaimer of warranty; keep intact
+  all the notices that refer to <span class="keyword">this</span> License and to the absence of any
+  warranty; and distribute a copy of <span class="keyword">this</span> License along with the
+  Library<span class="operator">.</span>
+
+    You may charge a fee <span class="keyword">for</span> the physical act of transferring a copy<span class="operator">,</span>
+  and you may at your option offer warranty protection in exchange <span class="keyword">for</span> a
+  fee<span class="operator">.</span>
+
+    <span class="number">2.</span> You may modify your copy <span class="keyword">or</span> copies of the Library <span class="keyword">or</span> any portion
+  of it<span class="operator">,</span> thus forming a work based on the Library<span class="operator">,</span> and copy and
+  distribute such modifications <span class="keyword">or</span> work under the terms of Section <span class="number">1</span>
+  above<span class="operator">,</span> provided that you also meet all of these conditions:
+
+      a) The modified work must itself be a software library<span class="operator">.</span>
+
+      b) You must cause the files modified to carry prominent notices
+      stating that you changed the files and the date of any change<span class="operator">.</span>
+
+      c) You must cause the whole of the work to be licensed at no
+      charge to all third parties under the terms of <span class="keyword">this</span> License<span class="operator">.</span>
+
+      d) If a facility in the modified Library refers to a function <span class="keyword">or</span> a
+      table of data to be supplied by an application program that uses
+      the facility<span class="operator">,</span> other than as an argument passed when the facility
+      is invoked<span class="operator">,</span> then you must make a good faith effort to ensure that<span class="operator">,</span>
+      in the event an application does <span class="keyword">not</span> supply such function <span class="keyword">or</span>
+      table<span class="operator">,</span> the facility still operates<span class="operator">,</span> and performs whatever part of
+      its purpose remains meaningful<span class="operator">.</span>
+
+      (For example<span class="operator">,</span> a function in a library to compute square roots has
+      a purpose that is entirely well<span class="operator">-</span>defined independent of the
+      application<span class="operator">.</span>  Therefore<span class="operator">,</span> Subsection <span class="number">2d</span> requires that any
+      application<span class="operator">-</span>supplied function <span class="keyword">or</span> table used by <span class="keyword">this</span> function must
+      be optional: <span class="keyword">if</span> the application does <span class="keyword">not</span> supply it<span class="operator">,</span> the square
+      root function must still compute square roots<span class="operator">.</span>)
+
+  These requirements apply to the modified work as a whole<span class="operator">.</span>  If
+  identifiable sections of that work are <span class="keyword">not</span> derived from the Library<span class="operator">,</span>
+  and can be reasonably considered independent and separate works in
+  themselves<span class="operator">,</span> then <span class="keyword">this</span> License<span class="operator">,</span> and its terms<span class="operator">,</span> <span class="keyword">do</span> <span class="keyword">not</span> apply to those
+  sections when you distribute them as separate works<span class="operator">.</span>  But when you
+  distribute the same sections as part of a whole which is a work based
+  on the Library<span class="operator">,</span> the distribution of the whole must be on the terms of
+  <span class="keyword">this</span> License<span class="operator">,</span> whose permissions <span class="keyword">for</span> other licensees extend to the
+  entire whole<span class="operator">,</span> and thus to each and every part regardless of who wrote
+  it<span class="operator">.</span>
+
+  Thus<span class="operator">,</span> it is <span class="keyword">not</span> the intent of <span class="keyword">this</span> section to claim rights <span class="keyword">or</span> contest
+  your rights to work written entirely by you; rather<span class="operator">,</span> the intent is to
+  exercise the right to control the distribution of derivative <span class="keyword">or</span>
+  collective works based on the Library<span class="operator">.</span>
+
+  In addition<span class="operator">,</span> mere aggregation of another work <span class="keyword">not</span> based on the Library
+  with the Library (<span class="keyword">or</span> with a work based on the Library) on a volume of
+  a storage <span class="keyword">or</span> distribution medium does <span class="keyword">not</span> bring the other work under
+  the scope of <span class="keyword">this</span> License<span class="operator">.</span>
+
+    <span class="number">3.</span> You may opt to apply the terms of the ordinary GNU General Public
+  License instead of <span class="keyword">this</span> License to a given copy of the Library<span class="operator">.</span>  To <span class="keyword">do</span>
+  <span class="keyword">this</span><span class="operator">,</span> you must alter all the notices that refer to <span class="keyword">this</span> License<span class="operator">,</span> so
+  that they refer to the ordinary GNU General Public License<span class="operator">,</span> version <span class="number">2</span><span class="operator">,</span>
+  instead of to <span class="keyword">this</span> License<span class="operator">.</span>  (If a newer version than version <span class="number">2</span> of the
+  ordinary GNU General Public License has appeared<span class="operator">,</span> then you can specify
+  that version instead <span class="keyword">if</span> you wish<span class="operator">.</span>)  Do <span class="keyword">not</span> make any other change in
+  these notices<span class="operator">.</span>
+
+    Once <span class="keyword">this</span> change is made in a given copy<span class="operator">,</span> it is irreversible <span class="keyword">for</span>
+  that copy<span class="operator">,</span> so the ordinary GNU General Public License applies to all
+  subsequent copies and derivative works made from that copy<span class="operator">.</span>
+
+    This option is useful when you wish to copy part of the code of
+  the Library into a program that is <span class="keyword">not</span> a library<span class="operator">.</span>
+
+    <span class="number">4.</span> You may copy and distribute the Library (<span class="keyword">or</span> a portion <span class="keyword">or</span>
+  derivative of it<span class="operator">,</span> under Section <span class="number">2</span>) in object code <span class="keyword">or</span> executable form
+  under the terms of Sections <span class="number">1</span> and <span class="number">2</span> above provided that you accompany
+  it with the complete corresponding machine<span class="operator">-</span>readable source code<span class="operator">,</span> which
+  must be distributed under the terms of Sections <span class="number">1</span> and <span class="number">2</span> above on a
+  medium customarily used <span class="keyword">for</span> software interchange<span class="operator">.</span>
+
+    If distribution of object code is made by offering access to copy
+  from a designated place<span class="operator">,</span> then offering equivalent access to copy the
+  source code from the same place satisfies the requirement to
+  distribute the source code<span class="operator">,</span> even though third parties are <span class="keyword">not</span>
+  compelled to copy the source along with the object code<span class="operator">.</span>
+
+    <span class="number">5.</span> A program that contains no derivative of any portion of the
+  Library<span class="operator">,</span> but is designed to work with the Library by being compiled <span class="keyword">or</span>
+  linked with it<span class="operator">,</span> is called a <span class="string">&quot;work that uses the Library&quot;</span><span class="operator">.</span>  Such a
+  work<span class="operator">,</span> in isolation<span class="operator">,</span> is <span class="keyword">not</span> a derivative work of the Library<span class="operator">,</span> and
+  therefore falls outside the scope of <span class="keyword">this</span> License<span class="operator">.</span>
+
+    However<span class="operator">,</span> linking a <span class="string">&quot;work that uses the Library&quot;</span> with the Library
+  creates an executable that is a derivative of the Library (because it
+  contains portions of the Library)<span class="operator">,</span> rather than a <span class="string">&quot;work that uses the
+  library&quot;</span><span class="operator">.</span>  The executable is therefore covered by <span class="keyword">this</span> License<span class="operator">.</span>
+  Section <span class="number">6</span> states terms <span class="keyword">for</span> distribution of such executables<span class="operator">.</span>
+
+    When a <span class="string">&quot;work that uses the Library&quot;</span> uses material from a header file
+  that is part of the Library<span class="operator">,</span> the object code <span class="keyword">for</span> the work may be a
+  derivative work of the Library even though the source code is <span class="keyword">not</span><span class="operator">.</span>
+  Whether <span class="keyword">this</span> is <span class="keyword">true</span> is especially significant <span class="keyword">if</span> the work can be
+  linked without the Library<span class="operator">,</span> <span class="keyword">or</span> <span class="keyword">if</span> the work is itself a library<span class="operator">.</span>  The
+  threshold <span class="keyword">for</span> <span class="keyword">this</span> to be <span class="keyword">true</span> is <span class="keyword">not</span> precisely defined by law<span class="operator">.</span>
+
+    If such an object file uses only numerical parameters<span class="operator">,</span> data
+  structure layouts and accessors<span class="operator">,</span> and small macros and small <span class="keyword">inline</span>
+  functions (ten lines <span class="keyword">or</span> less in length)<span class="operator">,</span> then the use of the object
+  file is unrestricted<span class="operator">,</span> regardless of whether it is legally a derivative
+  work<span class="operator">.</span>  (Executables containing <span class="keyword">this</span> object code plus portions of the
+  Library will still fall under Section <span class="number">6.</span>)
+
+    Otherwise<span class="operator">,</span> <span class="keyword">if</span> the work is a derivative of the Library<span class="operator">,</span> you may
+  distribute the object code <span class="keyword">for</span> the work under the terms of Section <span class="number">6.</span>
+  Any executables containing that work also fall under Section <span class="number">6</span><span class="operator">,</span>
+  whether <span class="keyword">or</span> <span class="keyword">not</span> they are linked directly with the Library itself<span class="operator">.</span>
+
+    <span class="number">6.</span> As an exception to the Sections above<span class="operator">,</span> you may also combine <span class="keyword">or</span>
+  link a <span class="string">&quot;work that uses the Library&quot;</span> with the Library to produce a
+  work containing portions of the Library<span class="operator">,</span> and distribute that work
+  under terms of your choice<span class="operator">,</span> provided that the terms permit
+  modification of the work <span class="keyword">for</span> the customer<span class="char">'s own use and reverse
+  engineering for debugging such modifications.
+
+    You must give prominent notice with each copy of the work that the
+  Library is used in it and that the Library and its use are covered by
+  this License.  You must supply a copy of this License.  If the work
+  during execution displays copyright notices, you must include the
+  copyright notice for the Library among them, as well as a reference
+  directing the user to the copy of this License.  Also, you must do one
+  of these things:
+
+      a) Accompany the work with the complete corresponding
+      machine-readable source code for the Library including whatever
+      changes were used in the work (which must be distributed under
+      Sections 1 and 2 above); and, if the work is an executable linked
+      with the Library, with the complete machine-readable &quot;work that
+      uses the Library&quot;, as object code and/or source code, so that the
+      user can modify the Library and then relink to produce a modified
+      executable containing the modified Library.  (It is understood
+      that the user who changes the contents of definitions files in the
+      Library will not necessarily be able to recompile the application
+      to use the modified definitions.)
+
+      b) Use a suitable shared library mechanism for linking with the
+      Library.  A suitable mechanism is one that (1) uses at run time a
+      copy of the library already present on the user'</span>s computer system<span class="operator">,</span>
+      rather than copying library functions into the executable<span class="operator">,</span> and (<span class="number">2</span>)
+      will operate properly with a modified version of the library<span class="operator">,</span> <span class="keyword">if</span>
+      the user installs one<span class="operator">,</span> as <span class="type">long</span> as the modified version is
+      interface<span class="operator">-</span>compatible with the version that the work was made with<span class="operator">.</span>
+
+      c) Accompany the work with a written offer<span class="operator">,</span> valid <span class="keyword">for</span> at
+      least three years<span class="operator">,</span> to give the same user the materials
+      specified in Subsection <span class="number">6a</span><span class="operator">,</span> above<span class="operator">,</span> <span class="keyword">for</span> a charge no more
+      than the cost of performing <span class="keyword">this</span> distribution<span class="operator">.</span>
+
+      d) If distribution of the work is made by offering access to copy
+      from a designated place<span class="operator">,</span> offer equivalent access to copy the above
+      specified materials from the same place<span class="operator">.</span>
+
+      e) Verify that the user has already received a copy of these
+      materials <span class="keyword">or</span> that you have already sent <span class="keyword">this</span> user a copy<span class="operator">.</span>
+
+    For an executable<span class="operator">,</span> the required form of the <span class="string">&quot;work that uses the
+  Library&quot;</span> must <span class="keyword">include</span> any data and utility programs needed <span class="keyword">for</span>
+  reproducing the executable from it<span class="operator">.</span>  However<span class="operator">,</span> as a special exception<span class="operator">,</span>
+  the materials to be distributed need <span class="keyword">not</span> <span class="keyword">include</span> anything that is
+  normally distributed (in either source <span class="keyword">or</span> binary form) with the major
+  components (compiler<span class="operator">,</span> kernel<span class="operator">,</span> and so on) of the operating system on
+  which the executable runs<span class="operator">,</span> unless that component itself accompanies
+  the executable<span class="operator">.</span>
+
+    It may happen that <span class="keyword">this</span> requirement contradicts the license
+  restrictions of other proprietary libraries that <span class="keyword">do</span> <span class="keyword">not</span> normally
+  accompany the operating system<span class="operator">.</span>  Such a contradiction means you cannot
+  use both them and the Library together in an executable that you
+  distribute<span class="operator">.</span>
+
+    <span class="number">7.</span> You may place library facilities that are a work based on the
+  Library side<span class="operator">-</span>by<span class="operator">-</span>side in a single library together with other library
+  facilities <span class="keyword">not</span> covered by <span class="keyword">this</span> License<span class="operator">,</span> and distribute such a combined
+  library<span class="operator">,</span> provided that the separate distribution of the work based on
+  the Library and of the other library facilities is otherwise
+  permitted<span class="operator">,</span> and provided that you <span class="keyword">do</span> these two things:
+
+      a) Accompany the combined library with a copy of the same work
+      based on the Library<span class="operator">,</span> uncombined with any other library
+      facilities<span class="operator">.</span>  This must be distributed under the terms of the
+      Sections above<span class="operator">.</span>
+
+      b) Give prominent notice with the combined library of the fact
+      that part of it is a work based on the Library<span class="operator">,</span> and explaining
+      where to find the accompanying uncombined form of the same work<span class="operator">.</span>
+
+    <span class="number">8.</span> You may <span class="keyword">not</span> copy<span class="operator">,</span> modify<span class="operator">,</span> sublicense<span class="operator">,</span> link with<span class="operator">,</span> <span class="keyword">or</span> distribute
+  <span class="number">0the</span> Library except as expressly provided under <span class="keyword">this</span> License<span class="operator">.</span>  Any
+  attempt otherwise to copy<span class="operator">,</span> modify<span class="operator">,</span> sublicense<span class="operator">,</span> link with<span class="operator">,</span> <span class="keyword">or</span>
+  distribute the Library is <span class="type">void</span><span class="operator">,</span> and will automatically terminate your
+  rights under <span class="keyword">this</span> License<span class="operator">.</span>  However<span class="operator">,</span> parties who have received copies<span class="operator">,</span>
+  <span class="keyword">or</span> rights<span class="operator">,</span> from you under <span class="keyword">this</span> License will <span class="keyword">not</span> have their licenses
+  terminated so <span class="type">long</span> as such parties remain in full compliance<span class="operator">.</span>
+
+    <span class="number">9.</span> You are <span class="keyword">not</span> required to accept <span class="keyword">this</span> License<span class="operator">,</span> since you have <span class="keyword">not</span>
+  <span class="type">signed</span> it<span class="operator">.</span>  However<span class="operator">,</span> nothing <span class="keyword">else</span> grants you permission to modify <span class="keyword">or</span>
+  distribute the Library <span class="keyword">or</span> its derivative works<span class="operator">.</span>  These actions are
+  prohibited by law <span class="keyword">if</span> you <span class="keyword">do</span> <span class="keyword">not</span> accept <span class="keyword">this</span> License<span class="operator">.</span>  Therefore<span class="operator">,</span> by
+  modifying <span class="keyword">or</span> distributing the Library (<span class="keyword">or</span> any work based on the
+  Library)<span class="operator">,</span> you indicate your acceptance of <span class="keyword">this</span> License to <span class="keyword">do</span> so<span class="operator">,</span> and
+  all its terms and conditions <span class="keyword">for</span> copying<span class="operator">,</span> distributing <span class="keyword">or</span> modifying
+  the Library <span class="keyword">or</span> works based on it<span class="operator">.</span>
+
+    <span class="number">10.</span> Each time you redistribute the Library (<span class="keyword">or</span> any work based on the
+  Library)<span class="operator">,</span> the recipient automatically receives a license from the
+  original licensor to copy<span class="operator">,</span> distribute<span class="operator">,</span> link with <span class="keyword">or</span> modify the Library
+  subject to these terms and conditions<span class="operator">.</span>  You may <span class="keyword">not</span> impose any further
+  restrictions on the recipients<span class="char">' exercise of the rights granted herein.
+  You are not responsible for enforcing compliance by third parties with
+  this License.
+
+    11. If, as a consequence of a court judgment or allegation of patent
+  infringement or for any other reason (not limited to patent issues),
+  conditions are imposed on you (whether by court order, agreement or
+  otherwise) that contradict the conditions of this License, they do not
+  excuse you from the conditions of this License.  If you cannot
+  distribute so as to satisfy simultaneously your obligations under this
+  License and any other pertinent obligations, then as a consequence you
+  may not distribute the Library at all.  For example, if a patent
+  license would not permit royalty-free redistribution of the Library by
+  all those who receive copies directly or indirectly through you, then
+  the only way you could satisfy both it and this License would be to
+  refrain entirely from distribution of the Library.
+
+  If any portion of this section is held invalid or unenforceable under any
+  particular circumstance, the balance of the section is intended to apply,
+  and the section as a whole is intended to apply in other circumstances.
+
+  It is not the purpose of this section to induce you to infringe any
+  patents or other property right claims or to contest validity of any
+  such claims; this section has the sole purpose of protecting the
+  integrity of the free software distribution system which is
+  implemented by public license practices.  Many people have made
+  generous contributions to the wide range of software distributed
+  through that system in reliance on consistent application of that
+  system; it is up to the author/donor to decide if he or she is willing
+  to distribute software through any other system and a licensee cannot
+  impose that choice.
+
+  This section is intended to make thoroughly clear what is believed to
+  be a consequence of the rest of this License.
+
+    12. If the distribution and/or use of the Library is restricted in
+  certain countries either by patents or by copyrighted interfaces, the
+  original copyright holder who places the Library under this License may add
+  an explicit geographical distribution limitation excluding those countries,
+  so that distribution is permitted only in or among countries not thus
+  excluded.  In such case, this License incorporates the limitation as if
+  written in the body of this License.
+
+    13. The Free Software Foundation may publish revised and/or new
+  versions of the Lesser General Public License from time to time.
+  Such new versions will be similar in spirit to the present version,
+  but may differ in detail to address new problems or concerns.
+
+  Each version is given a distinguishing version number.  If the Library
+  specifies a version number of this License which applies to it and
+  &quot;any later version&quot;, you have the option of following the terms and
+  conditions either of that version or of any later version published by
+  the Free Software Foundation.  If the Library does not specify a
+  license version number, you may choose any version ever published by
+  the Free Software Foundation.
+
+    14. If you wish to incorporate parts of the Library into other free
+  programs whose distribution conditions are incompatible with these,
+  write to the author to ask for permission.  For software which is
+  copyrighted by the Free Software Foundation, write to the Free
+  Software Foundation; we sometimes make exceptions for this.  Our
+  decision will be guided by the two goals of preserving the free status
+  of all derivatives of our free software and of promoting the sharing
+  and reuse of software generally.
+
+                              NO WARRANTY
+
+    15. BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
+  WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+  OTHER PARTIES PROVIDE THE LIBRARY &quot;AS IS&quot; WITHOUT WARRANTY OF ANY
+  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+  LIBRARY IS WITH YOU.  SHOULD THE LIBRARY PROVE DEFECTIVE, YOU ASSUME
+  THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    16. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
+  WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+  AND/OR REDISTRIBUTE THE LIBRARY AS PERMITTED ABOVE, BE LIABLE TO YOU
+  FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+  CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+  LIBRARY (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+  RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+  FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+  SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+  DAMAGES.
+
+                       END OF TERMS AND CONDITIONS
+
+             How to Apply These Terms to Your New Libraries
+
+    If you develop a new library, and you want it to be of the greatest
+  possible use to the public, we recommend making it free software that
+  everyone can redistribute and change.  You can do so by permitting
+  redistribution under these terms (or, alternatively, under the terms of the
+  ordinary General Public License).
+
+    To apply these terms, attach the following notices to the library.  It is
+  safest to attach them to the start of each source file to most effectively
+  convey the exclusion of warranty; and each file should have at least the
+  &quot;copyright&quot; line and a pointer to where the full notice is found.
+
+      &lt;one line to give the library'</span>s name and a brief idea of what it does<span class="operator">.</span><span class="operator">&gt;</span>
+      Copyright (C) <span class="operator">&lt;</span>year<span class="operator">&gt;</span>  <span class="operator">&lt;</span>name of author<span class="operator">&gt;</span>
+
+      This library is free software; you can redistribute it and<span class="operator">/</span><span class="keyword">or</span>
+      modify it under the terms of the GNU Lesser General Public
+      License as published by the Free Software Foundation; either
+      version <span class="number">2.1</span> of the License<span class="operator">,</span> <span class="keyword">or</span> (at your option) any later version<span class="operator">.</span>
+
+      This library is distributed in the hope that it will be useful<span class="operator">,</span>
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY <span class="keyword">or</span> FITNESS FOR A PARTICULAR PURPOSE<span class="operator">.</span>  See the GNU
+      Lesser General Public License <span class="keyword">for</span> more details<span class="operator">.</span>
+
+      You should have received a copy of the GNU Lesser General Public
+      License along with <span class="keyword">this</span> library; <span class="keyword">if</span> <span class="keyword">not</span><span class="operator">,</span> write to the Free Software
+      Foundation<span class="operator">,</span> Inc<span class="operator">.</span><span class="operator">,</span> <span class="number">51</span> Franklin Street<span class="operator">,</span> Fifth Floor<span class="operator">,</span> Boston<span class="operator">,</span> MA  <span class="number">02110</span><span class="operator">-</span><span class="number">1301</span>  USA
+
+  Also add information on how to contact you by electronic and paper mail<span class="operator">.</span>
+
+  You should also get your employer (<span class="keyword">if</span> you work as a programmer) <span class="keyword">or</span> your
+  school<span class="operator">,</span> <span class="keyword">if</span> any<span class="operator">,</span> to sign a <span class="string">&quot;copyright disclaimer&quot;</span> <span class="keyword">for</span> the library<span class="operator">,</span> <span class="keyword">if</span>
+  necessary<span class="operator">.</span>  Here is a sample; alter the names:
+
+    Yoyodyne<span class="operator">,</span> Inc<span class="operator">.</span><span class="operator">,</span> hereby disclaims all copyright interest in the
+    library `Frob<span class="char">' (a library for tweaking knobs) written by James Random Hacker.
+
+    &lt;signature of Ty Coon&gt;, 1 April 1990
+    Ty Coon, President of Vice
+
+  That'</span>s all there is to it<span class="operator">!</span>
+
+</pre>
+<a name="the-qt-company-qt-lgpl-exception-version-1-1"></a>
+<h2 id="the-qt-company-qt-lgpl-exception-version-1-1">The Qt Company Qt LGPL Exception version 1.1</h2>
+<p>As a special exception to the GNU Lesser General Public License version 2.1, the object code form of a &quot;work that uses the Library&quot; may incorporate material from a header file that is part of the Library. You may distribute such object code under terms of your choice, provided that the incorporated material (i) does not exceed more than 5% of the total size of the Library; and (ii) is limited to numerical parameters, data structure layouts, accessors, macros, inline functions and templates.</p>
+</div>
+<!-- @@@lgpl.html -->
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2016 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>
