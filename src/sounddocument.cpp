@@ -156,12 +156,14 @@ bool SoundDocument::loadFromXml(const QString &filePath, const QDomDocument &doc
         error = tr("The sound contains invalid target options."); return false;
     }
     const QString data = root.firstChildElement(QStringLiteral("data")).text().trimmed();
+    QString audioPath = data.isEmpty() ? QString() : QDir::cleanPath(QFileInfo(filePath).absoluteDir().absoluteFilePath(
+        QStringLiteral("audio/") + QString(data).replace(QLatin1Char('\\'), QLatin1Char('/'))));
+    // GMX resources can retain a filename even when no audio was supplied.
+    if (!QFileInfo::exists(audioPath)) audioPath.clear();
     const QString extension = state.extension.toLower();
-    if (!data.isEmpty() && extension != QStringLiteral(".wav") && extension != QStringLiteral(".mp3") && extension != QStringLiteral(".ogg")) {
+    if (!audioPath.isEmpty() && extension != QStringLiteral(".wav") && extension != QStringLiteral(".mp3") && extension != QStringLiteral(".ogg")) {
         error = tr("This editor supports WAV, MP3 and OGG Vorbis sounds."); return false;
     }
-    const QString audioPath = data.isEmpty() ? QString() : QDir::cleanPath(QFileInfo(filePath).absoluteDir().absoluteFilePath(
-        QStringLiteral("audio/") + QString(data).replace(QLatin1Char('\\'), QLatin1Char('/'))));
     if (timings) timings->metadataNanoseconds = timer.nsecsElapsed();
     if (!audioPath.isEmpty() && !readSoundAudio(audioPath, state.audio, error, timings)) return false;
     m_filePath = QFileInfo(filePath).absoluteFilePath(); m_configurationIndex = index;

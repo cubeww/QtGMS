@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFileInfo>
+#include <limits>
 
 CompileResult ProjectCompiler::compile(
     const CompileRequest &request, const std::function<void(const QString &, int, int)> &progress)
@@ -65,8 +66,19 @@ CompileResult ProjectCompiler::compile(
         profile.start(QStringLiteral("Audio group assembly"));
         stage(QStringLiteral("Assembling audio groups..."));
         const auto writeAudio = [&](DataWriter &file, int group) {
+            const auto &entries = build.audio[group];
+            // Reserve the exact final size once instead of growing a large
+            // QByteArray through several overlapping allocations.
+            qint64 finalSize = qint64(file.position()) + 12 + qint64(entries.size()) * 4;
+            for (const auto &entry : entries) {
+                finalSize = (finalSize + 3) & ~qint64(3);
+                finalSize += 4 + qint64(entry.size);
+            }
+            finalSize = (finalSize + 15) & ~qint64(15);
+            if (finalSize >= std::numeric_limits<int>::max())
+                throw CompileError(QStringLiteral("Compiled audio group %1 exceeds the 2 GiB output buffer limit.").arg(group));
+            file.bytes.reserve(int(finalSize));
             file.chunk("AUDO", [&] {
-                const auto &entries = build.audio[group];
                 file.u32(entries.size());
                 int table = file.position();
                 for (int i = 0; i < entries.size(); ++i)
@@ -74,8 +86,18 @@ CompileResult ProjectCompiler::compile(
                 for (int i = 0; i < entries.size(); ++i) {
                     file.align(4);
                     file.patch(table + i * 4, file.position());
-                    file.u32(entries.at(i).size());
-                    file.bytes.append(entries.at(i));
+                    const auto &entry = entries.at(i);
+                    file.u32(entry.size);
+                    if (!build.audioData.seek(entry.offset))
+                        throw CompileError(QStringLiteral("Cannot seek compiled audio: %1").arg(build.audioData.errorString()));
+                    int remaining = entry.size;
+                    while (remaining > 0) {
+                        const QByteArray block = build.audioData.read(qMin(remaining, 1024 * 1024));
+                        if (block.isEmpty() || build.audioData.error() != QFile::NoError)
+                            throw CompileError(QStringLiteral("Cannot read compiled audio: %1").arg(build.audioData.errorString()));
+                        file.bytes.append(block);
+                        remaining -= block.size();
+                    }
                 }
             });
         };

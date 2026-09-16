@@ -135,6 +135,22 @@ void CompilerBuild::external(const QString &name, const QByteArray &bytes)
         }
     externalFiles.insert(normalized, bytes);
 }
+int CompilerBuild::addAudio(int group, const QByteArray &bytes)
+{
+    // Keep converted audio on disk until AUDO is assembled. Retaining every
+    // decoded song here duplicates the final data.win buffer in a 32-bit process.
+    if (!audioData.isOpen() && !audioData.open())
+        throw CompileError(QStringLiteral("Cannot create temporary audio storage: %1").arg(audioData.errorString()));
+    CompilerAudioEntry entry;
+    entry.offset = audioData.pos();
+    entry.size = bytes.size();
+    if (audioData.write(bytes) != bytes.size())
+        throw CompileError(QStringLiteral("Cannot store compiled audio: %1").arg(audioData.errorString()));
+    auto &entries = audio[group];
+    const int index = entries.size();
+    entries.append(entry);
+    return index;
+}
 void CompilerBuild::load()
 {
     if (!request.project.isOpen() || request.configuration < 0

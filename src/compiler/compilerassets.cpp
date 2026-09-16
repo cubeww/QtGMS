@@ -69,10 +69,8 @@ void CompilerBuild::assets(CompileProfile &profile)
             if (!bytes.isEmpty()) {
                 if (streamed)
                     external(name, bytes);
-                else {
-                    id = audio[group].size();
-                    audio[group].append(bytes);
-                }
+                else
+                    id = addAudio(group, bytes);
             }
             file.string(resource.node.name);
             file.u32(newAudio ? (streamed ? 100 : state.attributes == 2 ? 103 : compressed ? 102 : 101)
@@ -165,7 +163,6 @@ void CompilerBuild::assets(CompileProfile &profile)
         const auto &backgrounds = resources[ResourceType::Background];
         file.list(backgrounds.size(), [&](int i) {
             const auto &resource = backgrounds.at(i);
-            const auto &root = resource.xml;
             file.string(resource.node.name);
             file.u32(0);
             file.u32(0);
@@ -176,6 +173,11 @@ void CompilerBuild::assets(CompileProfile &profile)
                     request.configuration, error))
                 throw CompileError(resource.node.name + ": " + error);
             const auto &state = document.state();
+            if (state.image.isNull()) {
+                file.u32(0);
+                profile.count(QStringLiteral("Backgrounds without images"));
+                return;
+            }
             TextureSettings texture;
             texture.crop = !state.isTileSet;
             texture.separate = state.for3D;

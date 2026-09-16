@@ -49,14 +49,14 @@ QString CompilerBuild::actionCode(const QDomElement &event)
                     break;
                 }
             const int type = number(argument, "kind");
-            if (kind != 7 && (type == 1 || type == 2) && !value.startsWith('"') && !value.startsWith('\'')) {
+            if (kind != 6 && kind != 7 && (type == 1 || type == 2) && !value.startsWith('"') && !value.startsWith('\'')) {
                 if (value.contains('"'))
                     throw CompileError(QStringLiteral("DND string contains an unquoted double quote"));
                 value = '"' + value + '"';
             }
-            // Execute Code contains source text, not a DND argument value.
-            // In particular, an empty code action must remain an empty statement.
-            if (kind != 7) {
+            // Variable assignments contain a raw lvalue and expression; Execute
+            // Code contains source text. Neither uses ordinary string arguments.
+            if (kind != 6 && kind != 7) {
                 if (value.isEmpty())
                     value = "0";
                 if (value == "<undefined>")
@@ -67,7 +67,13 @@ QString CompilerBuild::actionCode(const QDomElement &event)
         if (kind == 5)
             return "repeat (" + values.value(0, "0") + ") " + action();
         QString body;
-        if (kind == 7)
+        if (kind == 6) {
+            if (values.size() != 2 || values.at(0).trimmed().isEmpty() || values.at(1).trimmed().isEmpty())
+                throw CompileError(QStringLiteral("DND Set Variable requires a variable and a value"));
+            body = text(current, "codestring") + values.at(0)
+                + (number(current, "relative") != 0 ? QStringLiteral(" += ") : QStringLiteral(" = "))
+                + values.at(1);
+        } else if (kind == 7)
             body = values.value(0);
         else if (number(current, "exetype") == 1) {
             QString function = text(current, "functionname");
@@ -92,7 +98,11 @@ QString CompilerBuild::actionCode(const QDomElement &event)
             : QString();
         const QString suffix
             = relative ? QStringLiteral("action_set_relative(%1);\n").arg(relativeBaseline ? 1 : 0) : QString();
-        const QString owner = text(current, "whoName", "self");
+        QString owner = text(current, "whoName", "self");
+        // Apply-to references use the same undefined-object sentinel as the
+        // original compiler; the XML marker itself is not a GML expression.
+        if (owner == QStringLiteral("<undefined>"))
+            owner = QStringLiteral("-100");
         const bool apply = number(current, "useapplyto") != 0 && owner != "self";
         if (number(current, "isquestion") != 0) {
             // Evaluate the condition in its apply-to scope, then execute the body
@@ -121,7 +131,7 @@ QString CompilerBuild::actionCode(const QDomElement &event)
         // GMEvent terminates code actions with an empty block comment. Its
         // closing delimiter also ends an open user comment before generated
         // scope/relative-state cleanup and the next action.
-        if (kind == 7 || number(current, "exetype") == 2)
+        if (kind == 6 || kind == 7 || number(current, "exetype") == 2)
             body += "\n/* */\n";
         body = prefix + body + "\n;\n" + suffix;
         return apply ? "with (" + owner + ") {\n" + body + "}\n" : "{\n" + body + "}\n";

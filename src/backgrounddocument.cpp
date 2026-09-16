@@ -126,12 +126,16 @@ bool BackgroundDocument::loadFromXml(const QString &filePath, const QDomDocument
     QString imagePath;
     if (!reference.isEmpty()) {
         imagePath = QDir::cleanPath(QFileInfo(filePath).absoluteDir().absoluteFilePath(QString(reference).replace(QLatin1Char('\\'), QLatin1Char('/'))));
+        // An absent image represents an empty background, even with a stored path.
+        if (!QFileInfo::exists(imagePath)) imagePath.clear();
+    }
+    if (!imagePath.isEmpty()) {
         QImageReader reader(imagePath);
         state.image = reader.read().convertToFormat(QImage::Format_ARGB32);
         if (state.image.isNull()) { error = tr("Cannot read background image %1:\n%2").arg(imagePath, reader.errorString()); return false; }
     }
-    if (state.image.width() != backgroundValue(root, QStringLiteral("width"))
-        || state.image.height() != backgroundValue(root, QStringLiteral("height"))) {
+    if (!state.image.isNull() && (state.image.width() != backgroundValue(root, QStringLiteral("width"))
+        || state.image.height() != backgroundValue(root, QStringLiteral("height")))) {
         error = tr("The image dimensions do not match the background resource."); return false;
     }
     m_filePath = QFileInfo(filePath).absoluteFilePath();

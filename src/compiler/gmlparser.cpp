@@ -544,10 +544,12 @@ private:
                     fail(QStringLiteral("GMS 1.4 requires a function name"), result->line);
                 result->kind = GmlNodeKind::Call;
                 canIncrement = false;
-                if (!at(GmlSymbol::RightParen))
-                    do {
-                        result->children.append(expression());
-                    } while (take(GmlSymbol::Comma));
+                // GMS permits a trailing comma without adding another argument.
+                while (!at(GmlSymbol::RightParen) && !isEnd()) {
+                    result->children.append(expression());
+                    if (!take(GmlSymbol::Comma))
+                        break;
+                }
                 expect(GmlSymbol::RightParen);
             } else if (take(GmlSymbol::Dot)) {
                 if (current().kind != GmlTokenKind::Name)
@@ -675,8 +677,13 @@ private:
             expect(GmlSymbol::Semicolon);
             result->children.append(
                 at(GmlSymbol::Semicolon) ? node(GmlNodeKind::Number, QStringLiteral("1")) : expression());
-            expect(GmlSymbol::Semicolon);
-            result->children.append(at(GmlSymbol::RightParen) ? node(GmlNodeKind::Block) : assignment());
+            // GMS requires the initializer separator but permits omitting the
+            // separator after the condition: for (i = n; i > 0 i -= step).
+            take(GmlSymbol::Semicolon);
+            // GMS parses the update clause as a statement and accepts trailing
+            // semicolons inside the parentheses: for (i = 0; i < n; i += 1;).
+            result->children.append(at(GmlSymbol::RightParen) ? node(GmlNodeKind::Block) : statement());
+            while (take(GmlSymbol::Semicolon)) {}
             expect(GmlSymbol::RightParen);
             result->children.append(statement());
         } else if (take(GmlSymbol::Switch)) {

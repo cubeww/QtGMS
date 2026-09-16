@@ -4,6 +4,7 @@
 #include "gmlcompiler.h"
 #include "texturecompiler.h"
 #include <QDomDocument>
+#include <QTemporaryFile>
 
 struct CompilerResource
 {
@@ -12,6 +13,11 @@ struct CompilerResource
     QDomElement xml;
     QByteArray sourceBytes;
     QString embeddedSource;
+};
+struct CompilerAudioEntry
+{
+    qint64 offset = 0;
+    int size = 0;
 };
 struct CompilerBuild
 {
@@ -23,7 +29,8 @@ struct CompilerBuild
     QMap<ResourceType, QVector<CompilerResource>> resources;
     QVector<VmCode> codes;
     QMap<QString, QByteArray> externalFiles;
-    QMap<int, QVector<QByteArray>> audio;
+    QMap<int, QVector<CompilerAudioEntry>> audio;
+    QTemporaryFile audioData;
     QMap<QString, QString> options;
     int instanceId = 100000;
     int tileId = 10000000;
@@ -40,6 +47,7 @@ struct CompilerBuild
     int option(const char *key, int fallback = 0) const;
     QString actionCode(const QDomElement &event);
     void external(const QString &name, const QByteArray &bytes);
+    int addAudio(int group, const QByteArray &bytes);
     static QByteArray read(const QString &path);
     static QDomDocument xml(const QString &path, QByteArray *sourceBytes = nullptr);
     static QString text(const QDomElement &element, const char *key, const QString &fallback = QString());
