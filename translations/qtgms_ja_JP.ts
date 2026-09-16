@@ -5131,6 +5131,82 @@ Alt: スナップなし
     <context>
         <name>PreferencesDialog</name>
         <message>
+            <source>Scripts and Code</source>
+            <translation>スクリプトとコード</translation>
+        </message>
+        <message>
+            <source>Font</source>
+            <translation>フォント</translation>
+        </message>
+        <message>
+            <source>Font:</source>
+            <translation>フォント:</translation>
+        </message>
+        <message>
+            <source>Size:</source>
+            <translation>サイズ:</translation>
+        </message>
+        <message>
+            <source>Editing</source>
+            <translation>編集</translation>
+        </message>
+        <message>
+            <source>Automatic indentation</source>
+            <translation>自動インデント</translation>
+        </message>
+        <message>
+            <source>Indent amount:</source>
+            <translation>インデント幅:</translation>
+        </message>
+        <message>
+            <source>Automatically complete brackets</source>
+            <translation>括弧を自動補完</translation>
+        </message>
+        <message>
+            <source>Show auto-completion options</source>
+            <translation>自動補完候補を表示</translation>
+        </message>
+        <message>
+            <source>Completion delay (ms):</source>
+            <translation>補完の遅延（ミリ秒）:</translation>
+        </message>
+        <message>
+            <source>Show function argument help</source>
+            <translation>関数の引数ヒントを表示</translation>
+        </message>
+        <message>
+            <source>Display</source>
+            <translation>表示</translation>
+        </message>
+        <message>
+            <source>Show line numbers</source>
+            <translation>行番号を表示</translation>
+        </message>
+        <message>
+            <source>Show matching brackets</source>
+            <translation>対応する括弧を強調表示</translation>
+        </message>
+        <message>
+            <source>Show indentation guides</source>
+            <translation>インデントガイドを表示</translation>
+        </message>
+        <message>
+            <source>Highlight the current line</source>
+            <translation>現在の行を強調表示</translation>
+        </message>
+        <message>
+            <source>Highlight search matches</source>
+            <translation>検索結果を強調表示</translation>
+        </message>
+        <message>
+            <source>Code settings apply to open editors when you click OK. Ctrl+Space always opens completion.</source>
+            <translation>コード設定は「OK」を押すと開いているエディターに適用されます。Ctrl+Space でいつでも補完を開けます。</translation>
+        </message>
+        <message>
+            <source>Restore Code Defaults</source>
+            <translation>コード設定を初期値に戻す</translation>
+        </message>
+        <message>
             <source>Preferences</source>
             <translation>環境設定</translation>
         </message>

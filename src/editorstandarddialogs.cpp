@@ -46,5 +46,6 @@ EditorMessageBox::StandardButton EditorMessageBox::question(QWidget *parent, con
 void EditorMessageBox::about(QWidget *parent, const QString &title, const QString &text)
 {
     EditorMessageBox dialog(NoIcon, title, text, Ok, parent);
+    dialog.setTextInteractionFlags(Qt::TextBrowserInteraction);
     dialog.setIconPixmap(dialog.windowIcon().pixmap(32, 32)); dialog.exec();
 }

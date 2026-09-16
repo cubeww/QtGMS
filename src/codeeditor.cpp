@@ -48,6 +48,25 @@ CodeEditor::CodeEditor(QWidget *parent)
         m_highlightsPending = true;
         QTimer::singleShot(0, this, [this] { m_highlightsPending = false; updateHighlights(); });
     });
+    connect(&CodeEditorSettings::instance(), &CodeEditorSettings::changed, this, &CodeEditor::applySettings);
+    applySettings();
+}
+void CodeEditor::applySettings()
+{
+    const auto options = CodeEditorSettings::instance().options();
+    const bool fontChanged = options.fontFamily != m_options.fontFamily || options.fontPixelSize != m_options.fontPixelSize;
+    m_options = options;
+    m_indentSize = options.indentSize;
+    if (fontChanged) {
+        QFont codeFont(options.fontFamily);
+        codeFont.setStyleHint(QFont::Monospace);
+        codeFont.setPixelSize(options.fontPixelSize);
+        setFont(codeFont);
+        document()->setDefaultFont(codeFont);
+    }
+    setTabStopWidth(fontMetrics().width(QLatin1Char(' ')) * m_indentSize);
+    if (m_completion) m_completion->configure(options.automaticCompletion, options.completionDelay);
+    m_signatureHelp->setEnabled(options.functionHelp);
     updateGutter(); updateHighlights();
 }
 void CodeEditor::setCodePixelSize(int size)
@@ -56,10 +75,11 @@ void CodeEditor::setCodePixelSize(int size)
     setTabStopWidth(fontMetrics().width(QLatin1Char(' ')) * m_indentSize); updateGutter();
 }
 int CodeEditor::lineNumberWidth() const
-{ return 12 + fontMetrics().width(QLatin1Char('9')) * qMax(2, QString::number(blockCount()).size()); }
+{ return m_options.lineNumbers ? 12 + fontMetrics().width(QLatin1Char('9')) * qMax(2, QString::number(blockCount()).size()) : 0; }
 void CodeEditor::updateGutter()
 {
     const int width = lineNumberWidth(); setViewportMargins(width, 0, 0, 0);
+    m_lineNumbers->setVisible(m_options.lineNumbers);
     const QRect content = contentsRect(); m_lineNumbers->setGeometry(content.left(), content.top(), width, content.height());
     m_lineNumbers->update();
 }
@@ -95,6 +115,7 @@ static int adjacentCodeIndent(QTextBlock block, int indentSize, bool forward)
 void CodeEditor::paintEvent(QPaintEvent *event)
 {
     QPlainTextEdit::paintEvent(event);
+    if (!m_options.indentGuides) return;
     struct GuideLine { QTextBlock block; int columns; bool blank; int top; int height; };
     QVector<GuideLine> lines;
     const int cursorLine = textCursor().blockNumber();
@@ -187,8 +208,9 @@ void CodeEditor::updateHighlights()
     QList<QTextEdit::ExtraSelection> selections;
     QTextEdit::ExtraSelection current; current.cursor = textCursor(); current.cursor.clearSelection();
     current.format.setBackground(CodeEditorColors::CurrentLine); current.format.setProperty(QTextFormat::FullWidthSelection, true);
-    selections.append(current); selections.append(m_searchHighlights);
-    if (!textCursor().hasSelection()) {
+    if (m_options.currentLine) selections.append(current);
+    if (m_options.searchHighlights) selections.append(m_searchHighlights);
+    if (m_options.matchingBrackets && !textCursor().hasSelection()) {
         int position = textCursor().position();
         int partner = matchingBracket(position);
         if (partner < 0 && position > 0) partner = matchingBracket(--position);
@@ -309,7 +331,7 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
     }
     if (!isReadOnly() && event->key() == Qt::Key_Backspace && modifiers == Qt::NoModifier
         && deleteIndent()) { event->accept(); return; }
-    if (!isReadOnly() && !overwriteMode() && editBracket(event)) { event->accept(); return; }
+    if (!isReadOnly() && !overwriteMode() && m_options.automaticBrackets && editBracket(event)) { event->accept(); return; }
     if (!isReadOnly() && (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab)
         && !(event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
         if (event->key() == Qt::Key_Backtab || event->modifiers() & Qt::ShiftModifier) indentSelection(true);
@@ -394,7 +416,10 @@ void CodeEditor::editLines(bool down, bool duplicate)
 
 void CodeEditor::setCompletionItems(const QVector<CodeCompletionItem> &items)
 {
-    if (!m_completion) m_completion = new CodeCompletion(this);
+    if (!m_completion) {
+        m_completion = new CodeCompletion(this);
+        m_completion->configure(m_options.automaticCompletion, m_options.completionDelay);
+    }
     m_completion->setItems(items);
     m_signatureHelp->setItems(items);
 }
@@ -541,7 +566,7 @@ void CodeEditor::insertAdjacentLine(bool above)
     }
     const QString text = cursor.block().text();
     int leading = 0;
-    while (leading < text.size() && text.at(leading).isSpace()) ++leading;
+    while (m_options.automaticIndentation && leading < text.size() && text.at(leading).isSpace()) ++leading;
     cursor.movePosition(QTextCursor::StartOfBlock);
     const int start = cursor.position();
     cursor.beginEditBlock();
@@ -554,6 +579,11 @@ void CodeEditor::insertAdjacentLine(bool above)
 void CodeEditor::insertIndentedLine()
 {
     QTextCursor cursor = textCursor();
+    if (!m_options.automaticIndentation) {
+        cursor.insertText(QStringLiteral("\n"));
+        setTextCursor(cursor); ensureCursorVisible();
+        return;
+    }
     const int start = cursor.selectionStart(), end = cursor.selectionEnd();
     const QTextBlock first = document()->findBlock(start), last = document()->findBlock(end);
     const QString before = first.text().left(start - first.position());

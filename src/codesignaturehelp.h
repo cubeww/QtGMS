@@ -15,6 +15,7 @@ class CodeSignatureHelp : public QObject
 public:
     explicit CodeSignatureHelp(CodeEditor *editor);
     void setItems(const QVector<CodeCompletionItem> &items);
+    void setEnabled(bool enabled);
 signals:
     void changed(const QString &text, int parameterStart, int parameterLength);
 private:
@@ -28,6 +29,7 @@ private:
     QString m_text;
     int m_parameterStart = -1;
     int m_parameterLength = 0;
+    bool m_enabled = true;
 };
 
 #endif

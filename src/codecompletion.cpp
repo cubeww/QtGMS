@@ -164,6 +164,13 @@ void CodeCompletion::setItems(const QVector<CodeCompletionItem> &items)
     }
 }
 
+void CodeCompletion::configure(bool automatic, int delay)
+{
+    m_automatic = automatic;
+    dismiss();
+    m_timer->setInterval(delay);
+}
+
 bool CodeCompletion::token(QString &query, int &start, int &end) const
 {
     if (m_editor->isReadOnly() || m_editor->textCursor().hasSelection()) return false;
@@ -257,7 +264,7 @@ bool CodeCompletion::handleKeyPress(QKeyEvent *event)
         && event->text().size() == 1 && completionWordCharacter(event->text().at(0));
     const bool deleting = modifiers == Qt::NoModifier && m_completer->popup()->isVisible()
         && (event->key() == Qt::Key_Backspace || event->key() == Qt::Key_Delete);
-    if (typing || deleting) m_timer->start();
+    if ((typing && (m_automatic || m_completer->popup()->isVisible())) || deleting) m_timer->start();
     else if (event->key() != Qt::Key_Shift) dismiss();
     return false;
 }

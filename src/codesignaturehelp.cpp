@@ -37,8 +37,8 @@ CodeSignatureHelp::CodeSignatureHelp(CodeEditor *editor)
 {
     m_timer->setSingleShot(true);
     // Read lexical metadata after highlighting has finished processing the edit.
-    connect(editor, &QPlainTextEdit::cursorPositionChanged, this, [this] { m_timer->start(0); });
-    connect(editor, &QPlainTextEdit::textChanged, this, [this] { m_timer->start(0); });
+    connect(editor, &QPlainTextEdit::cursorPositionChanged, this, [this] { if (m_enabled) m_timer->start(0); });
+    connect(editor, &QPlainTextEdit::textChanged, this, [this] { if (m_enabled) m_timer->start(0); });
     connect(m_timer, &QTimer::timeout, this, &CodeSignatureHelp::update);
 }
 
@@ -76,9 +76,16 @@ void CodeSignatureHelp::publish(const QString &text, int start, int length)
     emit changed(text, start, length);
 }
 
+void CodeSignatureHelp::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
+    if (enabled) m_timer->start(0);
+    else { m_timer->stop(); publish(); }
+}
+
 void CodeSignatureHelp::update()
 {
-    if (m_signatures.isEmpty() || m_editor->textCursor().hasSelection()) { publish(); return; }
+    if (!m_enabled || m_signatures.isEmpty() || m_editor->textCursor().hasSelection()) { publish(); return; }
     BackwardCodeTokens iterator(m_editor->document(), m_editor->textCursor().position());
     CodeBlockData::Token token; QTextBlock block;
     QVector<QChar> closing;

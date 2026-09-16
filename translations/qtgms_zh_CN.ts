@@ -5131,6 +5131,82 @@ Alt：不吸附
     <context>
         <name>PreferencesDialog</name>
         <message>
+            <source>Scripts and Code</source>
+            <translation>脚本与代码</translation>
+        </message>
+        <message>
+            <source>Font</source>
+            <translation>字体</translation>
+        </message>
+        <message>
+            <source>Font:</source>
+            <translation>字体：</translation>
+        </message>
+        <message>
+            <source>Size:</source>
+            <translation>字号：</translation>
+        </message>
+        <message>
+            <source>Editing</source>
+            <translation>编辑</translation>
+        </message>
+        <message>
+            <source>Automatic indentation</source>
+            <translation>自动缩进</translation>
+        </message>
+        <message>
+            <source>Indent amount:</source>
+            <translation>缩进宽度：</translation>
+        </message>
+        <message>
+            <source>Automatically complete brackets</source>
+            <translation>自动补全括号</translation>
+        </message>
+        <message>
+            <source>Show auto-completion options</source>
+            <translation>显示自动补全选项</translation>
+        </message>
+        <message>
+            <source>Completion delay (ms):</source>
+            <translation>补全延迟（毫秒）：</translation>
+        </message>
+        <message>
+            <source>Show function argument help</source>
+            <translation>显示函数参数提示</translation>
+        </message>
+        <message>
+            <source>Display</source>
+            <translation>显示</translation>
+        </message>
+        <message>
+            <source>Show line numbers</source>
+            <translation>显示行号</translation>
+        </message>
+        <message>
+            <source>Show matching brackets</source>
+            <translation>高亮匹配的括号</translation>
+        </message>
+        <message>
+            <source>Show indentation guides</source>
+            <translation>显示缩进参考线</translation>
+        </message>
+        <message>
+            <source>Highlight the current line</source>
+            <translation>高亮当前行</translation>
+        </message>
+        <message>
+            <source>Highlight search matches</source>
+            <translation>高亮搜索匹配项</translation>
+        </message>
+        <message>
+            <source>Code settings apply to open editors when you click OK. Ctrl+Space always opens completion.</source>
+            <translation>点击“确定”后，代码设置会应用到已打开的编辑器。始终可用 Ctrl+Space 手动打开补全。</translation>
+        </message>
+        <message>
+            <source>Restore Code Defaults</source>
+            <translation>恢复代码编辑默认设置</translation>
+        </message>
+        <message>
             <source>Preferences</source>
             <translation>首选项</translation>
         </message>

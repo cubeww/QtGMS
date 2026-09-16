@@ -54,6 +54,8 @@ add_executable(QtGMS WIN32
     src/editorlanguage.cpp
     src/editorlanguage.h
     src/preferencesdialog.cpp
+    src/codeeditorsettings.cpp
+    src/codeeditorsettings.h
     src/preferencesdialog.h
     src/objecteventtranslations.cpp
     src/objecteventtranslations.h

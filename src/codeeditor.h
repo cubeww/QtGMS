@@ -3,6 +3,7 @@
 
 #include <QPlainTextEdit>
 #include "codecompletionitem.h"
+#include "codeeditorsettings.h"
 #include <QVector>
 
 class CodeCompletion;
@@ -37,6 +38,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 private:
     void updateGutter();
+    void applySettings();
     void updateHighlights();
     void setCodePixelSize(int size);
     bool isCodePosition(int position) const;
@@ -49,6 +51,7 @@ private:
     QWidget *m_lineNumbers;
     QList<QTextEdit::ExtraSelection> m_searchHighlights;
     int m_indentSize;
+    CodeEditorOptions m_options;
     bool m_highlightsPending = false;
     CodeCompletion *m_completion = nullptr;
     CodeSignatureHelp *m_signatureHelp;

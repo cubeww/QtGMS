@@ -834,7 +834,8 @@ void MainWindow::createMenusAndToolbar()
     QAction *aboutAction = helpMenu->addAction(tr("&About QtGMS..."));
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
-            tr("QtGMS 0.1.0\nA GameMaker Studio-style editor."));
+            QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
+                .arg(tr("QtGMS 0.1.0\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

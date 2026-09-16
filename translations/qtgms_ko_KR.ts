@@ -5131,6 +5131,82 @@ Alt: 맞춤 해제
     <context>
         <name>PreferencesDialog</name>
         <message>
+            <source>Scripts and Code</source>
+            <translation>스크립트 및 코드</translation>
+        </message>
+        <message>
+            <source>Font</source>
+            <translation>글꼴</translation>
+        </message>
+        <message>
+            <source>Font:</source>
+            <translation>글꼴:</translation>
+        </message>
+        <message>
+            <source>Size:</source>
+            <translation>크기:</translation>
+        </message>
+        <message>
+            <source>Editing</source>
+            <translation>편집</translation>
+        </message>
+        <message>
+            <source>Automatic indentation</source>
+            <translation>자동 들여쓰기</translation>
+        </message>
+        <message>
+            <source>Indent amount:</source>
+            <translation>들여쓰기 너비:</translation>
+        </message>
+        <message>
+            <source>Automatically complete brackets</source>
+            <translation>괄호 자동 완성</translation>
+        </message>
+        <message>
+            <source>Show auto-completion options</source>
+            <translation>자동 완성 후보 표시</translation>
+        </message>
+        <message>
+            <source>Completion delay (ms):</source>
+            <translation>자동 완성 지연(ms):</translation>
+        </message>
+        <message>
+            <source>Show function argument help</source>
+            <translation>함수 인수 도움말 표시</translation>
+        </message>
+        <message>
+            <source>Display</source>
+            <translation>표시</translation>
+        </message>
+        <message>
+            <source>Show line numbers</source>
+            <translation>줄 번호 표시</translation>
+        </message>
+        <message>
+            <source>Show matching brackets</source>
+            <translation>짝이 맞는 괄호 강조 표시</translation>
+        </message>
+        <message>
+            <source>Show indentation guides</source>
+            <translation>들여쓰기 안내선 표시</translation>
+        </message>
+        <message>
+            <source>Highlight the current line</source>
+            <translation>현재 줄 강조 표시</translation>
+        </message>
+        <message>
+            <source>Highlight search matches</source>
+            <translation>검색 일치 항목 강조 표시</translation>
+        </message>
+        <message>
+            <source>Code settings apply to open editors when you click OK. Ctrl+Space always opens completion.</source>
+            <translation>확인을 누르면 열려 있는 편집기에 코드 설정이 적용됩니다. Ctrl+Space로 언제든지 자동 완성을 열 수 있습니다.</translation>
+        </message>
+        <message>
+            <source>Restore Code Defaults</source>
+            <translation>코드 기본 설정 복원</translation>
+        </message>
+        <message>
             <source>Preferences</source>
             <translation>환경 설정</translation>
         </message>
