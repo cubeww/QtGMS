@@ -6,6 +6,7 @@ class BuildDirectory
 {
 public:
     static QString path(const Project &project);
+    static QString executablePath(const Project &project);
     static bool validate(const Project &project, QString &error);
     static bool clean(const Project &project, QString &error);
 };

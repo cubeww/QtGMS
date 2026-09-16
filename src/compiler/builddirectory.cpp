@@ -16,6 +16,14 @@ QString BuildDirectory::path(const Project &project)
     return QFileInfo(project.filePath()).absoluteDir().filePath(QStringLiteral("build"));
 }
 
+QString BuildDirectory::executablePath(const Project &project)
+{
+    QString name = QFileInfo(project.filePath()).completeBaseName();
+    if (name.endsWith(QStringLiteral(".project"), Qt::CaseInsensitive))
+        name.chop(8);
+    return QDir(path(project)).filePath(name + QStringLiteral(".exe"));
+}
+
 bool BuildDirectory::validate(const Project &project, QString &error)
 {
     if (!project.isOpen()) {

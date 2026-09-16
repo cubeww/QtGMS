@@ -37,7 +37,7 @@ struct CompilerBuild
     int classificationOffset = 0;
     void load();
     void general();
-    void assets(CompileProfile &profile);
+    void assets(CompileProfile &profile, const std::function<void(const QString &)> &progress);
     void objects();
     void rooms();
     void extensions();

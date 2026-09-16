@@ -11,7 +11,7 @@
 #include <QFileInfo>
 #include <QImageReader>
 
-void CompilerBuild::assets(CompileProfile &profile)
+void CompilerBuild::assets(CompileProfile &profile, const std::function<void(const QString &)> &progress)
 {
     profile.start(QStringLiteral("Audio loading / conversion / cache"));
     const bool newAudio = option("use_new_audio", 1) != 0;
@@ -49,6 +49,8 @@ void CompilerBuild::assets(CompileProfile &profile)
                 + QByteArray::number(state.channelType) + ":" + QByteArray::number(state.sampleRate) + ":"
                 + QByteArray::number(state.bitRate) + ":" + QByteArray::number(state.bitDepth);
             const auto encode = [&] {
+                progress(QStringLiteral("Converting audio [%1/%2]: %3...")
+                    .arg(i + 1).arg(sounds.size()).arg(resource.node.name));
                 try {
                     return compileAudio(state.audio, encoding, state.channelType == 1 ? 2 : 1,
                         state.sampleRate, state.bitRate, state.bitDepth);

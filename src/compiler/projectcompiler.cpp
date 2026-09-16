@@ -2,6 +2,8 @@
 #include "compilerbuild.h"
 #include "builddirectory.h"
 #include "projectfiletransaction.h"
+#include "runnericon.h"
+#include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFileInfo>
@@ -32,7 +34,9 @@ CompileResult ProjectCompiler::compile(
         build.general();
         build.extensions();
         stage(QStringLiteral("Compiling sprites, backgrounds, audio, paths, scripts and fonts..."));
-        build.assets(profile);
+        build.assets(profile, [&](const QString &message) {
+            progress(message, completedStages - 1, StageCount);
+        });
         profile.start(QStringLiteral("Object / timeline events"));
         stage(QStringLiteral("Compiling object and timeline events..."));
         build.objects();
@@ -128,6 +132,14 @@ CompileResult ProjectCompiler::compile(
             build.external("splash.png",
                 CompilerBuild::read(QFileInfo(request.project.filePath()).absoluteDir().absoluteFilePath(splash)));
         QDir output(BuildDirectory::path(request.project));
+        const QString executablePath = BuildDirectory::executablePath(request.project);
+        const QDir runtime(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("runtime/windows")));
+        for (const auto &name : {QStringLiteral("Runner.exe"), QStringLiteral("d3dx9_43.dll"), QStringLiteral("d3dcompiler_43.dll")})
+            build.external(name == QStringLiteral("Runner.exe") ? QFileInfo(executablePath).fileName() : name,
+                CompilerBuild::read(runtime.filePath(name)));
+        QString iconPath = build.options.value(QStringLiteral("option_windows_game_icon")).trimmed();
+        if (!iconPath.isEmpty())
+            iconPath = QFileInfo(request.project.filePath()).absoluteDir().absoluteFilePath(iconPath.replace('\\', '/'));
         if (!QDir().mkpath(output.absolutePath()))
             throw CompileError(QStringLiteral("Cannot create the output directory."));
         ProjectFileTransaction transaction(output.absolutePath());
@@ -147,7 +159,11 @@ CompileResult ProjectCompiler::compile(
                 result.files.append(path);
             }
             const QString data = output.absoluteFilePath("data.win");
-            if (!transaction.write(data, build.file.bytes, error) || !transaction.finish(error))
+            if (!transaction.write(data, build.file.bytes, error))
+                throw CompileError(error);
+            if (!iconPath.isEmpty() && !RunnerIcon::replace(executablePath, iconPath, error))
+                throw CompileError(error);
+            if (!transaction.finish(error))
                 throw CompileError(error);
             result.files.prepend(data);
             result.success = true;

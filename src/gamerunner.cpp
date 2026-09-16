@@ -1,8 +1,5 @@
 #include "gamerunner.h"
-#include "projectfiletransaction.h"
-#include <QCoreApplication>
 #include <QDir>
-#include <QFile>
 #include <QFileInfo>
 
 GameRunner::GameRunner(QObject *parent)
@@ -29,43 +26,25 @@ bool GameRunner::isRunning() const
     return m_process.state() != QProcess::NotRunning;
 }
 
-bool GameRunner::start(const QString &directory, QString &error)
+bool GameRunner::start(const QString &executablePath, QString &error)
 {
     if (isRunning()) {
         error = tr("A game is already running.");
         return false;
     }
-    const QDir output(directory),
-        runtime(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("runtime/windows")));
-    if (!QFileInfo::exists(output.filePath(QStringLiteral("data.win")))) {
+    const QFileInfo executable(executablePath);
+    const QString directory = executable.absolutePath();
+    const QDir output(directory);
+    if (!executable.exists() || !QFileInfo::exists(output.filePath(QStringLiteral("data.win")))) {
         error = tr("Compile the project before running it.");
         return false;
     }
-    ProjectFileTransaction transaction(directory);
-    for (const auto &name :
-        { QStringLiteral("Runner.exe"), QStringLiteral("d3dx9_43.dll"), QStringLiteral("d3dcompiler_43.dll") }) {
-        QFile source(runtime.filePath(name));
-        if (!source.open(QIODevice::ReadOnly)) {
-            error = tr("Cannot read runtime file %1: %2").arg(source.fileName(), source.errorString());
-            transaction.rollback(error);
-            return false;
-        }
-        const QByteArray bytes = source.readAll();
-        if (source.error() != QFile::NoError || !transaction.write(output.filePath(name), bytes, error)) {
-            if (error.isEmpty())
-                error = source.errorString();
-            transaction.rollback(error);
-            return false;
-        }
-    }
-    if (!transaction.finish(error))
-        return false;
     m_output.clear();
     m_stopping = false;
     m_process.setWorkingDirectory(directory);
     // Keep the legacy Runner's game argument ASCII. QProcess supplies the
     // Unicode executable path and working directory through the Windows API.
-    m_process.start(output.filePath(QStringLiteral("Runner.exe")),
+    m_process.start(executable.absoluteFilePath(),
         { QStringLiteral("-game"), QStringLiteral("data.win") });
     if (!m_process.waitForStarted(3000)) {
         error = tr("Cannot start Runner: %1").arg(m_process.errorString());

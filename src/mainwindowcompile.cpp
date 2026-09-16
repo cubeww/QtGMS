@@ -121,7 +121,7 @@ void MainWindow::runProject()
     if (!compileProject())
         return;
     QString error;
-    if (!m_gameRunner->start(BuildDirectory::path(m_project), error)) {
+    if (!m_gameRunner->start(BuildDirectory::executablePath(m_project), error)) {
         m_compilePanel->appendMessage(tr("ERROR: %1").arg(error));
         EditorMessageBox::warning(this, tr("Run Failed"), error);
     }

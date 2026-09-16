@@ -10,7 +10,7 @@ public:
     explicit GameRunner(QObject *parent = nullptr);
     ~GameRunner() override;
     bool isRunning() const;
-    bool start(const QString &directory, QString &error);
+    bool start(const QString &executablePath, QString &error);
     bool stop();
 signals:
     void runningChanged();

@@ -3493,9 +3493,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS について</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.3
+            <source>QtGMS 0.1.4
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.3
+            <translation>QtGMS 0.1.4
 GameMaker Studio スタイルのエディター。</translation>
         </message>
         <message>
