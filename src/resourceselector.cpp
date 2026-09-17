@@ -47,6 +47,14 @@ static QIcon resourceMenuIcon(const ResourceNode &node)
 
 static const int ResourceThumbnailRole = Qt::UserRole + 1;
 
+static void configureResourceMenu(QMenu *menu)
+{
+    // QMenu caches its scrollable style hint. Polish first so changing the
+    // stylesheet sends StyleChange and updates that cache before layout.
+    menu->ensurePolished();
+    menu->setStyleSheet(QStringLiteral("QMenu { menu-scrollable: 1; } QMenu::item { padding: 2px 22px 2px 22px; }"));
+}
+
 static void markCurrentResource(QMenu *menu, QAction *action, const QString &current)
 {
     if (action->data().toString() != current) return;
@@ -59,6 +67,7 @@ static void appendResourceChoices(QMenu *menu, const QList<ResourceNode> &nodes,
     for (const auto &node : nodes) {
         if (node.isGroup) {
             auto *group = menu->addMenu(QIcon(QStringLiteral(":/images/tree/folder.png")), menuLabel(node.name));
+            configureResourceMenu(group);
             const auto children = node.children;
             QObject::connect(group, &QMenu::aboutToShow, group, [group, children, current, excluded] {
                 if (group->actions().isEmpty()) appendResourceChoices(group, children, current, excluded);
@@ -77,7 +86,7 @@ ResourceSelectionMenu::ResourceSelectionMenu(const QList<ResourceNode> &resource
     : QMenu(parent)
 {
     // Qt handles submenus, keyboard navigation, screen edges and long menus.
-    setStyleSheet(QStringLiteral("QMenu { menu-scrollable: 1; } QMenu::item { padding: 2px 22px 2px 22px; }"));
+    configureResourceMenu(this);
     if (!emptyLabel.isEmpty()) {
         auto *empty = addAction(menuLabel(emptyLabel)); empty->setData(emptyValue);
         markCurrentResource(this, empty, current);

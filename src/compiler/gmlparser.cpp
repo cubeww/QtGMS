@@ -680,7 +680,6 @@ private:
                     break;
             }
             expect(GmlSymbol::RightBrace);
-            take(GmlSymbol::Semicolon);
         } else if (take(GmlSymbol::If)) {
             result->kind = GmlNodeKind::If;
             result->children.append(expression());
@@ -701,7 +700,6 @@ private:
             result->children.append(statement());
             expect(GmlSymbol::Until);
             result->children.append(expression());
-            take(GmlSymbol::Semicolon);
         } else if (take(GmlSymbol::For)) {
             result->kind = GmlNodeKind::For;
             expect(GmlSymbol::LeftParen);
@@ -715,7 +713,6 @@ private:
             // GMS parses the update clause as a statement and accepts trailing
             // semicolons inside the parentheses: for (i = 0; i < n; i += 1;).
             result->children.append(at(GmlSymbol::RightParen) ? node(GmlNodeKind::Block) : statement());
-            while (take(GmlSymbol::Semicolon)) {}
             expect(GmlSymbol::RightParen);
             result->children.append(statement());
         } else if (take(GmlSymbol::Switch)) {
@@ -740,18 +737,19 @@ private:
                 : at(GmlSymbol::Continue)       ? GmlNodeKind::Continue
                                                 : GmlNodeKind::Exit;
             ++m_index;
-            take(GmlSymbol::Semicolon);
         } else if (take(GmlSymbol::Return)) {
             result->kind = GmlNodeKind::Return;
             // Semicolons are optional; a following statement keyword must not
             // be consumed as a variable in the return expression.
             if (!isEnd() && !isReturnBoundary(current().symbol))
                 result->children.append(expression());
-            take(GmlSymbol::Semicolon);
         } else {
             result = assignment();
-            take(GmlSymbol::Semicolon);
         }
+        // GMS consumes all trailing semicolons after every statement, including
+        // blocks, so "if (...) { ... }; else ..." and "do { ... }; until ..."
+        // keep their following clause attached to the same statement.
+        while (take(GmlSymbol::Semicolon)) {}
         --m_depth;
         return result;
     }
