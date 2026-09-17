@@ -1,4 +1,5 @@
 #include "actionxml.h"
+#include "roomassets.h"
 #include "preferencesdialog.h"
 #include "resourcereferences.h"
 #include <QShortcut>
@@ -21,6 +22,7 @@
 #include "compilepanel.h"
 #include "gamerunner.h"
 #include "projectloader.h"
+#include "projectimportjob.h"
 #include "resourcebrowser.h"
 #include "spritedocument.h"
 #include "spritepropertieswindow.h"
@@ -92,6 +94,7 @@ static void showResourceEditor(ResourceEditorWindow *window)
 
 MainWindow::MainWindow(const QString &projectPath, QWidget *parent)
     : EditorWindow(parent),
+      m_roomAssets(new RoomAssets(&m_project)),
       m_resourceBrowser(new ResourceBrowser(this)),
       m_compilePanel(new CompilePanel(this)),
       m_configurationCombo(new QComboBox(this)),
@@ -153,7 +156,7 @@ MainWindow::MainWindow(const QString &projectPath, QWidget *parent)
     QTimer::singleShot(0, this, [this, projectPath] {
         if (projectPath.isEmpty())
             newProject();
-        else if (projectPath.endsWith(QStringLiteral(".gmz"), Qt::CaseInsensitive))
+        else if (ProjectImportJob::supportsFile(projectPath))
             importProjectFile(projectPath);
         else
             loadProject(projectPath);
@@ -217,6 +220,7 @@ bool MainWindow::saveProject()
             EditorMessageBox::critical(this, tr("Cannot Save Project"), error); continue;
         }
         const QString newDirectory = QFileInfo(m_project.filePath()).absolutePath();
+        m_roomAssets->reload();
         const auto windows = m_resourceEditors.values();
         m_resourceEditors.clear();
         for (const auto &window : windows) {
@@ -314,6 +318,7 @@ ResourceNode MainWindow::createResource(ResourceType type)
         return ResourceNode();
     }
     m_resourceBrowser->addResource(resource, groupPath);
+    m_roomAssets->invalidate(type, resource.filePath);
     for (const auto &editor : m_resourceEditors) {
         if (auto *objectWindow = qobject_cast<ObjectPropertiesWindow *>(editor.data())) objectWindow->updateResources();
         if (type == ResourceType::Object || type == ResourceType::Sprite || type == ResourceType::Background)
@@ -360,7 +365,7 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
         if (information->load(filePath, error)) window = information; else delete information;
     } else if (type == ResourceType::Path) {
         auto *document = new PathDocument;
-        if (document->load(filePath, error)) window = new PathPropertiesWindow(document, &m_project, this);
+        if (document->load(filePath, error)) window = new PathPropertiesWindow(document, &m_project, m_roomAssets, this);
         else delete document;
     } else if (type == ResourceType::Macro) {
         auto *document = new MacroDocument(&m_project);
@@ -373,7 +378,7 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
     } else if (type == ResourceType::Room) {
         auto *document = new RoomDocument;
         if (document->load(filePath, error)) {
-            auto *room = new RoomPropertiesWindow(document, &m_project, this);
+            auto *room = new RoomPropertiesWindow(document, &m_project, m_roomAssets, this);
             connect(room, &RoomPropertiesWindow::openResourceRequested, this, &MainWindow::openResource); window = room;
         } else delete document;
     } else if (type == ResourceType::Timeline) {
@@ -427,6 +432,7 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
     }
     connect(window, &ResourceEditorWindow::saveProjectRequested, this, [this] { saveProject(); });
     connect(window, &QObject::destroyed, this, [this] {
+        m_roomAssets->trimCache();
         for (auto it = m_resourceEditors.begin(); it != m_resourceEditors.end();) {
             if (it.value().isNull()) it = m_resourceEditors.erase(it);
             else ++it;
@@ -452,6 +458,7 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
         }
         if (savedType == ResourceType::Macro) { m_resourceBrowser->refreshMacros(m_project); return; }
         m_project.updateThumbnail(savedType, path, thumbnail);
+        m_roomAssets->invalidate(savedType, path);
         m_resourceBrowser->refreshIcons(m_project);
         for (const auto &editor : m_resourceEditors) {
             if (savedType == ResourceType::Room || savedType == ResourceType::Object || savedType == ResourceType::Sprite || savedType == ResourceType::Background)
@@ -488,6 +495,7 @@ void MainWindow::removeResource(ResourceType type, const QString &filePath)
     const bool removed = m_project.removeResource(type, filePath, error);
     QApplication::restoreOverrideCursor();
     if (removed) {
+        m_roomAssets->reload();
         m_settingsEdited = true;
         m_resourceBrowser->setProject(m_project);
         updateConfiguration(m_configurationCombo->currentIndex());
@@ -530,6 +538,7 @@ void MainWindow::renameResource(ResourceType type, const QString &filePath, cons
     const bool renamed = m_project.renameResource(type, filePath, name, newPath, error);
     QApplication::restoreOverrideCursor();
     if (renamed) {
+        m_roomAssets->reload();
         m_settingsEdited = true; m_resourceBrowser->setProject(m_project); updateConfiguration(m_configurationCombo->currentIndex()); m_resourceBrowser->selectResource(newPath);
     }
     for (const auto &item : opened) {
@@ -599,6 +608,7 @@ void MainWindow::updateProjectActions()
 
 void MainWindow::updateProject()
 {
+    m_roomAssets->reload();
     m_activeConfigurationPath.clear();
     m_informationEdited = false;
     m_settingsEdited = false;
@@ -871,7 +881,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.1.5\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.2.0\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

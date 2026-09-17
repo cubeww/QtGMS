@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "projectimportjob.h"
 
 #include "backgrounddocument.h"
 #include "editordialog.h"
@@ -31,7 +32,7 @@
 
 static bool isDroppedProject(const QString &path)
 {
-    return path.endsWith(QStringLiteral(".project.gmx"), Qt::CaseInsensitive);
+    return path.endsWith(QStringLiteral(".project.gmx"), Qt::CaseInsensitive) || ProjectImportJob::supportsFile(path);
 }
 
 static ResourceType droppedResourceType(const QString &path)
@@ -148,8 +149,10 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         // Leave the native drag loop before opening modal dialogs or editors.
         QTimer::singleShot(0, this, [this, paths, parent]() {
             m_fileDropPending = false;
-            if (paths.size() == 1 && isDroppedProject(paths.first())) loadProject(paths.first());
-            else importDroppedFiles(paths, parent ? parent.data() : this);
+            if (paths.size() == 1 && isDroppedProject(paths.first())) {
+                if (ProjectImportJob::supportsFile(paths.first())) importProjectFile(paths.first());
+                else loadProject(paths.first());
+            } else importDroppedFiles(paths, parent ? parent.data() : this);
         });
     }
     return true;
@@ -218,6 +221,7 @@ void MainWindow::importDroppedFiles(const QStringList &paths, QWidget *parent)
         } else errors.append(tr("%1: %2").arg(QFileInfo(path).fileName(), error));
     }
     if (imported) {
+        m_roomAssets->reload();
         m_settingsEdited = true;
         m_resourceBrowser->setProject(m_project);
         updateConfiguration(m_configurationCombo->currentIndex());

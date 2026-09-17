@@ -3089,20 +3089,46 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>System default (%1)</source>
+            <translation>システムの既定値 (%1)</translation>
+        </message>
+        <message>
+            <source>Japanese (Shift-JIS / CP932)</source>
+            <translation>日本語 (Shift-JIS / CP932)</translation>
+        </message>
+        <message>
+            <source>Simplified Chinese (GBK / CP936)</source>
+            <translation>簡体字中国語 (GBK / CP936)</translation>
+        </message>
+        <message>
+            <source>Traditional Chinese (Big5 / CP950)</source>
+            <translation>繁体字中国語 (Big5 / CP950)</translation>
+        </message>
+        <message>
+            <source>Korean (CP949)</source>
+            <translation>韓国語 (CP949)</translation>
+        </message>
+        <message>
+            <source>Western European (Windows-1252)</source>
+            <translation>西ヨーロッパ言語 (Windows-1252)</translation>
+        </message>
+        <message>
+            <source>Cyrillic (Windows-1251)</source>
+            <translation>キリル文字 (Windows-1251)</translation>
+        </message>
+        <message>
+            <source>Text encoding for this GMK project:
+Choose the encoding used when the project was created.</source>
+            <translation>この GMK プロジェクトの文字コード：
+作成時に使用した文字コードを選んでください。</translation>
+        </message>
+        <message>
             <source>Import Project</source>
             <translation>プロジェクトをインポート</translation>
         </message>
         <message>
             <source>Cannot Import Project</source>
             <translation>プロジェクトをインポートできません</translation>
-        </message>
-        <message>
-            <source>Only GMZ projects can currently be imported.</source>
-            <translation>現在インポートできるのは GMZ プロジェクトのみです。</translation>
-        </message>
-        <message>
-            <source>Reading GMZ package...</source>
-            <translation>GMZ パッケージを読み込み中...</translation>
         </message>
         <message>
             <source>Imported temporary project: %1</source>
@@ -3493,9 +3519,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS について</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.5
+            <source>QtGMS 0.2.0
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.5
+            <translation>QtGMS 0.2.0
 GameMaker Studio スタイルのエディター。</translation>
         </message>
         <message>
@@ -3685,6 +3711,18 @@ Any resources completed before this error remain saved.</source>
 %1</source>
             <translation>プロジェクトファイルが存在しないため、最近のプロジェクトから削除しました:
 %1</translation>
+        </message>
+        <message>
+            <source>GameMaker Projects (*.gmz *.gmk *.gm81 *.gm82);;GameMaker Compressed Projects (*.gmz);;GameMaker 7/8 Projects (*.gmk);;GameMaker 8.1 Projects (*.gm81);;GameMaker 8.2 Projects (*.gm82)</source>
+            <translation>GameMaker プロジェクト (*.gmz *.gmk *.gm81 *.gm82);;GameMaker 圧縮プロジェクト (*.gmz);;GameMaker 7/8 プロジェクト (*.gmk);;GameMaker 8.1 プロジェクト (*.gm81);;GameMaker 8.2 プロジェクト (*.gm82)</translation>
+        </message>
+        <message>
+            <source>Choose a GMZ, GMK, GM81 or GM82 project.</source>
+            <translation>GMZ、GMK、GM81 または GM82 プロジェクトを選択してください。</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>プロジェクトを読み込み中…</translation>
         </message>
     </context>
     <context>
@@ -5298,6 +5336,10 @@ Alt: スナップなし
     <context>
         <name>QObject</name>
         <message>
+            <source>Unsupported text encoding: %1</source>
+            <translation>未対応の文字コード：%1</translation>
+        </message>
+        <message>
             <source>Action library exceeds 32 MB.</source>
             <translation>アクションライブラリが 32 MB を超えています。</translation>
         </message>
@@ -6418,6 +6460,366 @@ Cannot remove the unregistered information file: %1</source>
         <message>
             <source>The file is not valid UTF-8 or BOM-marked UTF-16 text. Convert its encoding before importing it.</source>
             <translation>有効な UTF-8 または BOM 付き UTF-16 ではありません。文字コードを変換してからインポートしてください。</translation>
+        </message>
+        <message>
+            <source>%1 (file offset %2%3): %4</source>
+            <translation>%1 (ファイル位置 %2%3): %4</translation>
+        </message>
+        <message>
+            <source>, block offset %1</source>
+            <translation>、ブロック位置 %1</translation>
+        </message>
+        <message>
+            <source>Invalid or excessively large data block.</source>
+            <translation>データブロックが無効か、大きすぎます。</translation>
+        </message>
+        <message>
+            <source>Unexpected end of a resource block.</source>
+            <translation>リソースブロックが予期せず終了しました。</translation>
+        </message>
+        <message>
+            <source>Unexpected end of the project file.</source>
+            <translation>プロジェクトファイルが予期せず終了しました。</translation>
+        </message>
+        <message>
+            <source>Invalid data block length: %1.</source>
+            <translation>データブロックの長さが無効です: %1。</translation>
+        </message>
+        <message>
+            <source>Invalid item count: %1.</source>
+            <translation>項目数が無効です: %1。</translation>
+        </message>
+        <message>
+            <source>Invalid boolean value: %1.</source>
+            <translation>真偽値が無効です: %1。</translation>
+        </message>
+        <message>
+            <source>Invalid floating point value.</source>
+            <translation>浮動小数点数が無効です。</translation>
+        </message>
+        <message>
+            <source>Unsupported legacy format version: %1.</source>
+            <translation>未対応の旧形式バージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Damaged or excessively large compressed resource.</source>
+            <translation>圧縮リソースが破損しているか、大きすぎます。</translation>
+        </message>
+        <message>
+            <source>Unexpected nested resource block.</source>
+            <translation>予期しないリソースブロックの入れ子です。</translation>
+        </message>
+        <message>
+            <source>Invalid GM7 encoding seed.</source>
+            <translation>GM7 エンコードシードが無効です。</translation>
+        </message>
+        <message>
+            <source>Cannot create directory for %1.</source>
+            <translation>%1 のディレクトリを作成できません。</translation>
+        </message>
+        <message>
+            <source>Cannot write %1: %2</source>
+            <translation>%1 に書き込めません: %2</translation>
+        </message>
+        <message>
+            <source>Invalid resource filename: %1</source>
+            <translation>リソースのファイル名が無効です: %1</translation>
+        </message>
+        <message>
+            <source>Resource '%1' (%2 ID %3) was imported as '%4' to use a valid, unique filename. Resource references were updated; check name-based GML references.</source>
+            <translation>リソース '%1' (%2、ID %3) は有効で重複しないファイル名を使うため、'%4' としてインポートしました。リソース参照は更新済みです。GML 内の名前による参照を確認してください。</translation>
+        </message>
+        <message>
+            <source>Project header</source>
+            <translation>プロジェクトヘッダー</translation>
+        </message>
+        <message>
+            <source>Extension packages</source>
+            <translation>拡張パッケージ</translation>
+        </message>
+        <message>
+            <source>Extension package '%1' is not embedded in the legacy project. Add its GMS extension separately.</source>
+            <translation>拡張パッケージ '%1' は旧形式のプロジェクトに含まれていません。対応する GMS 拡張を別途追加してください。</translation>
+        </message>
+        <message>
+            <source>Library initialization</source>
+            <translation>アクションライブラリの初期化</translation>
+        </message>
+        <message>
+            <source>Legacy library initialization was saved to %1; move it to game initialization code.</source>
+            <translation>旧形式のライブラリ初期化コードを %1 に保存しました。ゲームの初期化コードに移してください。</translation>
+        </message>
+        <message>
+            <source>Resource tree</source>
+            <translation>リソースツリー</translation>
+        </message>
+        <message>
+            <source>Triggers</source>
+            <translation>トリガー</translation>
+        </message>
+        <message>
+            <source>Legacy trigger definitions and events were preserved, but automatic trigger execution is not supported. Convert them to Step events before running the game.</source>
+            <translation>旧形式のトリガー定義とイベントは保持されましたが、トリガーの自動実行には対応していません。ゲームを実行する前に Step イベントに変換してください。</translation>
+        </message>
+        <message>
+            <source>Resolving resource references...</source>
+            <translation>リソース参照を解決中…</translation>
+        </message>
+        <message>
+            <source>Room groups were flattened to preserve the legacy room execution order.</source>
+            <translation>旧形式のルーム実行順序を保持するため、ルームグループを展開しました。</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>プロジェクトを読み込み中…</translation>
+        </message>
+        <message>
+            <source>Incomplete action arguments.</source>
+            <translation>アクションの引数が不足しています。</translation>
+        </message>
+        <message>
+            <source>Too many object events.</source>
+            <translation>オブジェクトのイベント数が多すぎます。</translation>
+        </message>
+        <message>
+            <source>Cannot decode the legacy bitmap.</source>
+            <translation>旧形式のビットマップを読み取れません。</translation>
+        </message>
+        <message>
+            <source>Invalid image dimensions: %1 x %2.</source>
+            <translation>画像サイズが無効です: %1 x %2。</translation>
+        </message>
+        <message>
+            <source>Image byte count does not match its dimensions.</source>
+            <translation>画像のバイト数とサイズが一致しません。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the image.</source>
+            <translation>メモリ不足のため、画像をインポートできません。</translation>
+        </message>
+        <message>
+            <source>Cannot encode image: %1</source>
+            <translation>画像をエンコードできません: %1</translation>
+        </message>
+        <message>
+            <source>Invalid sound extension: %1.</source>
+            <translation>サウンドの拡張子が無効です: %1。</translation>
+        </message>
+        <message>
+            <source>Sprite frames have different sizes.</source>
+            <translation>スプライトの各フレームのサイズが異なります。</translation>
+        </message>
+        <message>
+            <source>Game settings</source>
+            <translation>ゲーム設定</translation>
+        </message>
+        <message>
+            <source>Included files</source>
+            <translation>同梱ファイル</translation>
+        </message>
+        <message>
+            <source>Invalid or duplicate included filename: %1</source>
+            <translation>同梱ファイル名が無効か、重複しています: %1</translation>
+        </message>
+        <message>
+            <source>Included file '%1' was not embedded and could not be found beside the project. Restore it manually.</source>
+            <translation>同梱ファイル '%1' は埋め込まれておらず、元のプロジェクトの横にも見つかりません。手動で復元してください。</translation>
+        </message>
+        <message>
+            <source>Included file '%1' uses legacy extraction options. GMS copies included files beside the game; review its file paths and cleanup code.</source>
+            <translation>同梱ファイル '%1' は旧形式の展開設定を使用しています。GMS はゲームの横にファイルを配置するため、パスと削除処理を確認してください。</translation>
+        </message>
+        <message>
+            <source>Game information</source>
+            <translation>ゲーム情報</translation>
+        </message>
+        <message>
+            <source>Duplicate room instance ID: %1.</source>
+            <translation>ルームのインスタンス ID が重複しています: %1。</translation>
+        </message>
+        <message>
+            <source>Duplicate room tile ID: %1.</source>
+            <translation>ルームのタイル ID が重複しています: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported sound version: %1.</source>
+            <translation>未対応のサウンドバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported sprite version: %1.</source>
+            <translation>未対応のスプライトバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported background version: %1.</source>
+            <translation>未対応の背景バージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported path version: %1.</source>
+            <translation>未対応のパスバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported script version: %1.</source>
+            <translation>未対応のスクリプトバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported font version: %1.</source>
+            <translation>未対応のフォントバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported timeline version: %1.</source>
+            <translation>未対応のタイムラインバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported object version: %1.</source>
+            <translation>未対応のオブジェクトバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>Unsupported room version: %1.</source>
+            <translation>未対応のルームバージョンです: %1。</translation>
+        </message>
+        <message>
+            <source>%1: %2</source>
+            <translation>%1: %2</translation>
+        </message>
+        <message>
+            <source>%1: Action library definition %2/%3 is not installed. GM82 stores action IDs only; install the matching .lib file before importing.</source>
+            <translation>%1: アクション定義 %2/%3 がありません。GM82 はアクション ID のみを保存するため、対応する .lib ファイルをインストールしてからインポートしてください。</translation>
+        </message>
+        <message>
+            <source>%1: Instance code has no filename.</source>
+            <translation>%1: インスタンスコードのファイル名がありません。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance name.</source>
+            <translation>%1: GM82 インスタンス名が無効です。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance record.</source>
+            <translation>%1: GM82 インスタンスレコードが無効です。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 tile record.</source>
+            <translation>%1: GM82 タイルレコードが無効です。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid integer for %2.</source>
+            <translation>%1: %2 の整数値が無効です。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room blend color: %2</source>
+            <translation>%1: ルームのブレンド色が無効です: %2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room coordinate: %2</source>
+            <translation>%1: ルーム座標が無効です: %2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid sound %2.</source>
+            <translation>%1: サウンドの %2 が無効です。</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 action header.</source>
+            <translation>%1: GM82 アクションヘッダーがありません。</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 event header.</source>
+            <translation>%1: GM82 イベントヘッダーがありません。</translation>
+        </message>
+        <message>
+            <source>%1: Unexpected code after a non-code GM82 action.</source>
+            <translation>%1: コード以外の GM82 アクションの後に予期しないコードがあります。</translation>
+        </message>
+        <message>
+            <source>%1: Unterminated GM82 action header.</source>
+            <translation>%1: GM82 アクションヘッダーが閉じられていません。</translation>
+        </message>
+        <message>
+            <source>%1: Unknown GM82 action property: %2</source>
+            <translation>%1: 不明な GM82 アクションプロパティ: %2</translation>
+        </message>
+        <message>
+            <source>%1:%2: Expected key=value.</source>
+            <translation>%1:%2: key=value 形式が必要です。</translation>
+        </message>
+        <message>
+            <source>Cannot read GM82 project file: %1</source>
+            <translation>GM82 プロジェクトファイルを読み込めません: %1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 resource: %1/%2</source>
+            <translation>GM82 リソースが重複しています: %1/%2</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tile layer: %1</source>
+            <translation>GM82 タイルレイヤーが重複しています: %1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tree entry: %1/%2</source>
+            <translation>GM82 ツリー項目が重複しています: %1/%2</translation>
+        </message>
+        <message>
+            <source>GM82 extension '%1' is not embedded in the project. Add a compatible GMS extension manually.</source>
+            <translation>GM82 拡張機能「%1」はプロジェクトに含まれていません。互換性のある GMS 拡張機能を手動で追加してください。</translation>
+        </message>
+        <message>
+            <source>GM82 project file points outside the project directory: %1</source>
+            <translation>GM82 プロジェクトファイルがプロジェクト外を参照しています: %1</translation>
+        </message>
+        <message>
+            <source>GM82 text file exceeds 64 MiB: %1</source>
+            <translation>GM82 テキストファイルが 64 MiB を超えています: %1</translation>
+        </message>
+        <message>
+            <source>GM82 text is not valid UTF-8: %1</source>
+            <translation>GM82 テキストが有効な UTF-8 ではありません: %1</translation>
+        </message>
+        <message>
+            <source>GM82's swapped creation event order was not converted. Review initialization code in GMS.</source>
+            <translation>GM82 の作成イベント順序の入れ替え設定は変換されませんでした。GMS で初期化コードを確認してください。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 event: %1</source>
+            <translation>GM82 イベントが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 executable version.</source>
+            <translation>GM82 実行ファイルのバージョンが無効です。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 image dimensions: %1</source>
+            <translation>GM82 画像サイズが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 path point: %1</source>
+            <translation>GM82 パスポイントが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 project path: %1</source>
+            <translation>GM82 プロジェクトパスが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 resource tree: %1</source>
+            <translation>GM82 リソースツリーが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 sprite frame count.</source>
+            <translation>GM82 スプライトのフレーム数が無効です。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 timeline moment: %1</source>
+            <translation>GM82 タイムラインのモーメントが無効です: %1</translation>
+        </message>
+        <message>
+            <source>Too many GM82 resources in %1.</source>
+            <translation>%1 の GM82 リソースが多すぎます。</translation>
+        </message>
+        <message>
+            <source>Unknown GM82 resource: %1/%2</source>
+            <translation>不明な GM82 リソース: %1/%2</translation>
+        </message>
+        <message>
+            <source>Unsupported GM82 format version: %1.</source>
+            <translation>未対応の GM82 形式バージョン: %1。</translation>
         </message>
     </context>
     <context>
@@ -9234,6 +9636,18 @@ Line %2, column %3: %4</source>
         <message>
             <source>The imported project references a file outside its directory: %1</source>
             <translation>インポートしたプロジェクトがフォルダー外のファイルを参照しています: %1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the project.</source>
+            <translation>メモリ不足のため、プロジェクトをインポートできません。</translation>
+        </message>
+        <message>
+            <source>Reading legacy project...</source>
+            <translation>旧形式のプロジェクトを読み込み中…</translation>
+        </message>
+        <message>
+            <source>Cannot name the imported project: %1</source>
+            <translation>インポートしたプロジェクトに名前を付けられません: %1</translation>
         </message>
     </context>
 </TS>

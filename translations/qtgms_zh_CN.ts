@@ -3089,20 +3089,46 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>System default (%1)</source>
+            <translation>系统默认（%1）</translation>
+        </message>
+        <message>
+            <source>Japanese (Shift-JIS / CP932)</source>
+            <translation>日文（Shift-JIS / CP932）</translation>
+        </message>
+        <message>
+            <source>Simplified Chinese (GBK / CP936)</source>
+            <translation>简体中文（GBK / CP936）</translation>
+        </message>
+        <message>
+            <source>Traditional Chinese (Big5 / CP950)</source>
+            <translation>繁体中文（Big5 / CP950）</translation>
+        </message>
+        <message>
+            <source>Korean (CP949)</source>
+            <translation>韩文（CP949）</translation>
+        </message>
+        <message>
+            <source>Western European (Windows-1252)</source>
+            <translation>西欧语言（Windows-1252）</translation>
+        </message>
+        <message>
+            <source>Cyrillic (Windows-1251)</source>
+            <translation>西里尔字母（Windows-1251）</translation>
+        </message>
+        <message>
+            <source>Text encoding for this GMK project:
+Choose the encoding used when the project was created.</source>
+            <translation>此 GMK 工程的文本编码：
+请选择创建工程时使用的编码。</translation>
+        </message>
+        <message>
             <source>Import Project</source>
             <translation>导入工程</translation>
         </message>
         <message>
             <source>Cannot Import Project</source>
             <translation>无法导入工程</translation>
-        </message>
-        <message>
-            <source>Only GMZ projects can currently be imported.</source>
-            <translation>目前仅支持导入 GMZ 工程。</translation>
-        </message>
-        <message>
-            <source>Reading GMZ package...</source>
-            <translation>正在读取 GMZ 工程包…</translation>
         </message>
         <message>
             <source>Imported temporary project: %1</source>
@@ -3493,9 +3519,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>关于 QtGMS</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.5
+            <source>QtGMS 0.2.0
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.5
+            <translation>QtGMS 0.2.0
 GameMaker Studio 风格的编辑器。</translation>
         </message>
         <message>
@@ -3685,6 +3711,18 @@ Any resources completed before this error remain saved.</source>
 %1</source>
             <translation>工程文件已不存在，已从最近工程中移除：
 %1</translation>
+        </message>
+        <message>
+            <source>GameMaker Projects (*.gmz *.gmk *.gm81 *.gm82);;GameMaker Compressed Projects (*.gmz);;GameMaker 7/8 Projects (*.gmk);;GameMaker 8.1 Projects (*.gm81);;GameMaker 8.2 Projects (*.gm82)</source>
+            <translation>GameMaker 工程 (*.gmz *.gmk *.gm81 *.gm82);;GameMaker 压缩工程 (*.gmz);;GameMaker 7/8 工程 (*.gmk);;GameMaker 8.1 工程 (*.gm81);;GameMaker 8.2 工程 (*.gm82)</translation>
+        </message>
+        <message>
+            <source>Choose a GMZ, GMK, GM81 or GM82 project.</source>
+            <translation>请选择 GMZ、GMK、GM81 或 GM82 工程。</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>正在读取工程…</translation>
         </message>
     </context>
     <context>
@@ -5298,6 +5336,10 @@ Alt：不吸附
     <context>
         <name>QObject</name>
         <message>
+            <source>Unsupported text encoding: %1</source>
+            <translation>不支持的文本编码：%1</translation>
+        </message>
+        <message>
             <source>Action library exceeds 32 MB.</source>
             <translation>动作库超过 32 MB。</translation>
         </message>
@@ -6418,6 +6460,366 @@ Cannot remove the unregistered information file: %1</source>
         <message>
             <source>The file is not valid UTF-8 or BOM-marked UTF-16 text. Convert its encoding before importing it.</source>
             <translation>文件不是有效的 UTF-8 或带 BOM 的 UTF-16 文本。请转换编码后导入。</translation>
+        </message>
+        <message>
+            <source>%1 (file offset %2%3): %4</source>
+            <translation>%1（文件偏移 %2%3）：%4</translation>
+        </message>
+        <message>
+            <source>, block offset %1</source>
+            <translation>，数据块偏移 %1</translation>
+        </message>
+        <message>
+            <source>Invalid or excessively large data block.</source>
+            <translation>数据块无效或过大。</translation>
+        </message>
+        <message>
+            <source>Unexpected end of a resource block.</source>
+            <translation>资源数据块意外结束。</translation>
+        </message>
+        <message>
+            <source>Unexpected end of the project file.</source>
+            <translation>工程文件意外结束。</translation>
+        </message>
+        <message>
+            <source>Invalid data block length: %1.</source>
+            <translation>数据块长度无效：%1。</translation>
+        </message>
+        <message>
+            <source>Invalid item count: %1.</source>
+            <translation>项目数量无效：%1。</translation>
+        </message>
+        <message>
+            <source>Invalid boolean value: %1.</source>
+            <translation>布尔值无效：%1。</translation>
+        </message>
+        <message>
+            <source>Invalid floating point value.</source>
+            <translation>浮点数值无效。</translation>
+        </message>
+        <message>
+            <source>Unsupported legacy format version: %1.</source>
+            <translation>不支持的旧版格式版本：%1。</translation>
+        </message>
+        <message>
+            <source>Damaged or excessively large compressed resource.</source>
+            <translation>压缩资源已损坏或过大。</translation>
+        </message>
+        <message>
+            <source>Unexpected nested resource block.</source>
+            <translation>意外的嵌套资源块。</translation>
+        </message>
+        <message>
+            <source>Invalid GM7 encoding seed.</source>
+            <translation>GM7 编码种子无效。</translation>
+        </message>
+        <message>
+            <source>Cannot create directory for %1.</source>
+            <translation>无法为 %1 创建目录。</translation>
+        </message>
+        <message>
+            <source>Cannot write %1: %2</source>
+            <translation>无法写入 %1：%2</translation>
+        </message>
+        <message>
+            <source>Invalid resource filename: %1</source>
+            <translation>资源文件名无效：%1</translation>
+        </message>
+        <message>
+            <source>Resource '%1' (%2 ID %3) was imported as '%4' to use a valid, unique filename. Resource references were updated; check name-based GML references.</source>
+            <translation>资源“%1”（%2，ID %3）已以“%4”导入，以使用有效且不重复的文件名。资源引用已同步更新，请检查 GML 中按名称访问此资源的代码。</translation>
+        </message>
+        <message>
+            <source>Project header</source>
+            <translation>工程文件头</translation>
+        </message>
+        <message>
+            <source>Extension packages</source>
+            <translation>扩展包</translation>
+        </message>
+        <message>
+            <source>Extension package '%1' is not embedded in the legacy project. Add its GMS extension separately.</source>
+            <translation>旧版工程未内嵌扩展包“%1”，请另行添加对应的 GMS 扩展。</translation>
+        </message>
+        <message>
+            <source>Library initialization</source>
+            <translation>动作库初始化</translation>
+        </message>
+        <message>
+            <source>Legacy library initialization was saved to %1; move it to game initialization code.</source>
+            <translation>旧版动作库初始化代码已保存到 %1，请将其移至游戏初始化代码中。</translation>
+        </message>
+        <message>
+            <source>Resource tree</source>
+            <translation>资源树</translation>
+        </message>
+        <message>
+            <source>Triggers</source>
+            <translation>触发器</translation>
+        </message>
+        <message>
+            <source>Legacy trigger definitions and events were preserved, but automatic trigger execution is not supported. Convert them to Step events before running the game.</source>
+            <translation>已保留旧版触发器定义和事件，但暂不支持自动执行触发器。运行游戏前请将其转换为 Step 事件。</translation>
+        </message>
+        <message>
+            <source>Resolving resource references...</source>
+            <translation>正在解析资源引用…</translation>
+        </message>
+        <message>
+            <source>Room groups were flattened to preserve the legacy room execution order.</source>
+            <translation>为保留旧版房间执行顺序，已展开房间分组。</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>正在读取工程…</translation>
+        </message>
+        <message>
+            <source>Incomplete action arguments.</source>
+            <translation>动作参数不完整。</translation>
+        </message>
+        <message>
+            <source>Too many object events.</source>
+            <translation>对象事件数量过多。</translation>
+        </message>
+        <message>
+            <source>Cannot decode the legacy bitmap.</source>
+            <translation>无法解码旧版位图。</translation>
+        </message>
+        <message>
+            <source>Invalid image dimensions: %1 x %2.</source>
+            <translation>图像尺寸无效：%1 × %2。</translation>
+        </message>
+        <message>
+            <source>Image byte count does not match its dimensions.</source>
+            <translation>图像字节数与尺寸不匹配。</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the image.</source>
+            <translation>内存不足，无法导入图像。</translation>
+        </message>
+        <message>
+            <source>Cannot encode image: %1</source>
+            <translation>无法编码图像：%1</translation>
+        </message>
+        <message>
+            <source>Invalid sound extension: %1.</source>
+            <translation>音频扩展名无效：%1。</translation>
+        </message>
+        <message>
+            <source>Sprite frames have different sizes.</source>
+            <translation>精灵各帧尺寸不一致。</translation>
+        </message>
+        <message>
+            <source>Game settings</source>
+            <translation>游戏设置</translation>
+        </message>
+        <message>
+            <source>Included files</source>
+            <translation>包含文件</translation>
+        </message>
+        <message>
+            <source>Invalid or duplicate included filename: %1</source>
+            <translation>包含文件名无效或重复：%1</translation>
+        </message>
+        <message>
+            <source>Included file '%1' was not embedded and could not be found beside the project. Restore it manually.</source>
+            <translation>包含文件“%1”未内嵌，且在原工程目录中未找到，请手动补齐。</translation>
+        </message>
+        <message>
+            <source>Included file '%1' uses legacy extraction options. GMS copies included files beside the game; review its file paths and cleanup code.</source>
+            <translation>包含文件“%1”使用旧版解压选项。GMS 会将包含文件复制到游戏目录，请检查文件路径和清理代码。</translation>
+        </message>
+        <message>
+            <source>Game information</source>
+            <translation>游戏信息</translation>
+        </message>
+        <message>
+            <source>Duplicate room instance ID: %1.</source>
+            <translation>房间实例 ID 重复：%1。</translation>
+        </message>
+        <message>
+            <source>Duplicate room tile ID: %1.</source>
+            <translation>房间图块 ID 重复：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported sound version: %1.</source>
+            <translation>不支持的音频版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported sprite version: %1.</source>
+            <translation>不支持的精灵版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported background version: %1.</source>
+            <translation>不支持的背景版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported path version: %1.</source>
+            <translation>不支持的路径版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported script version: %1.</source>
+            <translation>不支持的脚本版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported font version: %1.</source>
+            <translation>不支持的字体版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported timeline version: %1.</source>
+            <translation>不支持的时间轴版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported object version: %1.</source>
+            <translation>不支持的对象版本：%1。</translation>
+        </message>
+        <message>
+            <source>Unsupported room version: %1.</source>
+            <translation>不支持的房间版本：%1。</translation>
+        </message>
+        <message>
+            <source>%1: %2</source>
+            <translation>%1：%2</translation>
+        </message>
+        <message>
+            <source>%1: Action library definition %2/%3 is not installed. GM82 stores action IDs only; install the matching .lib file before importing.</source>
+            <translation>%1：未安装 action 库定义 %2/%3。GM82 仅保存 action 编号，请先安装对应的 .lib 文件再导入。</translation>
+        </message>
+        <message>
+            <source>%1: Instance code has no filename.</source>
+            <translation>%1：实例代码缺少文件名。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance name.</source>
+            <translation>%1：GM82 实例名称无效。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance record.</source>
+            <translation>%1：GM82 实例记录无效。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 tile record.</source>
+            <translation>%1：GM82 图块记录无效。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid integer for %2.</source>
+            <translation>%1：%2 的整数值无效。</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room blend color: %2</source>
+            <translation>%1：房间混合颜色无效：%2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room coordinate: %2</source>
+            <translation>%1：房间坐标无效：%2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid sound %2.</source>
+            <translation>%1：音频 %2 参数无效。</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 action header.</source>
+            <translation>%1：缺少 GM82 action 头。</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 event header.</source>
+            <translation>%1：缺少 GM82 事件头。</translation>
+        </message>
+        <message>
+            <source>%1: Unexpected code after a non-code GM82 action.</source>
+            <translation>%1：非代码 GM82 action 后出现了意外代码。</translation>
+        </message>
+        <message>
+            <source>%1: Unterminated GM82 action header.</source>
+            <translation>%1：GM82 action 头未结束。</translation>
+        </message>
+        <message>
+            <source>%1: Unknown GM82 action property: %2</source>
+            <translation>%1：未知的 GM82 action 属性：%2</translation>
+        </message>
+        <message>
+            <source>%1:%2: Expected key=value.</source>
+            <translation>%1:%2：应为 key=value 格式。</translation>
+        </message>
+        <message>
+            <source>Cannot read GM82 project file: %1</source>
+            <translation>无法读取 GM82 工程文件：%1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 resource: %1/%2</source>
+            <translation>GM82 资源重复：%1/%2</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tile layer: %1</source>
+            <translation>GM82 图块层重复：%1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tree entry: %1/%2</source>
+            <translation>GM82 资源树条目重复：%1/%2</translation>
+        </message>
+        <message>
+            <source>GM82 extension '%1' is not embedded in the project. Add a compatible GMS extension manually.</source>
+            <translation>GM82 扩展“%1”未包含在工程中，请手动添加兼容的 GMS 扩展。</translation>
+        </message>
+        <message>
+            <source>GM82 project file points outside the project directory: %1</source>
+            <translation>GM82 工程文件指向工程目录之外：%1</translation>
+        </message>
+        <message>
+            <source>GM82 text file exceeds 64 MiB: %1</source>
+            <translation>GM82 文本文件超过 64 MiB：%1</translation>
+        </message>
+        <message>
+            <source>GM82 text is not valid UTF-8: %1</source>
+            <translation>GM82 文本不是有效的 UTF-8：%1</translation>
+        </message>
+        <message>
+            <source>GM82's swapped creation event order was not converted. Review initialization code in GMS.</source>
+            <translation>GM82 的创建事件顺序交换设置未转换，请在 GMS 中检查初始化代码。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 event: %1</source>
+            <translation>GM82 事件无效：%1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 executable version.</source>
+            <translation>GM82 可执行文件版本号无效。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 image dimensions: %1</source>
+            <translation>GM82 图像尺寸无效：%1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 path point: %1</source>
+            <translation>GM82 路径点无效：%1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 project path: %1</source>
+            <translation>GM82 工程路径无效：%1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 resource tree: %1</source>
+            <translation>GM82 资源树无效：%1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 sprite frame count.</source>
+            <translation>GM82 精灵帧数无效。</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 timeline moment: %1</source>
+            <translation>GM82 时间线时刻无效：%1</translation>
+        </message>
+        <message>
+            <source>Too many GM82 resources in %1.</source>
+            <translation>%1 中的 GM82 资源数量过多。</translation>
+        </message>
+        <message>
+            <source>Unknown GM82 resource: %1/%2</source>
+            <translation>未知的 GM82 资源：%1/%2</translation>
+        </message>
+        <message>
+            <source>Unsupported GM82 format version: %1.</source>
+            <translation>不支持的 GM82 格式版本：%1。</translation>
         </message>
     </context>
     <context>
@@ -9234,6 +9636,18 @@ Line %2, column %3: %4</source>
         <message>
             <source>The imported project references a file outside its directory: %1</source>
             <translation>导入的工程引用了工程目录外的文件：%1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the project.</source>
+            <translation>内存不足，无法导入工程。</translation>
+        </message>
+        <message>
+            <source>Reading legacy project...</source>
+            <translation>正在读取旧版工程…</translation>
+        </message>
+        <message>
+            <source>Cannot name the imported project: %1</source>
+            <translation>无法命名导入的工程：%1</translation>
         </message>
     </context>
 </TS>

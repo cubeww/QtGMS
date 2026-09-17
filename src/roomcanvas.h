@@ -59,6 +59,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 private:
     void refreshPlacementVisual();
+    void refreshBackgroundImages();
     void updateGhost();
     void invalidateOverlay(const QRectF &rect);
     void drawEditingOverlay(QPainter *painter, const QRectF &rect);
@@ -80,6 +81,7 @@ private:
     RoomAssets *m_assets;
     QHash<QString, RoomGraphicsItem *> m_items;
     QDomDocument m_settings;
+    QHash<QString, QPixmap> m_backgroundImages;
     QRectF m_room;
     Mode m_mode = Mode::Objects;
     QString m_object, m_tileBackground;

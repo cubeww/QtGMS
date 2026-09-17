@@ -20,7 +20,7 @@ class RoomPropertiesWindow : public ResourceEditorWindow
 {
     Q_OBJECT
 public:
-    RoomPropertiesWindow(RoomDocument *document, Project *project, QWidget *parent = nullptr);
+    RoomPropertiesWindow(RoomDocument *document, Project *project, const QSharedPointer<RoomAssets> &assets, QWidget *parent = nullptr);
     ~RoomPropertiesWindow() override;
     bool save() override;
     QString filePath() const override;
@@ -58,7 +58,7 @@ private:
     void changeLock(bool locked);
     RoomDocument *m_document;
     Project *m_project;
-    RoomAssets m_assets;
+    QSharedPointer<RoomAssets> m_assets;
     RoomCanvas *m_canvas;
     QLabel *m_status, *m_preview;
     RoomTilePicker *m_tilePicker;

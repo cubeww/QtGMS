@@ -60,7 +60,8 @@ ScriptEditorWindow::ScriptEditorWindow(TextFileDocument *document, const Project
     m_nameEdit = nameEdit;
     connect(nameEdit, &QLineEdit::editingFinished, this, &ScriptEditorWindow::renameTab);
     nameEdit->setMinimumWidth(80); nameEdit->setMaximumWidth(211); nameEdit->setFixedHeight(22);
-    nameLayout->addWidget(nameEdit);
+    nameLayout->addWidget(nameEdit, 1);
+    nameLayout->addStretch();
     nameFields->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolbar->addWidget(nameFields);
     setCentralWidget(m_codePanel);

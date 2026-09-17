@@ -18,7 +18,6 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QFile>
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QGroupBox>
@@ -151,9 +150,11 @@ ObjectPropertiesWindow::ObjectPropertiesWindow(ObjectDocument *document, Project
     connect(document, &ObjectDocument::changed, this, &ObjectPropertiesWindow::refreshCodeEditors);
     connect(document->undoStack(), &QUndoStack::cleanChanged, this, [this] { setWindowTitle(tr("Object Properties: %1%2").arg(m_document->name(), m_document->isModified() ? QStringLiteral(" *") : QString())); });
     connect(document, &ObjectDocument::saved, this, [this] {
-        const QString sprite = ActionXml::text(m_document->xml().documentElement(), QStringLiteral("spriteName")); QString thumbnail;
+        const QDomElement root = m_document->xml().documentElement();
+        const QString sprite = ActionXml::text(root, QStringLiteral("spriteName")); QString thumbnail;
         for (const ResourceNode &node : ActionXml::resourceList(*m_project, ResourceType::Sprite)) if (node.name == sprite) { thumbnail = node.thumbnailPath; break; }
-        m_project->updateObjectSprite(filePath(), sprite, thumbnail); emit resourceSaved(ResourceType::Object, filePath(), thumbnail);
+        m_project->updateObjectMetadata(filePath(), sprite, ActionXml::text(root, QStringLiteral("parentName")), thumbnail);
+        emit resourceSaved(ResourceType::Object, filePath(), thumbnail);
     });
     m_events->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_events, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos) {
@@ -178,8 +179,7 @@ void ObjectPropertiesWindow::refreshResources()
     m_parent->setResources(*m_project, ResourceType::Object, ActionXml::text(root, QStringLiteral("parentName")), tr("<no parent>"), QStringLiteral("<undefined>"), {m_document->name()});
     m_children->clear();
     for (const ResourceNode &node : ActionXml::resourceList(*m_project, ResourceType::Object)) {
-        QFile file(node.filePath); QDomDocument xml;
-        if (file.open(QIODevice::ReadOnly) && xml.setContent(&file) && ActionXml::text(xml.documentElement(), QStringLiteral("parentName")) == m_document->name()) {
+        if (node.parentName == m_document->name()) {
             auto *item = new QListWidgetItem(node.name, m_children); item->setData(Qt::UserRole, node.filePath);
         }
     }

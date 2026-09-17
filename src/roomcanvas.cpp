@@ -30,7 +30,7 @@ public:
     QString id;
     bool tile = false, locked = false;
     int depth = 0;
-    QPixmap image;
+    QPixmap image, sourceImage;
     QRectF source, bounds;
     QPointF scaleFactors;
     qreal angle = 0;
@@ -48,7 +48,9 @@ public:
         depth = xml.attribute(QStringLiteral("depth")).toInt();
         const RoomVisual visual = tile ? assets->background(xml.attribute(QStringLiteral("bgName"))) : assets->object(xml.attribute(QStringLiteral("objName")));
         quint32 color = xml.attribute(QStringLiteral("colour"), QStringLiteral("4294967295")).toUInt();
-        image = assets->colored(visual.image, color);
+        // A tinted copy must also keep its source alive in the shared cache.
+        sourceImage = visual.image;
+        image = assets->colored(sourceImage, color);
         if (image.isNull()) image = QPixmap(QStringLiteral(":/images/object.png"));
         source = tile ? QRectF(roomNumber(xml, QStringLiteral("xo")), roomNumber(xml, QStringLiteral("yo")),
                               qMax(1.0, roomNumber(xml, QStringLiteral("w"), 16)), qMax(1.0, roomNumber(xml, QStringLiteral("h"), 16))) : QRectF(image.rect());
@@ -262,6 +264,7 @@ void RoomCanvas::refreshSettings()
     m_settings = m_document->settings(); const QDomElement root = m_settings.documentElement();
     m_room = QRectF(0, 0, ActionXml::text(root, QStringLiteral("width")).toInt(), ActionXml::text(root, QStringLiteral("height")).toInt());
     m_snapX = qMax(1, ActionXml::text(root, QStringLiteral("hsnap")).toInt()); m_snapY = qMax(1, ActionXml::text(root, QStringLiteral("vsnap")).toInt());
+    refreshBackgroundImages();
     scene()->setSceneRect(scene()->sceneRect().united(m_room.adjusted(-128, -128, 512, 256))); viewport()->update(); updateGhost();
     emit previewChanged();
 }
@@ -283,7 +286,7 @@ void RoomCanvas::synchronize(const QStringList &ids)
     if (sceneBounds != scene()->sceneRect()) scene()->setSceneRect(sceneBounds);
     blocker.unblock(); emit selectionChanged(); emit previewChanged();
 }
-void RoomCanvas::reloadAssets() { finishInteraction(); m_assets->reload(); synchronize(m_document->entities().keys()); refreshPlacementVisual(); viewport()->update(); }
+void RoomCanvas::reloadAssets() { finishInteraction(); synchronize(m_document->entities().keys()); refreshBackgroundImages(); refreshPlacementVisual(); viewport()->update(); }
 void RoomCanvas::setObject(const QString &name)
 { m_object = name; refreshPlacementVisual(); }
 void RoomCanvas::setTile(const QString &name, const QRect &source, int depth)
@@ -333,8 +336,23 @@ void RoomCanvas::setDisplay(const QString &key, bool visible)
     else if (key == QStringLiteral("foregrounds")) m_showForegrounds = visible;
     else if (key == QStringLiteral("views")) m_showViews = visible;
     if (key == QStringLiteral("objects") || key == QStringLiteral("tiles")) updateItemVisibility();
+    if (key == QStringLiteral("backgrounds") || key == QStringLiteral("foregrounds")) refreshBackgroundImages();
     viewport()->update();
     emit previewChanged();
+}
+void RoomCanvas::refreshBackgroundImages()
+{
+    // Keep visible layers referenced between paints, just like instance images.
+    // Painting must not reload a background that an unrelated cache miss evicted.
+    QHash<QString, QPixmap> images;
+    for (const QDomElement &background : ActionXml::elements(m_settings.documentElement().firstChildElement(QStringLiteral("backgrounds")), QStringLiteral("background"))) {
+        if (!background.attribute(QStringLiteral("visible")).toInt()) continue;
+        if (background.attribute(QStringLiteral("foreground")).toInt() ? !m_showForegrounds : !m_showBackgrounds) continue;
+        const QString name = background.attribute(QStringLiteral("name"));
+        if (!images.contains(name)) images.insert(name, m_assets->background(name).image);
+    }
+    m_backgroundImages = images;
+    m_assets->trimCache();
 }
 void RoomCanvas::drawLayers(QPainter *painter, const QRectF &rect, bool foreground)
 {
@@ -342,7 +360,7 @@ void RoomCanvas::drawLayers(QPainter *painter, const QRectF &rect, bool foregrou
     painter->save(); painter->setClipRect(m_room.intersected(rect));
     for (QDomElement bg : ActionXml::elements(m_settings.documentElement().firstChildElement(QStringLiteral("backgrounds")), QStringLiteral("background"))) {
         if (!bg.attribute(QStringLiteral("visible")).toInt() || (bg.attribute(QStringLiteral("foreground")).toInt() != 0) != foreground) continue;
-        const QPixmap image = m_assets->background(bg.attribute(QStringLiteral("name"))).image; if (image.isNull()) continue;
+        const QPixmap image = m_backgroundImages.value(bg.attribute(QStringLiteral("name"))); if (image.isNull()) continue;
         const QPointF position(roomNumber(bg, QStringLiteral("x")), roomNumber(bg, QStringLiteral("y")));
         if (bg.attribute(QStringLiteral("stretch")).toInt()) { painter->drawPixmap(QRectF(position, m_room.size()), image, image.rect()); continue; }
         const bool horizontal = bg.attribute(QStringLiteral("htiled")).toInt(), vertical = bg.attribute(QStringLiteral("vtiled")).toInt();

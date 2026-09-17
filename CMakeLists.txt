@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(QtGMS VERSION 0.1.5 LANGUAGES CXX)
+project(QtGMS VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -103,6 +103,20 @@ add_executable(QtGMS WIN32
     src/mainwindowprojectimport.cpp
     src/projectimportjob.cpp
     src/projectimportjob.h
+    src/legacyprojectreader.cpp
+    src/legacyprojectreader.h
+    src/legacyprojectimporter.cpp
+    src/legacyprojectimporter.h
+    src/legacyprojectsettings.cpp
+    src/legacyprojectresources.cpp
+    src/legacyprojectactions.cpp
+    src/legacyprojectrooms.cpp
+    src/gm82projectimporter.cpp
+    src/gm82projectimporter.h
+    src/gm82projectresources.cpp
+    src/gm82projectactions.cpp
+    src/gm82projectrooms.cpp
+    src/gm82projectsettings.cpp
     src/projectarchivedialog.cpp
     src/projectarchivedialog.h
     src/sevenziparchive.cpp

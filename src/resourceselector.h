@@ -26,6 +26,8 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 private:
+    void updateCurrentIcon();
+    ResourceType m_resourceType = ResourceType::Sprite;
     QList<ResourceNode> m_resources;
     QString m_emptyLabel, m_emptyValue;
     QStringList m_excluded;

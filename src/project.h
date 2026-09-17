@@ -21,6 +21,7 @@ struct ResourceNode {
     QString filePath;
     QString thumbnailPath;
     QString spriteName;
+    QString parentName;
     QString value;
     bool isGroup = false;
     bool isMissing = false;
@@ -61,7 +62,7 @@ public:
     const QStringList &warnings() const { return m_warnings; }
     int resourceCount() const { return m_resourceCount; }
     void updateThumbnail(ResourceType type, const QString &filePath, const QString &thumbnailPath);
-    void updateObjectSprite(const QString &filePath, const QString &spriteName, const QString &thumbnailPath);
+    void updateObjectMetadata(const QString &filePath, const QString &spriteName, const QString &parentName, const QString &thumbnailPath);
     bool saveResourceTree(ResourceType type, const QList<ResourceNode> &nodes, QString &error);
     bool copyResource(ResourceType type, const QString &source, const QList<int> &groupPath, ResourceNode &created, QString &error);
     QStringList resourceReferences(ResourceType type, const QString &path, QString &error) const;

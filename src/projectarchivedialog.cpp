@@ -1,4 +1,5 @@
 #include "projectarchivedialog.h"
+#include "editortheme.h"
 #include <QCloseEvent>
 #include <QLabel>
 #include <QProgressBar>
@@ -12,6 +13,8 @@ ProjectArchiveDialog::ProjectArchiveDialog(QThread *job, const QString &title,
 {
     setWindowTitle(title);
     auto *layout = new QVBoxLayout(bodyWidget());
+    layout->setContentsMargins(10, 6, 10, 8);
+    layout->setSpacing(4);
     m_label = new QLabel(message);
     m_label->setTextFormat(Qt::PlainText);
     m_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
@@ -19,6 +22,7 @@ ProjectArchiveDialog::ProjectArchiveDialog(QThread *job, const QString &title,
     m_progress = new QProgressBar;
     m_progress->setRange(0, 100);
     m_progress->setValue(0);
+    EditorTheme::applyProgressDialogStyle(bodyWidget(), m_progress);
     layout->addWidget(m_progress);
     m_cancelButton = new QPushButton(tr("Cancel"));
     layout->addWidget(m_cancelButton, 0, Qt::AlignRight);

@@ -6,6 +6,20 @@
 #include <QFont>
 #include <QPalette>
 #include <QImage>
+#include <QProgressBar>
+
+void EditorTheme::applyProgressDialogStyle(QWidget *body, QProgressBar *progressBar)
+{
+    body->setObjectName(QStringLiteral("progressDialogBody"));
+    body->setStyleSheet(QStringLiteral(
+        "QWidget#progressDialogBody { background: #383838; border: 1px solid #aaa; }"));
+    progressBar->setTextVisible(false);
+    progressBar->setFixedHeight(24);
+    progressBar->setStyleSheet(QStringLiteral(
+        "QProgressBar { background: #141414; border: 1px solid #292929; padding: 2px; }"
+        "QProgressBar::chunk { border: 1px solid #45651b; background: qlineargradient("
+        "x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #91df37, stop: 0.45 #76cb24, stop: 1 #459509); }"));
+}
 
 QImage EditorTheme::tintActionImage(const QImage &source)
 {

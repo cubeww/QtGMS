@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "roomassets.h"
 #include "resourcebrowser.h"
 #include "resourceeditorwindow.h"
 #include "resourcereferences.h"
@@ -203,6 +204,7 @@ void MainWindow::processTreeCommand(const ResourceTreeRequest &request)
     QApplication::restoreOverrideCursor();
     // A multi-resource operation keeps already completed copies/deletions if a
     // later resource fails. Always rebuild from the actual saved project state.
+    m_roomAssets->reload();
     m_settingsEdited = true; m_resourceBrowser->setProject(m_project); updateConfiguration(m_configurationCombo->currentIndex());
     if (command != ResourceTreeCommand::DeleteGroup) m_resourceBrowser->selectTreeNode(request.type, selection);
     for (const auto &item : opened) {

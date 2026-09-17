@@ -3089,20 +3089,46 @@ The font texture could not be restored: %1
     <context>
         <name>MainWindow</name>
         <message>
+            <source>System default (%1)</source>
+            <translation>시스템 기본값(%1)</translation>
+        </message>
+        <message>
+            <source>Japanese (Shift-JIS / CP932)</source>
+            <translation>일본어(Shift-JIS / CP932)</translation>
+        </message>
+        <message>
+            <source>Simplified Chinese (GBK / CP936)</source>
+            <translation>중국어 간체(GBK / CP936)</translation>
+        </message>
+        <message>
+            <source>Traditional Chinese (Big5 / CP950)</source>
+            <translation>중국어 번체(Big5 / CP950)</translation>
+        </message>
+        <message>
+            <source>Korean (CP949)</source>
+            <translation>한국어(CP949)</translation>
+        </message>
+        <message>
+            <source>Western European (Windows-1252)</source>
+            <translation>서유럽 언어(Windows-1252)</translation>
+        </message>
+        <message>
+            <source>Cyrillic (Windows-1251)</source>
+            <translation>키릴 문자(Windows-1251)</translation>
+        </message>
+        <message>
+            <source>Text encoding for this GMK project:
+Choose the encoding used when the project was created.</source>
+            <translation>이 GMK 프로젝트의 텍스트 인코딩:
+프로젝트 생성 시 사용한 인코딩을 선택하세요。</translation>
+        </message>
+        <message>
             <source>Import Project</source>
             <translation>프로젝트 가져오기</translation>
         </message>
         <message>
             <source>Cannot Import Project</source>
             <translation>프로젝트를 가져올 수 없음</translation>
-        </message>
-        <message>
-            <source>Only GMZ projects can currently be imported.</source>
-            <translation>현재 GMZ 프로젝트만 가져올 수 있습니다.</translation>
-        </message>
-        <message>
-            <source>Reading GMZ package...</source>
-            <translation>GMZ 패키지 읽는 중...</translation>
         </message>
         <message>
             <source>Imported temporary project: %1</source>
@@ -3493,9 +3519,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>QtGMS 정보</translation>
         </message>
         <message>
-            <source>QtGMS 0.1.5
+            <source>QtGMS 0.2.0
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.1.5
+            <translation>QtGMS 0.2.0
 GameMaker Studio 스타일 편집기.</translation>
         </message>
         <message>
@@ -3685,6 +3711,18 @@ Any resources completed before this error remain saved.</source>
 %1</source>
             <translation>프로젝트 파일이 없어 최근 프로젝트에서 제거했습니다:
 %1</translation>
+        </message>
+        <message>
+            <source>GameMaker Projects (*.gmz *.gmk *.gm81 *.gm82);;GameMaker Compressed Projects (*.gmz);;GameMaker 7/8 Projects (*.gmk);;GameMaker 8.1 Projects (*.gm81);;GameMaker 8.2 Projects (*.gm82)</source>
+            <translation>GameMaker 프로젝트 (*.gmz *.gmk *.gm81 *.gm82);;GameMaker 압축 프로젝트 (*.gmz);;GameMaker 7/8 프로젝트 (*.gmk);;GameMaker 8.1 프로젝트 (*.gm81);;GameMaker 8.2 프로젝트 (*.gm82)</translation>
+        </message>
+        <message>
+            <source>Choose a GMZ, GMK, GM81 or GM82 project.</source>
+            <translation>GMZ, GMK, GM81 또는 GM82 프로젝트를 선택하세요.</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>프로젝트 읽는 중…</translation>
         </message>
     </context>
     <context>
@@ -5298,6 +5336,10 @@ Alt: 맞춤 해제
     <context>
         <name>QObject</name>
         <message>
+            <source>Unsupported text encoding: %1</source>
+            <translation>지원하지 않는 텍스트 인코딩: %1</translation>
+        </message>
+        <message>
             <source>Action library exceeds 32 MB.</source>
             <translation>액션 라이브러리가 32 MB를 초과합니다.</translation>
         </message>
@@ -6418,6 +6460,366 @@ Cannot remove the unregistered information file: %1</source>
         <message>
             <source>The file is not valid UTF-8 or BOM-marked UTF-16 text. Convert its encoding before importing it.</source>
             <translation>유효한 UTF-8 또는 BOM이 있는 UTF-16 텍스트가 아닙니다. 인코딩을 변환한 후 가져오세요.</translation>
+        </message>
+        <message>
+            <source>%1 (file offset %2%3): %4</source>
+            <translation>%1 (파일 위치 %2%3): %4</translation>
+        </message>
+        <message>
+            <source>, block offset %1</source>
+            <translation>, 블록 위치 %1</translation>
+        </message>
+        <message>
+            <source>Invalid or excessively large data block.</source>
+            <translation>데이터 블록이 잘못되었거나 너무 큽니다.</translation>
+        </message>
+        <message>
+            <source>Unexpected end of a resource block.</source>
+            <translation>리소스 블록이 예기치 않게 끝났습니다.</translation>
+        </message>
+        <message>
+            <source>Unexpected end of the project file.</source>
+            <translation>프로젝트 파일이 예기치 않게 끝났습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid data block length: %1.</source>
+            <translation>데이터 블록 길이가 잘못되었습니다: %1.</translation>
+        </message>
+        <message>
+            <source>Invalid item count: %1.</source>
+            <translation>항목 수가 잘못되었습니다: %1.</translation>
+        </message>
+        <message>
+            <source>Invalid boolean value: %1.</source>
+            <translation>논리값이 잘못되었습니다: %1.</translation>
+        </message>
+        <message>
+            <source>Invalid floating point value.</source>
+            <translation>부동 소수점 값이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>Unsupported legacy format version: %1.</source>
+            <translation>지원하지 않는 이전 형식 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Damaged or excessively large compressed resource.</source>
+            <translation>압축 리소스가 손상되었거나 너무 큽니다.</translation>
+        </message>
+        <message>
+            <source>Unexpected nested resource block.</source>
+            <translation>예기치 않은 중첩 리소스 블록입니다.</translation>
+        </message>
+        <message>
+            <source>Invalid GM7 encoding seed.</source>
+            <translation>GM7 인코딩 시드가 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>Cannot create directory for %1.</source>
+            <translation>%1의 디렉터리를 만들 수 없습니다.</translation>
+        </message>
+        <message>
+            <source>Cannot write %1: %2</source>
+            <translation>%1에 쓸 수 없습니다: %2</translation>
+        </message>
+        <message>
+            <source>Invalid resource filename: %1</source>
+            <translation>리소스 파일 이름이 잘못되었습니다: %1</translation>
+        </message>
+        <message>
+            <source>Resource '%1' (%2 ID %3) was imported as '%4' to use a valid, unique filename. Resource references were updated; check name-based GML references.</source>
+            <translation>유효하고 중복되지 않는 파일 이름을 사용하도록 리소스 '%1'(%2, ID %3)을(를) '%4'(으)로 가져왔습니다. 리소스 참조는 갱신되었습니다. GML에서 이름으로 참조하는 코드를 확인하세요.</translation>
+        </message>
+        <message>
+            <source>Project header</source>
+            <translation>프로젝트 헤더</translation>
+        </message>
+        <message>
+            <source>Extension packages</source>
+            <translation>확장 패키지</translation>
+        </message>
+        <message>
+            <source>Extension package '%1' is not embedded in the legacy project. Add its GMS extension separately.</source>
+            <translation>확장 패키지 '%1'은 이전 형식 프로젝트에 포함되어 있지 않습니다. 해당 GMS 확장을 별도로 추가하세요.</translation>
+        </message>
+        <message>
+            <source>Library initialization</source>
+            <translation>액션 라이브러리 초기화</translation>
+        </message>
+        <message>
+            <source>Legacy library initialization was saved to %1; move it to game initialization code.</source>
+            <translation>이전 라이브러리 초기화 코드를 %1에 저장했습니다. 게임 초기화 코드로 옮기세요.</translation>
+        </message>
+        <message>
+            <source>Resource tree</source>
+            <translation>리소스 트리</translation>
+        </message>
+        <message>
+            <source>Triggers</source>
+            <translation>트리거</translation>
+        </message>
+        <message>
+            <source>Legacy trigger definitions and events were preserved, but automatic trigger execution is not supported. Convert them to Step events before running the game.</source>
+            <translation>이전 트리거 정의와 이벤트는 보존되었지만 트리거 자동 실행은 지원하지 않습니다. 게임 실행 전에 Step 이벤트로 변환하세요.</translation>
+        </message>
+        <message>
+            <source>Resolving resource references...</source>
+            <translation>리소스 참조 확인 중…</translation>
+        </message>
+        <message>
+            <source>Room groups were flattened to preserve the legacy room execution order.</source>
+            <translation>이전 루ーム 실행 순서를 보존하기 위해 룸 그룹을 펼쳤습니다.</translation>
+        </message>
+        <message>
+            <source>Reading project...</source>
+            <translation>프로젝트 읽는 중…</translation>
+        </message>
+        <message>
+            <source>Incomplete action arguments.</source>
+            <translation>액션 인수가 불완전합니다.</translation>
+        </message>
+        <message>
+            <source>Too many object events.</source>
+            <translation>오브젝트 이벤트가 너무 많습니다.</translation>
+        </message>
+        <message>
+            <source>Cannot decode the legacy bitmap.</source>
+            <translation>이전 비트맵을 디코딩할 수 없습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid image dimensions: %1 x %2.</source>
+            <translation>이미지 크기가 잘못되었습니다: %1 x %2.</translation>
+        </message>
+        <message>
+            <source>Image byte count does not match its dimensions.</source>
+            <translation>이미지 바이트 수가 크기와 일치하지 않습니다.</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the image.</source>
+            <translation>메모리가 부족하여 이미지를 가져올 수 없습니다.</translation>
+        </message>
+        <message>
+            <source>Cannot encode image: %1</source>
+            <translation>이미지를 인코딩할 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>Invalid sound extension: %1.</source>
+            <translation>사운드 확장자가 잘못되었습니다: %1.</translation>
+        </message>
+        <message>
+            <source>Sprite frames have different sizes.</source>
+            <translation>스프라이트 프레임의 크기가 서로 다릅니다.</translation>
+        </message>
+        <message>
+            <source>Game settings</source>
+            <translation>게임 설정</translation>
+        </message>
+        <message>
+            <source>Included files</source>
+            <translation>포함 파일</translation>
+        </message>
+        <message>
+            <source>Invalid or duplicate included filename: %1</source>
+            <translation>포함 파일 이름이 잘못되었거나 중복됩니다: %1</translation>
+        </message>
+        <message>
+            <source>Included file '%1' was not embedded and could not be found beside the project. Restore it manually.</source>
+            <translation>포함 파일 '%1'은 내장되지 않았으며 원본 프로젝트 옆에서도 찾을 수 없습니다. 수동으로 복원하세요.</translation>
+        </message>
+        <message>
+            <source>Included file '%1' uses legacy extraction options. GMS copies included files beside the game; review its file paths and cleanup code.</source>
+            <translation>포함 파일 '%1'은 이전 추출 옵션을 사용합니다. GMS는 게임 옆에 파일을 복사하므로 파일 경로와 정리 코드를 확인하세요.</translation>
+        </message>
+        <message>
+            <source>Game information</source>
+            <translation>게임 정보</translation>
+        </message>
+        <message>
+            <source>Duplicate room instance ID: %1.</source>
+            <translation>룸 인스턴스 ID가 중복됩니다: %1.</translation>
+        </message>
+        <message>
+            <source>Duplicate room tile ID: %1.</source>
+            <translation>룸 타일 ID가 중복됩니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported sound version: %1.</source>
+            <translation>지원하지 않는 사운드 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported sprite version: %1.</source>
+            <translation>지원하지 않는 스프라이트 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported background version: %1.</source>
+            <translation>지원하지 않는 배경 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported path version: %1.</source>
+            <translation>지원하지 않는 경로 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported script version: %1.</source>
+            <translation>지원하지 않는 스크립트 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported font version: %1.</source>
+            <translation>지원하지 않는 글꼴 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported timeline version: %1.</source>
+            <translation>지원하지 않는 타임라인 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported object version: %1.</source>
+            <translation>지원하지 않는 오브젝트 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>Unsupported room version: %1.</source>
+            <translation>지원하지 않는 룸 버전입니다: %1.</translation>
+        </message>
+        <message>
+            <source>%1: %2</source>
+            <translation>%1: %2</translation>
+        </message>
+        <message>
+            <source>%1: Action library definition %2/%3 is not installed. GM82 stores action IDs only; install the matching .lib file before importing.</source>
+            <translation>%1: 액션 정의 %2/%3이 설치되지 않았습니다. GM82는 액션 ID만 저장하므로 해당 .lib 파일을 설치한 후 가져오세요.</translation>
+        </message>
+        <message>
+            <source>%1: Instance code has no filename.</source>
+            <translation>%1: 인스턴스 코드에 파일 이름이 없습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance name.</source>
+            <translation>%1: GM82 인스턴스 이름이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 instance record.</source>
+            <translation>%1: GM82 인스턴스 레코드가 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Invalid GM82 tile record.</source>
+            <translation>%1: GM82 타일 레코드가 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Invalid integer for %2.</source>
+            <translation>%1: %2의 정수 값이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room blend color: %2</source>
+            <translation>%1: 룸의 혼합 색상이 잘못되었습니다: %2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid room coordinate: %2</source>
+            <translation>%1: 룸 좌표가 잘못되었습니다: %2</translation>
+        </message>
+        <message>
+            <source>%1: Invalid sound %2.</source>
+            <translation>%1: 사운드의 %2 값이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 action header.</source>
+            <translation>%1: GM82 액션 헤더가 없습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Missing GM82 event header.</source>
+            <translation>%1: GM82 이벤트 헤더가 없습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Unexpected code after a non-code GM82 action.</source>
+            <translation>%1: 코드가 아닌 GM82 액션 뒤에 예기치 않은 코드가 있습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Unterminated GM82 action header.</source>
+            <translation>%1: GM82 액션 헤더가 닫히지 않았습니다.</translation>
+        </message>
+        <message>
+            <source>%1: Unknown GM82 action property: %2</source>
+            <translation>%1: 알 수 없는 GM82 액션 속성: %2</translation>
+        </message>
+        <message>
+            <source>%1:%2: Expected key=value.</source>
+            <translation>%1:%2: key=value 형식이 필요합니다.</translation>
+        </message>
+        <message>
+            <source>Cannot read GM82 project file: %1</source>
+            <translation>GM82 프로젝트 파일을 읽을 수 없습니다: %1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 resource: %1/%2</source>
+            <translation>중복된 GM82 리소스: %1/%2</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tile layer: %1</source>
+            <translation>중복된 GM82 타일 레이어: %1</translation>
+        </message>
+        <message>
+            <source>Duplicate GM82 tree entry: %1/%2</source>
+            <translation>중복된 GM82 트리 항목: %1/%2</translation>
+        </message>
+        <message>
+            <source>GM82 extension '%1' is not embedded in the project. Add a compatible GMS extension manually.</source>
+            <translation>GM82 확장 '%1'이 프로젝트에 포함되어 있지 않습니다. 호환되는 GMS 확장을 직접 추가하세요.</translation>
+        </message>
+        <message>
+            <source>GM82 project file points outside the project directory: %1</source>
+            <translation>GM82 프로젝트 파일이 프로젝트 폴더 밖을 가리킵니다: %1</translation>
+        </message>
+        <message>
+            <source>GM82 text file exceeds 64 MiB: %1</source>
+            <translation>GM82 텍스트 파일이 64 MiB를 초과합니다: %1</translation>
+        </message>
+        <message>
+            <source>GM82 text is not valid UTF-8: %1</source>
+            <translation>GM82 텍스트가 올바른 UTF-8이 아닙니다: %1</translation>
+        </message>
+        <message>
+            <source>GM82's swapped creation event order was not converted. Review initialization code in GMS.</source>
+            <translation>GM82의 생성 이벤트 순서 변경 설정은 변환되지 않았습니다. GMS에서 초기화 코드를 확인하세요.</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 event: %1</source>
+            <translation>잘못된 GM82 이벤트: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 executable version.</source>
+            <translation>GM82 실행 파일 버전이 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 image dimensions: %1</source>
+            <translation>잘못된 GM82 이미지 크기: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 path point: %1</source>
+            <translation>잘못된 GM82 경로 점: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 project path: %1</source>
+            <translation>잘못된 GM82 프로젝트 경로: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 resource tree: %1</source>
+            <translation>잘못된 GM82 리소스 트리: %1</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 sprite frame count.</source>
+            <translation>GM82 스프라이트 프레임 수가 잘못되었습니다.</translation>
+        </message>
+        <message>
+            <source>Invalid GM82 timeline moment: %1</source>
+            <translation>잘못된 GM82 타임라인 시점: %1</translation>
+        </message>
+        <message>
+            <source>Too many GM82 resources in %1.</source>
+            <translation>%1에 GM82 리소스가 너무 많습니다.</translation>
+        </message>
+        <message>
+            <source>Unknown GM82 resource: %1/%2</source>
+            <translation>알 수 없는 GM82 리소스: %1/%2</translation>
+        </message>
+        <message>
+            <source>Unsupported GM82 format version: %1.</source>
+            <translation>지원하지 않는 GM82 형식 버전: %1.</translation>
         </message>
     </context>
     <context>
@@ -9234,6 +9636,18 @@ Line %2, column %3: %4</source>
         <message>
             <source>The imported project references a file outside its directory: %1</source>
             <translation>가져온 프로젝트가 해당 폴더 외부의 파일을 참조합니다: %1</translation>
+        </message>
+        <message>
+            <source>Not enough memory to import the project.</source>
+            <translation>메모리가 부족하여 프로젝트를 가져올 수 없습니다.</translation>
+        </message>
+        <message>
+            <source>Reading legacy project...</source>
+            <translation>이전 형식 프로젝트 읽는 중…</translation>
+        </message>
+        <message>
+            <source>Cannot name the imported project: %1</source>
+            <translation>가져온 프로젝트의 이름을 지정할 수 없습니다: %1</translation>
         </message>
     </context>
 </TS>

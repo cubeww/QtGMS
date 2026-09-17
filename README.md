@@ -8,6 +8,7 @@ A Qt rewrite of the **GameMaker: Studio 1.4.9999** editor.
 
 - **Start creating immediately:** Double-click `QtGMS.exe` and start making your game—no project wizard required.
 - **Familiar workflow:** Classic layouts, resource editors, menus, and shortcuts that feel at home to GameMaker Studio 1.4 users.
+- **Legacy project import:** Import `.GMK`, `.GM81`, and `.GM82` projects and save them as GMX.
 - **Fast compiler:** An efficient project compiler that caches converted assets to speed up subsequent builds.
 - **Better code editing:** Smart indentation and fuzzy autocompletion for a smoother GML editing experience.
 - **High-DPI support:** Scales with your display settings while keeping text crisp and clear.
@@ -20,6 +21,21 @@ A Qt rewrite of the **GameMaker: Studio 1.4.9999** editor.
 - Some advanced compiler features, such as SWF support, are not yet implemented.
 
 If you need these features, you can switch back to the original GameMaker Studio 1.4 editor at any time.
+
+## Importing projects
+
+Use **File > Import Project** to import `.gmz`, GameMaker 7/8 `.gmk`,
+GameMaker 8.1 `.gm81`, or GameMaker 8.2 `.gm82` files. Imported projects are temporary until you use
+**Save As** to save them as GMX. Legacy extensions, triggers and functions removed
+in GameMaker Studio may need manual changes. Import warnings appear in the compile panel.
+For GMK files, choose the original project's text encoding when prompted (for example,
+Shift-JIS / CP932 for Japanese projects). GM81 and GM82 files use UTF-8.
+
+For GM82, select the `.gm82` file inside the project directory and keep its resource
+folders alongside it. Resource groups, actions, room instances and tile transforms
+are converted to GMX. Custom actions require their matching `.lib` files in QtGMS's
+`lib` directory. GM82-specific runtime features and extensions may require manual
+changes; importing does not replace the GMS runner with the GM82 runner.
 
 ## Building
 

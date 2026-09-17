@@ -1,6 +1,8 @@
 #include "projectimportjob.h"
 #include "projectloader.h"
 #include "sevenziparchive.h"
+#include "legacyprojectimporter.h"
+#include "gm82projectimporter.h"
 
 #include <QDir>
 #include <QFile>
@@ -40,12 +42,56 @@ static bool projectPathsInside(const QList<ResourceNode> &resources, const QDir 
 void ProjectImportJob::run()
 {
     try {
-        importFiles();
+        if (m_path.endsWith(QStringLiteral(".gmz"), Qt::CaseInsensitive)) importFiles();
+        else importLegacyProject();
+    } catch (const QString &error) {
+        m_error = error;
     } catch (const std::bad_alloc &) {
-        m_error = archiveError(SZ_ERROR_MEM);
+        m_error = tr("Not enough memory to import the project.");
     }
     m_cancelled = isInterruptionRequested();
     if (m_cancelled) m_project = Project();
+}
+
+bool ProjectImportJob::supportsFile(const QString &path)
+{
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    return suffix == QStringLiteral("gmz") || suffix == QStringLiteral("gmk")
+        || suffix == QStringLiteral("gm81") || suffix == QStringLiteral("gm82");
+}
+
+void ProjectImportJob::importLegacyProject()
+{
+    emit progressChanged(tr("Reading legacy project..."), 0);
+    Project temporary;
+    if (!Project::createTemporary(temporary, m_error)) return;
+    const auto cancelled = [this] { return isInterruptionRequested(); };
+    const auto progress = [this](const QString &name, int percent) { emit progressChanged(name, percent); };
+    QStringList warnings;
+    if (m_path.endsWith(QStringLiteral(".gm82"), Qt::CaseInsensitive)) {
+        Gm82ProjectImporter importer(m_path, temporary.filePath(), cancelled, progress);
+        importer.importProject();
+        warnings = importer.warnings();
+    } else {
+        LegacyProjectImporter importer(m_path, temporary.filePath(), m_legacyTextEncoding, cancelled, progress);
+        importer.importProject();
+        warnings = importer.warnings();
+    }
+    if (isInterruptionRequested()) return;
+    QString manifest = QFileInfo(temporary.filePath()).absoluteDir().filePath(
+        QFileInfo(m_path).completeBaseName() + QStringLiteral(".project.gmx"));
+    if (manifest.compare(temporary.filePath(), Qt::CaseInsensitive) == 0) manifest = temporary.filePath();
+    if (manifest != temporary.filePath() && !QFile::rename(temporary.filePath(), manifest)) {
+        m_error = tr("Cannot name the imported project: %1").arg(manifest);
+        return;
+    }
+    Project imported;
+    ProjectLoader loader;
+    if (!loader.load(manifest, imported, m_error)) return;
+    imported.m_temporaryDirectory = temporary.m_temporaryDirectory;
+    imported.m_imported = true;
+    imported.m_warnings.append(warnings);
+    m_project = imported;
 }
 
 void ProjectImportJob::importFiles()

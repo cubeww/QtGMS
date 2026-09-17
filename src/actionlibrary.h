@@ -27,7 +27,7 @@ struct ActionLibrary {
 class ActionLibraryReader
 {
 public:
-    static bool read(const QString &path, ActionLibrary &library, QString &error);
+    static bool read(const QString &path, ActionLibrary &library, QString &error, bool loadIcons = true);
 };
 class ActionLibraryManager : public QObject
 {

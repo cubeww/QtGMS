@@ -125,9 +125,9 @@ static QDomElement roomSection(QDomDocument &xml, RoomPropertyScope scope, int i
     while (entries.size() <= index) { QDomElement entry = xml.createElement(tag); container.appendChild(entry); entries.append(entry); }
     return entries.at(index);
 }
-RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *project, QWidget *parent)
-    : ResourceEditorWindow(parent), m_document(document), m_project(project), m_assets(project),
-      m_canvas(new RoomCanvas(document, &m_assets)), m_status(new QLabel), m_preview(new RoomObjectPreview), m_tilePicker(new RoomTilePicker), m_pages(new QStackedWidget)
+RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *project, const QSharedPointer<RoomAssets> &assets, QWidget *parent)
+    : ResourceEditorWindow(parent), m_document(document), m_project(project), m_assets(assets),
+      m_canvas(new RoomCanvas(document, m_assets.data())), m_status(new QLabel), m_preview(new RoomObjectPreview), m_tilePicker(new RoomTilePicker), m_pages(new QStackedWidget)
 {
     document->setParent(this); setAttribute(Qt::WA_DeleteOnClose); editorMenuBar()->hide(); resize(1060, 780); setMinimumSize(870, 560);
     auto *body = new QWidget; body->setObjectName(QStringLiteral("roomProperties")); auto *layout = new QVBoxLayout(body); layout->setContentsMargins(0, 0, 0, 0); layout->setSpacing(0);
@@ -234,7 +234,9 @@ RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *proj
     connect(document->undoStack(), &QUndoStack::cleanChanged, this, [this] { setWindowTitle(tr("Room Properties: %1%2").arg(m_document->name(), m_document->isModified() ? QStringLiteral(" *") : QString())); });
     connect(document, &RoomDocument::saved, this, [this] { emit resourceSaved(ResourceType::Room, filePath(), QString()); });
     auto *saveShortcut = new QShortcut(QKeySequence::Save, this); connect(saveShortcut, &QShortcut::activated, this, &RoomPropertiesWindow::saveProjectRequested);
-    refresh(); refreshSelection(); refreshObjectPreview();
+    for (const auto &entry : m_resourceCombos)
+        entry.first->setResources(*m_project, entry.second, QString(), tr("<none>"), QString());
+    refreshSelection(); refreshObjectPreview();
 }
 RoomPropertiesWindow::~RoomPropertiesWindow()
 {
@@ -284,7 +286,7 @@ QCheckBox *RoomPropertiesWindow::checkControl(QWidget *parent, const QString &la
 ResourceComboBox *RoomPropertiesWindow::resourceCombo(ResourceType type)
 {
     auto *combo = new ResourceComboBox; combo->setMinimumWidth(0); combo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon); combo->setMinimumContentsLength(8);
-    combo->setResources(*m_project, type, QString(), tr("<none>"), QString());
+    // Attach and style the controls before filling their resource models.
     m_resourceCombos.append(qMakePair(combo, type)); return combo;
 }
 QWidget *RoomPropertiesWindow::resourceControl(QWidget *parent, RoomPropertyScope scope, const QString &key, ResourceType type)
@@ -323,7 +325,7 @@ void RoomPropertiesWindow::selectPlacementObject(const QString &name)
 }
 void RoomPropertiesWindow::refreshObjectPreview()
 {
-    const QPixmap image = m_assets.object(m_objectChoice->currentData().toString()).image;
+    const QPixmap image = m_assets->object(m_objectChoice->currentData().toString()).image;
     if (!m_preview->pixmap() || m_preview->pixmap()->cacheKey() != image.cacheKey()) {
         m_preview->setPixmap(image);
         m_preview->resize(image.size().expandedTo(QSize(1, 1)));
@@ -347,7 +349,7 @@ void RoomPropertiesWindow::updateResources()
 {
     m_refreshing = true;
     for (const auto &entry : m_resourceCombos) entry.first->setResources(*m_project, entry.second, entry.first->currentData().toString(), tr("<none>"), QString());
-    m_refreshing = false; m_canvas->reloadAssets(); m_tilePicker->visual = m_assets.background(m_tileChoice->currentData().toString()); m_tilePicker->update(); refreshSelection(); refreshObjectPreview();
+    m_refreshing = false; m_canvas->reloadAssets(); m_tilePicker->visual = m_assets->background(m_tileChoice->currentData().toString()); m_tilePicker->update(); refreshSelection(); refreshObjectPreview();
 }
 void RoomPropertiesWindow::changeLock(bool locked)
 {
@@ -567,7 +569,7 @@ QWidget *RoomPropertiesWindow::createTilesPage()
         if (added) refreshTileLayers();
     });
     connect(m_tileChoice, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [this, updateStamp] {
-        m_tilePicker->visual = m_assets.background(m_tileChoice->currentData().toString());
+        m_tilePicker->visual = m_assets->background(m_tileChoice->currentData().toString());
         m_tileSource = QRect(m_tilePicker->visual.tileOffset, m_tilePicker->visual.tileSize); updateStamp(); refresh();
     });
     m_tilePicker->changed = [this, updateStamp](const QRect &rect) { m_tileSource = rect; updateStamp(); refresh(); };

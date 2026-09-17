@@ -48,8 +48,8 @@ static QSpinBox *pathInteger(int minimum, int maximum, int width)
 {
     auto *edit = new QSpinBox; edit->setRange(minimum, maximum); edit->setKeyboardTracking(false); edit->setButtonSymbols(QAbstractSpinBox::NoButtons); edit->setFixedSize(width, 20); return edit;
 }
-PathPropertiesWindow::PathPropertiesWindow(PathDocument *document, const Project *project, QWidget *parent)
-    : ResourceEditorWindow(parent), m_document(document), m_project(project), m_canvas(new PathCanvas(document)), m_points(new QListWidget), m_assets(new RoomAssets(project))
+PathPropertiesWindow::PathPropertiesWindow(PathDocument *document, const Project *project, const QSharedPointer<RoomAssets> &assets, QWidget *parent)
+    : ResourceEditorWindow(parent), m_document(document), m_project(project), m_canvas(new PathCanvas(document)), m_points(new QListWidget), m_assets(assets)
 {
     setObjectName(QStringLiteral("pathProperties")); document->setParent(this); setAttribute(Qt::WA_DeleteOnClose); editorMenuBar()->hide(); resize(850, 485); setMinimumSize(700, 420);
     auto *body = new QWidget; auto *layout = new QVBoxLayout(body); layout->setContentsMargins(0, 0, 0, 0); layout->setSpacing(0); setCentralWidget(body);
@@ -234,13 +234,13 @@ bool PathPropertiesWindow::loadRoomPreview(int roomIndex, QString &error)
     const QString path = rooms.at(roomIndex).filePath;
     auto *document = new RoomDocument(this);
     if (!document->load(path, error)) { delete document; return false; }
-    auto *preview = new RoomCanvas(document, m_assets.get(), this); preview->hide();
+    auto *preview = new RoomCanvas(document, m_assets.data(), this); preview->hide();
     m_canvas->setRoomPreview(preview); delete m_roomPreview; delete m_roomDocument; m_roomPreview = preview; m_roomDocument = document; m_previewIndex = roomIndex; return true;
 }
 void PathPropertiesWindow::updateResources()
 {
     m_canvas->setRoomPreview(nullptr); delete m_roomPreview; m_roomPreview = nullptr; delete m_roomDocument; m_roomDocument = nullptr;
-    m_assets->reload(); m_previewIndex = -2; refresh();
+    m_previewIndex = -2; refresh();
 }
 bool PathPropertiesWindow::save()
 {

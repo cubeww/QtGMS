@@ -9,6 +9,7 @@
 #include <QDateTime>
 #include <QPixmapCache>
 #include <QPainter>
+#include <QStandardItemModel>
 #include <functional>
 
 static QIcon selectionIcon(ResourceType type)
@@ -43,6 +44,8 @@ static QIcon resourceMenuIcon(const ResourceNode &node)
     QPixmapCache::insert(key, thumbnail);
     return QIcon(thumbnail);
 }
+
+static const int ResourceThumbnailRole = Qt::UserRole + 1;
 
 static void markCurrentResource(QMenu *menu, QAction *action, const QString &current)
 {
@@ -85,6 +88,8 @@ ResourceSelectionMenu::ResourceSelectionMenu(const QList<ResourceNode> &resource
 ResourceComboBox::ResourceComboBox(QWidget *parent) : QComboBox(parent)
 {
     setMinimumContentsLength(8); setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+    connect(this, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &ResourceComboBox::updateCurrentIcon);
 }
 
 void ResourceComboBox::setResources(const Project &project, ResourceType type, const QString &current,
@@ -92,16 +97,49 @@ void ResourceComboBox::setResources(const Project &project, ResourceType type, c
 {
     const QSignalBlocker blocker(this);
     m_resources = project.resources(type); m_emptyLabel = emptyLabel; m_emptyValue = emptyValue; m_excluded = excluded;
-    clear(); if (!emptyLabel.isEmpty()) addItem(emptyLabel, emptyValue);
+    m_resourceType = type;
+    // Populate before attaching the model: inserting each row into a live view
+    // sends layout/selection notifications for the entire resource list.
+    auto *choices = new QStandardItemModel(this);
+    const QIcon icon = selectionIcon(type);
+    int selectedIndex = -1;
+    const auto appendChoice = [&](const QString &text, const QString &name, const QString &thumbnail, bool resource) {
+        auto *item = new QStandardItem(text);
+        item->setData(name, Qt::UserRole);
+        if (resource) {
+            item->setIcon(icon);
+            item->setData(thumbnail, ResourceThumbnailRole);
+        }
+        if (selectedIndex < 0 && name == current) selectedIndex = choices->rowCount();
+        choices->appendRow(item);
+    };
+    if (!emptyLabel.isEmpty()) appendChoice(emptyLabel, emptyValue, QString(), false);
     std::function<void(const QList<ResourceNode> &)> append = [&](const QList<ResourceNode> &nodes) {
         for (const auto &node : nodes) {
             if (node.isGroup) append(node.children);
-            else if (!excluded.contains(node.name)) addItem(node.thumbnailPath.isEmpty() ? selectionIcon(type) : QIcon(node.thumbnailPath), node.name, node.name);
+            else if (!excluded.contains(node.name)) appendChoice(node.name, node.name, node.thumbnailPath, true);
         }
     };
     append(m_resources);
-    if (findData(current) < 0 && !current.isEmpty() && !excluded.contains(current)) addItem(current, current);
-    setCurrentIndex(findData(current));
+    if (selectedIndex < 0 && !current.isEmpty() && !excluded.contains(current)) appendChoice(current, current, QString(), false);
+    // QComboBox owns and deletes its previous model.
+    setModel(choices);
+    setCurrentIndex(selectedIndex);
+    updateCurrentIcon();
+}
+
+void ResourceComboBox::updateCurrentIcon()
+{
+    const int index = currentIndex();
+    const QVariant path = itemData(index, ResourceThumbnailRole);
+    if (!path.isValid()) return;
+    // DecorationRole is also queried while sizing hidden Qt popup views. Keep
+    // those queries free of image I/O; only the selected resource needs a thumbnail.
+    ResourceNode node;
+    node.type = m_resourceType;
+    node.thumbnailPath = path.toString();
+    const QSignalBlocker blocker(this);
+    setItemIcon(index, node.thumbnailPath.isEmpty() ? selectionIcon(m_resourceType) : resourceMenuIcon(node));
 }
 
 void ResourceComboBox::showPopup()

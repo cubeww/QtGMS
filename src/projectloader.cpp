@@ -215,6 +215,7 @@ void ProjectLoader::readThumbnailMetadata(ResourceNode &resource)
     QXmlStreamReader xml(&file);
     QString imagePath;
     QString spriteName;
+    QString parentName;
     if (!xml.readNextStartElement() || xml.name() != root)
         xml.raiseError(QObject::tr("Expected a %1 root element.").arg(root));
     while (!xml.hasError() && xml.readNextStartElement()) {
@@ -230,6 +231,8 @@ void ProjectLoader::readThumbnailMetadata(ResourceNode &resource)
             imagePath = xml.readElementText().trimmed();
         } else if (resource.type == ResourceType::Object && xml.name() == QStringLiteral("spriteName")) {
             spriteName = xml.readElementText().trimmed();
+        } else if (resource.type == ResourceType::Object && xml.name() == QStringLiteral("parentName")) {
+            parentName = xml.readElementText().trimmed();
         } else {
             xml.skipCurrentElement();
         }
@@ -241,6 +244,7 @@ void ProjectLoader::readThumbnailMetadata(ResourceNode &resource)
         return;
     }
     resource.spriteName = spriteName;
+    resource.parentName = parentName;
     if (!imagePath.isEmpty()) {
         resource.thumbnailPath = QDir::cleanPath(QFileInfo(resource.filePath).absoluteDir()
             .absoluteFilePath(normalizedPath(imagePath)));

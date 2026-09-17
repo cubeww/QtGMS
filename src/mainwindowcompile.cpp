@@ -5,6 +5,7 @@
 #include "gamerunner.h"
 #include "editordialog.h"
 #include "editorstandarddialogs.h"
+#include "editortheme.h"
 #include <QCloseEvent>
 #include <QAction>
 #include <QComboBox>
@@ -24,9 +25,6 @@ public:
         , m_job(job)
     {
         setWindowTitle(tr("%1 - Compiling").arg(projectName));
-        bodyWidget()->setObjectName(QStringLiteral("compilerProgressBody"));
-        bodyWidget()->setStyleSheet(QStringLiteral(
-            "QWidget#compilerProgressBody { background: #383838; border: 1px solid #aaa; }"));
         auto *layout = new QVBoxLayout(bodyWidget());
         layout->setContentsMargins(10, 6, 10, 8);
         layout->setSpacing(4);
@@ -37,12 +35,7 @@ public:
         m_progressBar = new QProgressBar;
         m_progressBar->setRange(0, 1);
         m_progressBar->setValue(0);
-        m_progressBar->setTextVisible(false);
-        m_progressBar->setFixedHeight(24);
-        m_progressBar->setStyleSheet(QStringLiteral(
-            "QProgressBar { background: #141414; border: 1px solid #292929; padding: 2px; }"
-            "QProgressBar::chunk { border: 1px solid #45651b; background: qlineargradient("
-            "x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #91df37, stop: 0.45 #76cb24, stop: 1 #459509); }"));
+        EditorTheme::applyProgressDialogStyle(bodyWidget(), m_progressBar);
         layout->addWidget(m_progressBar);
         setFixedSize(460, 32 + 14 + m_label->sizeHint().height() + 4 + 24);
         connect(job, &CompileJob::progressChanged, this, [this](const QString &message, int completed, int total) {

@@ -706,11 +706,11 @@ private:
             result->kind = GmlNodeKind::For;
             expect(GmlSymbol::LeftParen);
             result->children.append(at(GmlSymbol::Semicolon) ? node(GmlNodeKind::Block) : assignment());
-            expect(GmlSymbol::Semicolon);
+            // Both separators may be omitted when the clauses are distinct:
+            // for (i = 0 i < n i += 1).
+            take(GmlSymbol::Semicolon);
             result->children.append(
                 at(GmlSymbol::Semicolon) ? node(GmlNodeKind::Number, QStringLiteral("1")) : expression());
-            // GMS requires the initializer separator but permits omitting the
-            // separator after the condition: for (i = n; i > 0 i -= step).
             take(GmlSymbol::Semicolon);
             // GMS parses the update clause as a statement and accepts trailing
             // semicolons inside the parentheses: for (i = 0; i < n; i += 1;).

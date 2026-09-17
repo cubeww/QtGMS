@@ -159,15 +159,16 @@ void Project::updateThumbnail(ResourceType type, const QString &filePath, const 
     if (type == ResourceType::Sprite && !name.isEmpty()) updateObjectNodes(m_resources[ResourceType::Object], name, thumbnailPath);
 }
 
-static void updateObjectSpriteNode(QList<ResourceNode> &nodes, const QString &path, const QString &sprite, const QString &thumbnail)
+static void updateObjectMetadataNode(QList<ResourceNode> &nodes, const QString &path, const QString &sprite,
+                                     const QString &parent, const QString &thumbnail)
 {
     for (ResourceNode &node : nodes) {
-        if (node.isGroup) updateObjectSpriteNode(node.children, path, sprite, thumbnail);
-        else if (node.filePath == path) { node.spriteName = sprite; node.thumbnailPath = thumbnail; }
+        if (node.isGroup) updateObjectMetadataNode(node.children, path, sprite, parent, thumbnail);
+        else if (node.filePath == path) { node.spriteName = sprite; node.parentName = parent; node.thumbnailPath = thumbnail; }
     }
 }
-void Project::updateObjectSprite(const QString &filePath, const QString &spriteName, const QString &thumbnailPath)
-{ updateObjectSpriteNode(m_resources[ResourceType::Object], filePath, spriteName, thumbnailPath); }
+void Project::updateObjectMetadata(const QString &filePath, const QString &spriteName, const QString &parentName, const QString &thumbnailPath)
+{ updateObjectMetadataNode(m_resources[ResourceType::Object], filePath, spriteName, parentName, thumbnailPath); }
 
 const QList<ResourceNode> &Project::resources(ResourceType type) const
 {

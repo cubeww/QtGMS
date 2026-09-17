@@ -1,7 +1,7 @@
 #ifndef QTGMS_PATHPROPERTIESWINDOW_H
 #define QTGMS_PATHPROPERTIESWINDOW_H
 #include "resourceeditorwindow.h"
-#include <memory>
+#include <QSharedPointer>
 class PathDocument;
 class PathCanvas;
 class Project;
@@ -20,7 +20,7 @@ class PathPropertiesWindow : public ResourceEditorWindow
 {
     Q_OBJECT
 public:
-    PathPropertiesWindow(PathDocument *document, const Project *project, QWidget *parent = nullptr);
+    PathPropertiesWindow(PathDocument *document, const Project *project, const QSharedPointer<RoomAssets> &assets, QWidget *parent = nullptr);
     ~PathPropertiesWindow() override;
     bool save() override;
     QString filePath() const override;
@@ -48,7 +48,7 @@ private:
     QLabel *m_status;
     QToolButton *m_roomButton;
     QPushButton *m_deleteButton;
-    std::unique_ptr<RoomAssets> m_assets;
+    QSharedPointer<RoomAssets> m_assets;
     RoomDocument *m_roomDocument = nullptr;
     RoomCanvas *m_roomPreview = nullptr;
     int m_previewIndex = -2;

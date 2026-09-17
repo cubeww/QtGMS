@@ -15,6 +15,7 @@ class CompilePanel;
 class ResourceBrowser;
 class ResourceEditorWindow;
 class RoomPropertiesWindow;
+class RoomAssets;
 class ActionLibraryManager;
 class GameRunner;
 
@@ -66,6 +67,7 @@ private:
     void openSearchMatch(const ScriptSearchMatch &match);
 
     Project m_project;
+    QSharedPointer<RoomAssets> m_roomAssets;
     QPointer<RoomPropertiesWindow> m_lastRoomEditor;
     ResourceBrowser *m_resourceBrowser;
     CompilePanel *m_compilePanel;

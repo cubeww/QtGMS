@@ -30,7 +30,7 @@ private:
     int m_position = 0;
     bool m_ok = true;
 };
-bool ActionLibraryReader::read(const QString &path, ActionLibrary &library, QString &error)
+bool ActionLibraryReader::read(const QString &path, ActionLibrary &library, QString &error, bool loadIcons)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) { error = file.errorString(); return false; }
@@ -48,7 +48,7 @@ bool ActionLibraryReader::read(const QString &path, ActionLibrary &library, QStr
         if (version != 500 && version != 520) { error = QObject::tr("Unsupported action record version: %1").arg(version); return false; }
         action.name = stream.string(); action.id = stream.integer();
         const int imageSize = stream.count(4 * 1024 * 1024); QByteArray imageBytes = stream.bytes(imageSize);
-        if (!imageBytes.isEmpty()) {
+        if (loadIcons && !imageBytes.isEmpty()) {
             QBuffer buffer(&imageBytes); buffer.open(QIODevice::ReadOnly); QImageReader reader(&buffer, QByteArrayLiteral("BMP"));
             const QSize size = reader.size();
             if (!size.isValid() || size.width() > 1024 || size.height() > 1024) { error = QObject::tr("Invalid action icon dimensions."); return false; }
