@@ -348,8 +348,8 @@ void CompilerBuild::rooms()
                       if (enabled) {
                           QString name = text(child, "name"), relative = sourceDirectory + "/" + name;
                           relative.replace('\\', '/');
-                          external(outputDirectory + name,
-                              read(QFileInfo(request.project.filePath()).absoluteDir().absoluteFilePath(relative)));
+                          externalFile(outputDirectory + name,
+                              QFileInfo(request.project.filePath()).absoluteDir().absoluteFilePath(relative));
                       }
                   }
               }

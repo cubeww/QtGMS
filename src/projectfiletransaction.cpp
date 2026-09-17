@@ -62,11 +62,17 @@ bool ProjectFileTransaction::remove(const QString &path, QString &error)
     error = QObject::tr("Cannot remove %1.").arg(path); return false;
 }
 
-bool ProjectFileTransaction::copy(const QString &source, const QString &destination, QString &error)
+bool ProjectFileTransaction::copy(const QString &source, const QString &destination, QString &error, bool overwrite)
 {
-    if (QFileInfo::exists(destination)) { error = QObject::tr("The destination already exists: %1").arg(destination); return false; }
+    const QFileInfo sourceInfo(source), destinationInfo(destination);
+    if (destinationInfo.exists() && !overwrite) { error = QObject::tr("The destination already exists: %1").arg(destination); return false; }
+    if (!sourceInfo.isFile()) { error = QObject::tr("Cannot copy %1 to %2.").arg(source, destination); return false; }
     if (!remember(destination, error)) return false;
-    if (QFileInfo(source).isFile() && QFile::copy(source, destination)) return true;
+    if (destinationInfo.exists()) {
+        if (sourceInfo.canonicalFilePath().compare(destinationInfo.canonicalFilePath(), Qt::CaseInsensitive) == 0) return true;
+        if (!QFile::remove(destination)) { error = QObject::tr("Cannot remove %1.").arg(destination); return false; }
+    }
+    if (QFile::copy(source, destination)) return true;
     error = QObject::tr("Cannot copy %1 to %2.").arg(source, destination); return false;
 }
 

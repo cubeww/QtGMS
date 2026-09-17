@@ -6,6 +6,8 @@
 #include <QDomDocument>
 #include <QTemporaryFile>
 
+class ProjectFileTransaction;
+
 struct CompilerResource
 {
     ResourceNode node;
@@ -22,8 +24,9 @@ struct CompilerAudioEntry
 };
 struct CompilerBuild
 {
-    explicit CompilerBuild(const CompileRequest &request);
+    CompilerBuild(const CompileRequest &request, ProjectFileTransaction &outputTransaction);
     const CompileRequest &request;
+    ProjectFileTransaction &outputTransaction;
     DataWriter file;
     TextureCompiler textures;
     GmlEnvironment environment;
@@ -32,7 +35,8 @@ struct CompilerBuild
     QHash<QString, QString> extensionScriptFiles;
     QSet<QString> includedExtensionScriptFiles;
     QStringList extensionEntryPoints;
-    QMap<QString, QByteArray> externalFiles;
+    // Source paths for copied files; final output paths for generated files.
+    QMap<QString, QString> externalFiles;
     QMap<int, QVector<CompilerAudioEntry>> audio;
     QTemporaryFile audioData;
     QMap<QString, QString> options;
@@ -53,6 +57,7 @@ struct CompilerBuild
     int option(const char *key, int fallback = 0) const;
     QString actionCode(const QDomElement &event);
     void external(const QString &name, const QByteArray &bytes);
+    void externalFile(const QString &name, const QString &sourcePath);
     int addAudio(int group, const QByteArray &bytes);
     static QByteArray read(const QString &path);
     static QDomDocument xml(const QString &path, QByteArray *sourceBytes = nullptr);

@@ -1,7 +1,9 @@
 #include "compilerbuild.h"
 #include "builddirectory.h"
 #include "actionxml.h"
+#include "projectfiletransaction.h"
 #include "scriptsource.h"
+#include <QBuffer>
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
@@ -10,8 +12,8 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 
-CompilerBuild::CompilerBuild(const CompileRequest &input)
-    : request(input)
+CompilerBuild::CompilerBuild(const CompileRequest &input, ProjectFileTransaction &transaction)
+    : request(input), outputTransaction(transaction)
 {
 }
 QByteArray CompilerBuild::read(const QString &path)
@@ -132,7 +134,7 @@ void CompilerBuild::scripts()
     });
     file.chunk("GLOB", [&] { file.u32(0); });
 }
-void CompilerBuild::external(const QString &name, const QByteArray &bytes)
+static QString normalizedOutputName(const QString &name)
 {
     QString normalized = name;
     normalized.replace('\\', '/');
@@ -140,13 +142,63 @@ void CompilerBuild::external(const QString &name, const QByteArray &bytes)
     if (QDir::isAbsolutePath(normalized) || normalized == ".." || normalized.startsWith("../")
         || normalized.contains(':') || normalized.compare("data.win", Qt::CaseInsensitive) == 0)
         throw CompileError(QStringLiteral("Invalid output file path: %1").arg(name));
+    return normalized;
+}
+static bool hasMatchingOutput(const QMap<QString, QString> &externalFiles, const QString &name, QIODevice &input)
+{
+    QString existingPath;
     for (auto it = externalFiles.cbegin(); it != externalFiles.cend(); ++it)
-        if (it.key().compare(normalized, Qt::CaseInsensitive) == 0) {
-            if (it.value() != bytes)
-                throw CompileError(QStringLiteral("Conflicting output file: %1").arg(normalized));
-            return;
+        if (it.key().compare(name, Qt::CaseInsensitive) == 0) {
+            existingPath = it.value();
+            break;
         }
-    externalFiles.insert(normalized, bytes);
+    if (existingPath.isEmpty())
+        return false;
+    QFile existing(existingPath);
+    if (!existing.open(QIODevice::ReadOnly))
+        throw CompileError(QStringLiteral("%1: %2").arg(existingPath, existing.errorString()));
+    if (input.size() != existing.size())
+        throw CompileError(QStringLiteral("Conflicting output file: %1").arg(name));
+    // Read contents only to check a duplicate output name, without loading
+    // either file in full. Identical duplicates retain the first source path.
+    while (!input.atEnd()) {
+        const QByteArray block = input.read(1024 * 1024);
+        if (block.isEmpty())
+            throw CompileError(QStringLiteral("Cannot read output file %1: %2").arg(name, input.errorString()));
+        const QByteArray other = existing.read(block.size());
+        if (existing.error() != QFile::NoError)
+            throw CompileError(QStringLiteral("%1: %2").arg(existingPath, existing.errorString()));
+        if (other != block)
+            throw CompileError(QStringLiteral("Conflicting output file: %1").arg(name));
+    }
+    if (!existing.atEnd())
+        throw CompileError(QStringLiteral("Conflicting output file: %1").arg(name));
+    return true;
+}
+void CompilerBuild::external(const QString &name, const QByteArray &bytes)
+{
+    const QString normalized = normalizedOutputName(name);
+    QBuffer input;
+    input.setData(bytes);
+    input.open(QIODevice::ReadOnly);
+    if (hasMatchingOutput(externalFiles, normalized, input))
+        return;
+    // Write each generated companion file once, then release its byte buffer.
+    // The transaction restores previous outputs if a later compiler phase fails.
+    const QString path = QDir(BuildDirectory::path(request.project)).absoluteFilePath(normalized);
+    QString error;
+    if (!outputTransaction.write(path, bytes, error))
+        throw CompileError(error);
+    externalFiles.insert(normalized, path);
+}
+void CompilerBuild::externalFile(const QString &name, const QString &sourcePath)
+{
+    const QString normalized = normalizedOutputName(name);
+    QFile input(sourcePath);
+    if (!input.open(QIODevice::ReadOnly))
+        throw CompileError(QStringLiteral("%1: %2").arg(sourcePath, input.errorString()));
+    if (!hasMatchingOutput(externalFiles, normalized, input))
+        externalFiles.insert(normalized, QFileInfo(sourcePath).absoluteFilePath());
 }
 int CompilerBuild::addAudio(int group, const QByteArray &bytes)
 {

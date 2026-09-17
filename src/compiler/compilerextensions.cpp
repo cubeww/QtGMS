@@ -92,7 +92,7 @@ void CompilerBuild::extensions()
                     for (const auto &function : functions)
                         extensionScriptFiles.insert(text(function, "name"), sourcePath);
                 } else if (!sourceName.endsWith(".ext", Qt::CaseInsensitive))
-                    external(name, read(sourcePath));
+                    externalFile(name, sourcePath);
             });
         });
         // Product identifiers are metadata; unlicensed extensions use the

@@ -15,7 +15,7 @@ public:
     ~ProjectFileTransaction();
     bool write(const QString &path, const QByteArray &bytes, QString &error);
     bool remove(const QString &path, QString &error);
-    bool copy(const QString &source, const QString &destination, QString &error);
+    bool copy(const QString &source, const QString &destination, QString &error, bool overwrite = false);
     bool move(const QString &source, const QString &destination, QString &error);
     bool finish(QString &error);
     void rollback(QString &error);
