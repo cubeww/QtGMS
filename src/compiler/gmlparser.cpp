@@ -86,6 +86,8 @@ struct GmlSymbolInfo
     bool assignment;
 };
 
+// From lowest to highest, GMS orders logical operators as OR, AND, XOR.
+// Comparisons share one level, as do bitwise operators, and associate left.
 static const GmlSymbolInfo GmlSymbols[] = {
     { QStringLiteral(""), 0, false },
     { QStringLiteral("("), 0, false },
@@ -103,27 +105,27 @@ static const GmlSymbolInfo GmlSymbols[] = {
     { QStringLiteral("@"), 0, false },
     { QStringLiteral("!"), 0, false },
     { QStringLiteral("~"), 0, false },
-    { QStringLiteral("+"), 10, false },
-    { QStringLiteral("-"), 10, false },
-    { QStringLiteral("*"), 11, false },
-    { QStringLiteral("/"), 11, false },
-    { QStringLiteral("%"), 11, false },
-    { QStringLiteral("|"), 6, false },
-    { QStringLiteral("^"), 7, false },
-    { QStringLiteral("&"), 8, false },
+    { QStringLiteral("+"), 7, false },
+    { QStringLiteral("-"), 7, false },
+    { QStringLiteral("*"), 8, false },
+    { QStringLiteral("/"), 8, false },
+    { QStringLiteral("%"), 8, false },
+    { QStringLiteral("|"), 5, false },
+    { QStringLiteral("^"), 5, false },
+    { QStringLiteral("&"), 5, false },
     { QStringLiteral("="), 4, true },
-    { QStringLiteral("<"), 5, false },
-    { QStringLiteral(">"), 5, false },
+    { QStringLiteral("<"), 4, false },
+    { QStringLiteral(">"), 4, false },
     { QStringLiteral("=="), 4, false },
     { QStringLiteral("!="), 4, false },
-    { QStringLiteral("<="), 5, false },
-    { QStringLiteral(">="), 5, false },
+    { QStringLiteral("<="), 4, false },
+    { QStringLiteral(">="), 4, false },
     { QStringLiteral("<>"), 4, false },
-    { QStringLiteral("&&"), 3, false },
+    { QStringLiteral("&&"), 2, false },
     { QStringLiteral("||"), 1, false },
-    { QStringLiteral("^^"), 2, false },
-    { QStringLiteral("<<"), 9, false },
-    { QStringLiteral(">>"), 9, false },
+    { QStringLiteral("^^"), 3, false },
+    { QStringLiteral("<<"), 6, false },
+    { QStringLiteral(">>"), 6, false },
     { QStringLiteral("+="), 0, true },
     { QStringLiteral("-="), 0, true },
     { QStringLiteral("*="), 0, true },
@@ -136,11 +138,11 @@ static const GmlSymbolInfo GmlSymbols[] = {
     { QStringLiteral("--"), 0, false },
     { QStringLiteral(":="), 0, true },
     { QStringLiteral("or"), 1, false },
-    { QStringLiteral("xor"), 2, false },
-    { QStringLiteral("and"), 3, false },
+    { QStringLiteral("xor"), 3, false },
+    { QStringLiteral("and"), 2, false },
     { QStringLiteral("not"), 0, false },
-    { QStringLiteral("div"), 11, false },
-    { QStringLiteral("mod"), 11, false },
+    { QStringLiteral("div"), 8, false },
+    { QStringLiteral("mod"), 8, false },
     { QStringLiteral("var"), 0, false },
     { QStringLiteral("globalvar"), 0, false },
     { QStringLiteral("enum"), 0, false },
@@ -164,6 +166,36 @@ static const GmlSymbolInfo GmlSymbols[] = {
 
 static_assert(
     sizeof(GmlSymbols) / sizeof(GmlSymbols[0]) == int(GmlSymbol::Count), "Every GML symbol must have metadata");
+
+static bool isReturnBoundary(GmlSymbol symbol)
+{
+    switch (symbol) {
+    case GmlSymbol::Semicolon:
+    case GmlSymbol::LeftBrace:
+    case GmlSymbol::RightBrace:
+    case GmlSymbol::Var:
+    case GmlSymbol::GlobalVar:
+    case GmlSymbol::If:
+    case GmlSymbol::Then:
+    case GmlSymbol::Else:
+    case GmlSymbol::While:
+    case GmlSymbol::Repeat:
+    case GmlSymbol::With:
+    case GmlSymbol::Do:
+    case GmlSymbol::Until:
+    case GmlSymbol::For:
+    case GmlSymbol::Switch:
+    case GmlSymbol::Case:
+    case GmlSymbol::Default:
+    case GmlSymbol::Break:
+    case GmlSymbol::Continue:
+    case GmlSymbol::Exit:
+    case GmlSymbol::Return:
+        return true;
+    default:
+        return false;
+    }
+}
 
 static GmlSymbol keywordSymbol(const QString &text)
 {
@@ -711,7 +743,9 @@ private:
             take(GmlSymbol::Semicolon);
         } else if (take(GmlSymbol::Return)) {
             result->kind = GmlNodeKind::Return;
-            if (!at(GmlSymbol::Semicolon) && !at(GmlSymbol::RightBrace) && !isEnd())
+            // Semicolons are optional; a following statement keyword must not
+            // be consumed as a variable in the return expression.
+            if (!isEnd() && !isReturnBoundary(current().symbol))
                 result->children.append(expression());
             take(GmlSymbol::Semicolon);
         } else {

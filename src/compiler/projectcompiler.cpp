@@ -48,7 +48,11 @@ CompileResult ProjectCompiler::compile(
         build.textures.write(build.file, qBound(256, build.option("windows_texture_page", 2048), 8192));
         profile.start(QStringLiteral("GML parsing / symbol preparation"));
         stage(QStringLiteral("Compiling %1 GML code blocks (VM16)...").arg(build.codes.size()));
-        prepareGml(build.codes, build.environment);
+        for (const auto &function : build.extensionEntryPoints)
+            build.includeExtensionScript(function);
+        prepareGml(build.codes, build.environment,
+            [&](const QString &function) { build.includeExtensionScript(function); });
+        build.scripts();
         profile.start(QStringLiteral("GML bytecode generation"));
         stage(QStringLiteral("Generating GML bytecode..."));
         for (auto &code : build.codes)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(QtGMS VERSION 0.1.4 LANGUAGES CXX)
+project(QtGMS VERSION 0.1.5 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -35,6 +35,7 @@ add_library(qtgmscompiler STATIC
     src/compiler/builddirectory.cpp
     src/compiler/datawriter.cpp
     src/compiler/gmlparser.cpp
+    src/compiler/gmlconstant.cpp
     src/compiler/gmlcompiler.cpp
     src/compiler/audiocompiler.cpp
     src/compiler/compilerbuild.cpp

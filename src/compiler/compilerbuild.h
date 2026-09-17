@@ -13,6 +13,7 @@ struct CompilerResource
     QDomElement xml;
     QByteArray sourceBytes;
     QString embeddedSource;
+    int codeIndex = -1;
 };
 struct CompilerAudioEntry
 {
@@ -28,6 +29,9 @@ struct CompilerBuild
     GmlEnvironment environment;
     QMap<ResourceType, QVector<CompilerResource>> resources;
     QVector<VmCode> codes;
+    QHash<QString, QString> extensionScriptFiles;
+    QSet<QString> includedExtensionScriptFiles;
+    QStringList extensionEntryPoints;
     QMap<QString, QByteArray> externalFiles;
     QMap<int, QVector<CompilerAudioEntry>> audio;
     QTemporaryFile audioData;
@@ -41,6 +45,8 @@ struct CompilerBuild
     void objects();
     void rooms();
     void extensions();
+    void includeExtensionScript(const QString &functionName);
+    void scripts();
     void shaders();
     int code(const QString &name, const QString &source);
     int resourceId(ResourceType type, const QString &name, int absent = -1) const;

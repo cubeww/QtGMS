@@ -516,6 +516,28 @@ bool CodeEditor::editBracket(QKeyEvent *event)
     if (event->modifiers() & (Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)) return false;
     QTextCursor cursor = textCursor();
     const int start = cursor.selectionStart(), end = cursor.selectionEnd();
+    const QChar next = document()->characterAt(start);
+    const QChar character = event->text().size() == 1 ? event->text().at(0) : QChar();
+    const bool quote = character == QLatin1Char('\'') || character == QLatin1Char('"');
+    if (!cursor.hasSelection() && (next == QLatin1Char('\'') || next == QLatin1Char('"'))) {
+        const QTextBlock block = document()->findBlock(start);
+        const auto *data = dynamic_cast<const CodeBlockData *>(block.userData());
+        // Use the highlighter's string boundaries, including its language-specific
+        // escape rules, so quotes inside comments or string contents are untouched.
+        if (data) for (const auto &range : data->excludedRanges) {
+            if (!range.string || range.includesEnd || range.end != start - block.position() + 1) continue;
+            if (quote && character == next) {
+                cursor.movePosition(QTextCursor::Right); setTextCursor(cursor); return true;
+            }
+            if (event->key() == Qt::Key_Backspace && event->modifiers() == Qt::NoModifier
+                && !range.includesStart && range.end - range.start == 2
+                && document()->characterAt(start - 1) == next) {
+                cursor.beginEditBlock();
+                cursor.setPosition(start - 1); cursor.setPosition(start + 1, QTextCursor::KeepAnchor);
+                cursor.removeSelectedText(); cursor.endEditBlock(); setTextCursor(cursor); return true;
+            }
+        }
+    }
     if (!isCodePosition(start)) return false;
     if (event->key() == Qt::Key_Backspace && event->modifiers() == Qt::NoModifier && !cursor.hasSelection() && start > 0) {
         const QChar closing = closingBracket(document()->characterAt(start - 1));
@@ -526,8 +548,7 @@ bool CodeEditor::editBracket(QKeyEvent *event)
         }
     }
     if (event->text().size() != 1) return false;
-    const QChar character = event->text().at(0);
-    const QChar closing = closingBracket(character);
+    const QChar closing = quote ? character : closingBracket(character);
     if (!closing.isNull()) {
         if (cursor.hasSelection()) {
             const bool reversed = cursor.position() < cursor.anchor();
@@ -538,7 +559,6 @@ bool CodeEditor::editBracket(QKeyEvent *event)
             cursor.setPosition(reversed ? end + 1 : start + 1);
             cursor.setPosition(reversed ? start + 1 : end + 1, QTextCursor::KeepAnchor);
         } else {
-            const QChar next = document()->characterAt(start);
             // Avoid inserting a second delimiter in the middle of an identifier.
             if (!next.isNull() && !next.isSpace() && !QStringLiteral(")]},;:").contains(next)) return false;
             cursor.beginEditBlock(); cursor.insertText(QString(character) + closing);

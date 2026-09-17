@@ -208,19 +208,13 @@ void CompilerBuild::assets(CompileProfile &profile, const std::function<void(con
             }
         });
     });
-    file.chunk("SCPT", [&] {
-        const auto &scripts = resources[ResourceType::Script];
-        file.list(scripts.size(), [&](int i) {
-            const auto &resource = scripts.at(i);
-            file.string(resource.node.name);
-            QString source = resource.embeddedSource.isEmpty() ? QString::fromUtf8(read(resource.node.filePath))
-                                                               : resource.embeddedSource;
-            if (source.trimmed().isEmpty())
-                source = "exit;";
-            file.u32(code("gml_Script_" + resource.node.name, source));
-        });
-    });
-    file.chunk("GLOB", [&] { file.u32(0); });
+    for (auto &script : resources[ResourceType::Script]) {
+        QString source = script.embeddedSource.isEmpty() ? QString::fromUtf8(read(script.node.filePath))
+                                                        : script.embeddedSource;
+        if (source.trimmed().isEmpty())
+            source = "exit;";
+        script.codeIndex = code("gml_Script_" + script.node.name, source);
+    }
     profile.start(QStringLiteral("Shader compilation"));
     shaders();
     profile.start(QStringLiteral("Fonts / glyph atlases"));

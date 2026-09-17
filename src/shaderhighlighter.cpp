@@ -91,6 +91,7 @@ void ShaderHighlighter::highlightBlock(const QString &text)
     if (!state && directive && text.endsWith(QLatin1Char('\\'))) state = 4;
     setCurrentBlockState(state);
     if (text.isEmpty() && state == 1) blockData->exclude(0, 0, true, true);
+    if (text.isEmpty() && (state == 2 || state == 3)) blockData->exclude(0, 0, true, true, true);
     blockData->collectTokens(text);
     setCurrentBlockUserData(blockData);
 }

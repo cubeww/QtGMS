@@ -59,6 +59,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QToolBar>
+#include <QTimer>
 
 static QAction *addUnavailableAction(QMenu *menu, const QString &text,
                                      const QString &iconName = QString(),
@@ -89,7 +90,7 @@ static void showResourceEditor(ResourceEditorWindow *window)
     window->showNormal(); window->raise(); window->activateWindow();
 }
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(const QString &projectPath, QWidget *parent)
     : EditorWindow(parent),
       m_resourceBrowser(new ResourceBrowser(this)),
       m_compilePanel(new CompilePanel(this)),
@@ -147,7 +148,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_resourceBrowser, &ResourceBrowser::removeResourceRequested, this, &MainWindow::removeResource);
     connect(m_resourceBrowser, &ResourceBrowser::renameResourceRequested, this, &MainWindow::renameResource);
     connect(m_resourceBrowser, &ResourceBrowser::createResourceRequested, this, &MainWindow::createResource);
-    newProject();
+    // Windows file associations pass the selected file as a startup argument.
+    // Wait until the main window is shown before opening projects or dialogs.
+    QTimer::singleShot(0, this, [this, projectPath] {
+        if (projectPath.isEmpty())
+            newProject();
+        else if (projectPath.endsWith(QStringLiteral(".gmz"), Qt::CaseInsensitive))
+            importProjectFile(projectPath);
+        else
+            loadProject(projectPath);
+    });
 }
 
 MainWindow::~MainWindow()
@@ -861,7 +871,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.1.4\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.1.5\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

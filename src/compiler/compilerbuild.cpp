@@ -119,6 +119,19 @@ int CompilerBuild::code(const QString &name, const QString &source)
     codes.append(entry);
     return codes.size() - 1;
 }
+void CompilerBuild::scripts()
+{
+    // Script IDs and code indices are final only after extension dependencies
+    // have been discovered while parsing the project's code.
+    file.chunk("SCPT", [&] {
+        const auto &scripts = resources[ResourceType::Script];
+        file.list(scripts.size(), [&](int i) {
+            file.string(scripts.at(i).node.name);
+            file.u32(scripts.at(i).codeIndex);
+        });
+    });
+    file.chunk("GLOB", [&] { file.u32(0); });
+}
 void CompilerBuild::external(const QString &name, const QByteArray &bytes)
 {
     QString normalized = name;

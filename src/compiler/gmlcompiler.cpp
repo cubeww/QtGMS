@@ -1,7 +1,28 @@
 #include "gmlcompiler.h"
 #include "gmlparser.h"
+#include "gmlconstant.h"
 #include <cmath>
 #include <QRegularExpression>
+
+static int integerType(qint64 value)
+{
+    return value >= -2147483647 - 1 && value <= 2147483647 ? 2 : 3;
+}
+
+static int numberType(double value)
+{
+    if (value == std::floor(value) && value >= -9223372036854775808.0 && value < 9223372036854775808.0)
+        return integerType(qint64(value));
+    return 0;
+}
+
+static int binaryResultType(int left, int right)
+{
+    // VM16 retains the wider operand, and the lower type code breaks size ties.
+    static const int TypeSizes[] = { 8, 4, 4, 8, 4, 16, 4 };
+    return TypeSizes[left] == TypeSizes[right] ? qMin(left, right)
+        : TypeSizes[left] > TypeSizes[right] ? left : right;
+}
 
 struct VmLoop
 {
@@ -62,6 +83,7 @@ private:
     DataWriter &m_file;
     const GmlEnvironment &m_environment;
     QSet<QString> m_globals;
+    QHash<const GmlNode *, int> m_expressionTypes;
     QVector<VmLoop> m_loops;
     int m_environmentDepth = 0;
     DataWriter &out() { return m_code.bytecode; }
@@ -78,20 +100,31 @@ private:
         if (from != to)
             instruction(7, from | (to << 4));
     }
-    void number(double value)
+    int integer(qint64 value, bool forceLong = false)
     {
-        if (value == std::floor(value) && value >= -32768 && value <= 32767)
+        if (!forceLong && value >= -32768 && value <= 32767)
             instruction(0x84, 15, quint16(qint16(value)));
-        else if (value == std::floor(value) && value >= -2147483648.0 && value <= 2147483647.0) {
+        else if (!forceLong && value >= -2147483647 - 1 && value <= 2147483647) {
             instruction(0xc0, 2);
-            out().u32(qint64(value));
+            out().u32(value);
         } else {
-            instruction(0xc0, 0);
-            out().f64(value);
-            convert(0, 5);
-            return;
+            instruction(0xc0, 3);
+            out().u64(quint64(value));
+            convert(3, 5);
+            return 3;
         }
         convert(2, 5);
+        return 2;
+    }
+    int number(double value)
+    {
+        // The upper bound is exclusive: double(INT64_MAX) rounds up to 2^63.
+        if (value == std::floor(value) && value >= -9223372036854775808.0 && value < 9223372036854775808.0)
+            return integer(qint64(value));
+        instruction(0xc0, 0);
+        out().f64(value);
+        convert(0, 5);
+        return 0;
     }
     int jump(int opcode = 0xb6)
     {
@@ -313,13 +346,13 @@ private:
         reference(place.name, place.scope == -5 || place.scope == -7 ? place.scope : -1, false,
             place.array ? 0 : 0x80000000u, store ? 0x45 : 0xc0, store ? (valueOnTop ? 0x52 : 0x55) : 5, 0);
     }
-    void operation(const QString &op)
+    void operation(const QString &op, int leftType = 5, int rightType = 5)
     {
         static const QHash<QString, int> compare
             = { { "<", 1 }, { "<=", 2 }, { "==", 3 }, { "=", 3 }, { "!=", 4 }, { "<>", 4 }, { ">=", 5 }, { ">", 6 } };
         const auto comparison = compare.constFind(op);
         if (comparison != compare.cend()) {
-            instruction(0x15, 0x55, quint16(comparison.value() << 8));
+            instruction(0x15, rightType | (leftType << 4), quint16(comparison.value() << 8));
             convert(4, 5);
             return;
         }
@@ -329,17 +362,88 @@ private:
         const auto operation = binary.constFind(op);
         if (operation == binary.cend())
             throw CompileError(QStringLiteral("Unknown operator: ") + op);
-        instruction(operation.value(), 0x55);
+        instruction(operation.value(), rightType | (leftType << 4));
+        convert(binaryResultType(leftType, rightType), 5);
+    }
+    int arithmeticOperandType(const QString &op, int type) const
+    {
+        if (op == QLatin1String("/"))
+            return type == 5 ? 5 : 0;
+        return type == 4 ? 2 : type;
+    }
+    QPair<int, int> binaryOperandTypes(const GmlNodePtr &node)
+    {
+        int left = arithmeticOperandType(node->text, expressionType(node->children.at(0)));
+        int right = arithmeticOperandType(node->text, expressionType(node->children.at(1)));
+        return qMakePair(left, right);
+    }
+    int expressionType(const GmlNodePtr &node)
+    {
+        const auto found = m_expressionTypes.constFind(node.data());
+        if (found != m_expressionTypes.cend())
+            return found.value();
+        int type = 5;
+        if (node->kind == GmlNodeKind::Number) {
+            GmlConstant value;
+            if (!evaluateGmlConstant(node, m_environment, value))
+                fail(node, QStringLiteral("Invalid numeric literal"));
+            type = value.isBoolean ? 4 : value.isInteger ? 3 : numberType(value.real);
+        } else if (node->kind == GmlNodeKind::Name || node->kind == GmlNodeKind::Member) {
+            QString name = node->text;
+            if (node->kind == GmlNodeKind::Member) {
+                if (node->children.first()->kind != GmlNodeKind::Name)
+                    return 5;
+                name = node->children.first()->text + "." + name;
+            }
+            const auto constant = m_environment.constants.constFind(name);
+            if (constant != m_environment.constants.cend())
+                type = numberType(constant.value());
+        } else if (node->kind == GmlNodeKind::Binary) {
+            if (bitwiseOpcode(node->text)) {
+                type = 3;
+            } else if (node->text == QLatin1String("+") || node->text == QLatin1String("-")
+                || node->text == QLatin1String("*") || node->text == QLatin1String("/")
+                || node->text == QLatin1String("div") || node->text == QLatin1String("mod")
+                || node->text == QLatin1String("%")) {
+                const auto operands = binaryOperandTypes(node);
+                type = binaryResultType(operands.first, operands.second);
+            } else {
+                type = 4;
+            }
+        } else if (node->kind == GmlNodeKind::Unary) {
+            const int operand = expressionType(node->children.first());
+            if (node->text == QLatin1String("~"))
+                type = operand == 3 ? 3 : 2;
+            else if (node->text == QLatin1String("!") || node->text == QLatin1String("not"))
+                type = 4;
+            else if (node->text == QLatin1String("+"))
+                type = operand;
+            else if (node->text == QLatin1String("-"))
+                type = operand == 4 ? 2 : operand;
+        }
+        m_expressionTypes.insert(node.data(), type);
+        return type;
+    }
+    void checkAssignment(const GmlNodePtr &node) const
+    {
+        const QString name = node->kind == GmlNodeKind::Name ? node->text
+            : node->kind == GmlNodeKind::Member && node->children.first()->kind == GmlNodeKind::Name
+            ? node->children.first()->text + "." + node->text
+            : QString();
+        if (m_environment.constants.contains(name))
+            fail(node, QStringLiteral("Cannot assign to a constant: ") + name);
     }
     void increment(const GmlNodePtr &node, bool keepResult)
     {
+        checkAssignment(node->children.first());
         const auto place = location(node->children.first());
         duplicateLocation(place);
         access(place);
         if (keepResult && node->kind == GmlNodeKind::Postfix)
             duplicateResult(place);
         number(1);
-        operation(node->text == QLatin1String("++") ? "+" : "-");
+        convert(5, 2);
+        operation(node->text == QLatin1String("++") ? "+" : "-", 5, 2);
         if (keepResult && node->kind == GmlNodeKind::Unary)
             duplicateResult(place);
         access(place, true, true);
@@ -347,17 +451,17 @@ private:
     void expression(const GmlNodePtr &node)
     {
         if (node->kind == GmlNodeKind::Number) {
-            bool valid;
-            double value;
-            if (node->text.startsWith('$'))
-                value = node->text.mid(1).toULongLong(&valid, 16);
-            else if (node->text.startsWith("0x", Qt::CaseInsensitive))
-                value = node->text.mid(2).toULongLong(&valid, 16);
-            else
-                value = node->text.toDouble(&valid);
-            if (!valid)
+            GmlConstant value;
+            if (!evaluateGmlConstant(node, m_environment, value))
                 fail(node, QStringLiteral("Invalid numeric literal"));
-            number(value);
+            if (value.isBoolean) {
+                instruction(0x84, 15, value.real >= 0.5 ? 1 : 0);
+                convert(4, 5);
+            } else if (value.isInteger) {
+                integer(value.integer, true);
+            } else {
+                number(value.real);
+            }
         } else if (node->kind == GmlNodeKind::String) {
             instruction(0xc0, 6);
             out().u32(m_file.stringId(node->text));
@@ -378,7 +482,7 @@ private:
             // Official array literals call the Runner's internal constructor.
             const bool arrayLiteral = node->kind == GmlNodeKind::ArrayLiteral;
             const QString function = arrayLiteral ? QStringLiteral("@@NewGMLArray@@")
-                                                  : m_environment.extensionFunctionStubs.value(node->text, node->text);
+                                                  : m_environment.extensionFunctionNames.value(node->text, node->text);
             if (!arrayLiteral && !m_environment.functions.contains(function))
                 fail(node, QStringLiteral("Unknown function or script: ") + node->text);
             const int expected = m_environment.functionArguments.value(function, -1);
@@ -435,9 +539,12 @@ private:
                 instruction(opcode, 0x33);
                 convert(3, 5);
             } else {
+                const auto types = binaryOperandTypes(node);
                 expression(node->children.at(0));
+                convert(5, types.first);
                 expression(node->children.at(1));
-                operation(node->text);
+                convert(5, types.second);
+                operation(node->text, types.first, types.second);
             }
         } else if (node->kind == GmlNodeKind::Unary || node->kind == GmlNodeKind::Postfix) {
             if (node->text == QLatin1String("++") || node->text == QLatin1String("--")) {
@@ -449,11 +556,17 @@ private:
                     instruction(18, 4);
                     convert(4, 5);
                 } else if (node->text == QLatin1String("~")) {
-                    convert(5, 2);
-                    instruction(18, 2);
-                    convert(2, 5);
-                } else if (node->text == QLatin1String("-"))
+                    const int type = expressionType(node->children.first()) == 3 ? 3 : 2;
+                    convert(5, type);
+                    instruction(18, type);
+                    convert(type, 5);
+                } else if (node->text == QLatin1String("-")) {
+                    if (expressionType(node->children.first()) == 4) {
+                        convert(5, 2);
+                        convert(2, 5);
+                    }
                     instruction(17, 5);
+                }
             }
         } else
             fail(node, QStringLiteral("Unsupported expression: ") + QLatin1String(gmlNodeKindName(node->kind)));
@@ -493,12 +606,7 @@ private:
                 }
         } else if (kind == GmlNodeKind::Assign) {
             const auto &left = node->children.first();
-            const QString name = left->kind == GmlNodeKind::Name ? left->text
-                : left->kind == GmlNodeKind::Member && left->children.first()->kind == GmlNodeKind::Name
-                ? left->children.first()->text + "." + left->text
-                : QString();
-            if (m_environment.constants.contains(name))
-                fail(left, QStringLiteral("Cannot assign to a constant: ") + name);
+            checkAssignment(left);
             const bool compound = node->text != QLatin1String("=") && node->text != QLatin1String(":=");
             // Plain assignment evaluates the RHS before its destination, as
             // in official GML2VM. Compound assignment retains the address.
@@ -512,15 +620,18 @@ private:
             const bool bitwise = node->text == QLatin1String("&=") || node->text == QLatin1String("|=")
                 || node->text == QLatin1String("^=");
             access(place);
-            if (bitwise)
-                convert(5, 3);
             expression(node->children.at(1));
+            int type = expressionType(node->children.at(1));
             if (bitwise) {
-                convert(5, 3);
-                instruction(node->text == QLatin1String("&=") ? 14 : node->text == QLatin1String("|=") ? 15 : 16, 0x33);
-                convert(3, 5);
-            } else
-                operation(node->text.left(1));
+                if (type != 2 && type != 3)
+                    type = 2;
+            } else if (type == 4) {
+                type = 2;
+            }
+            // Compound assignment keeps a Variable left operand; unlike a
+            // binary / expression, /= retains the right operand's numeric type.
+            convert(5, type);
+            operation(node->text.left(1), 5, type);
             access(place, true, true);
         } else if (kind == GmlNodeKind::If) {
             expression(node->children.at(0));
@@ -547,7 +658,8 @@ private:
                 if (kind == GmlNodeKind::Repeat) {
                     instruction(0x86, 2);
                     instruction(0x84, 15, 0);
-                    instruction(0x15, 0x22, 5 << 8);
+                    // Enter only while the remaining repeat count is positive.
+                    instruction(0x15, 0x22, 6 << 8);
                 } else {
                     expression(node->children.at(kind == GmlNodeKind::For ? 1 : 0));
                     convert(5, 4);
@@ -688,87 +800,110 @@ void compileGml(VmCode &code, DataWriter &file, const GmlEnvironment &environmen
     GmlEmitter(code, file, environment).compile(code.syntax);
 }
 
-void prepareGml(QVector<VmCode> &codes, GmlEnvironment &environment)
+void prepareGml(QVector<VmCode> &codes, GmlEnvironment &environment,
+    const std::function<void(const QString &)> &includeFunction)
 {
     const QRegularExpression macro(QStringLiteral("^\\s*#macro\\s+([A-Za-z_][A-Za-z0-9_]*)\\s+(.+)$"));
-    for (auto &code : codes) {
+    const auto preprocess = [&](VmCode &code) {
         // Most code blocks have no directives; avoid splitting and rebuilding them.
         if (!code.source.contains(QLatin1Char('#')))
-            continue;
+            return;
         QStringList lines = code.source.split('\n');
+        bool inBlockComment = false;
+        QChar stringQuote;
         for (auto &line : lines) {
-            if (!line.contains(QLatin1Char('#')))
-                continue;
-            auto match = macro.match(line);
-            if (match.hasMatch()) {
-                environment.macros.insert(match.captured(1), match.captured(2));
-                line.clear();
-            } else if (line.trimmed().startsWith("#region") || line.trimmed().startsWith("#endregion"))
-                line.clear();
+            if (!inBlockComment && stringQuote.isNull() && line.contains(QLatin1Char('#'))) {
+                auto match = macro.match(line);
+                if (match.hasMatch()) {
+                    environment.macros.insert(match.captured(1), match.captured(2));
+                    line.clear();
+                    continue;
+                }
+                if (line.trimmed().startsWith("#region") || line.trimmed().startsWith("#endregion")) {
+                    line.clear();
+                    continue;
+                }
+            }
+            // Directives inside multiline strings or comments are ordinary text.
+            // GMS 1.4 strings are literal, so backslashes do not escape quotes.
+            for (int i = 0; i < line.size(); ++i) {
+                const QChar character = line.at(i);
+                const QChar next = i + 1 < line.size() ? line.at(i + 1) : QChar();
+                if (!stringQuote.isNull()) {
+                    if (character == stringQuote)
+                        stringQuote = QChar();
+                } else if (inBlockComment) {
+                    if (character == QLatin1Char('*') && next == QLatin1Char('/')) {
+                        inBlockComment = false;
+                        ++i;
+                    }
+                } else if (character == QLatin1Char('/') && next == QLatin1Char('/')) {
+                    break;
+                } else if (character == QLatin1Char('/') && next == QLatin1Char('*')) {
+                    inBlockComment = true;
+                    ++i;
+                } else if (character == QLatin1Char('\"') || character == QLatin1Char('\'')) {
+                    stringQuote = character;
+                }
+            }
         }
         code.source = lines.join("\n");
-    }
-    std::function<double(const GmlNodePtr &)> constant = [&](const GmlNodePtr &node) -> double {
-        if (node->kind == GmlNodeKind::Number) {
-            bool valid;
-            double value = node->text.startsWith('$') ? node->text.mid(1).toULongLong(&valid, 16)
-                : node->text.startsWith("0x")         ? node->text.mid(2).toULongLong(&valid, 16)
-                                                      : node->text.toDouble(&valid);
-            if (valid)
-                return value;
-        }
-        QString name = node->text;
-        if (node->kind == GmlNodeKind::Member && node->children.first()->kind == GmlNodeKind::Name)
-            name = node->children.first()->text + "." + name;
-        if (environment.constants.contains(name))
-            return environment.constants.value(name);
-        if (node->kind == GmlNodeKind::Unary) {
-            double value = constant(node->children.first());
-            if (node->text == QLatin1String("-"))
-                return -value;
-            if (node->text == QLatin1String("+"))
-                return value;
-            if (node->text == QLatin1String("~"))
-                return ~qint64(value);
-        }
-        if (node->kind == GmlNodeKind::Binary) {
-            double a = constant(node->children.at(0)), b = constant(node->children.at(1));
-            if (node->text == QLatin1String("+"))
-                return a + b;
-            if (node->text == QLatin1String("-"))
-                return a - b;
-            if (node->text == QLatin1String("*"))
-                return a * b;
-            if (node->text == QLatin1String("/") && b != 0)
-                return a / b;
-            if (node->text == QLatin1String("|"))
-                return qint64(a) | qint64(b);
-            if (node->text == QLatin1String("&"))
-                return qint64(a) & qint64(b);
-            if (node->text == QLatin1String("<<") && b >= 0 && b < 64)
-                return quint64(a) << int(b);
-        }
-        throw CompileError(QStringLiteral("Enum value is not a supported constant expression: ") + node->text);
     };
     std::function<void(const GmlNodePtr &)> collect = [&](const GmlNodePtr &node) {
+        if (node->kind == GmlNodeKind::Call)
+            includeFunction(node->text);
         if (node->kind == GmlNodeKind::Declaration && node->text == QStringLiteral("globalvar"))
             for (const auto &child : node->children)
                 environment.globalVariables.insert(child->text);
         if (node->kind == GmlNodeKind::Enum) {
             double value = 0;
             for (const auto &child : node->children) {
-                if (!child->children.isEmpty())
-                    value = constant(child->children.first());
+                if (!child->children.isEmpty()) {
+                    GmlConstant constant;
+                    if (!evaluateGmlConstant(child->children.first(), environment, constant))
+                        throw CompileError(QStringLiteral("Enum value is not a supported constant expression: ")
+                            + node->text + QLatin1Char('.') + child->text);
+                    value = constant.isInteger ? double(constant.integer) : std::trunc(constant.real);
+                }
+                if (!std::isfinite(value) || value < -2147483648.0 || value > 2147483647.0)
+                    throw CompileError(QStringLiteral("Enum value is outside the 32-bit integer range: ")
+                        + node->text + QLatin1Char('.') + child->text);
                 environment.constants.insert(node->text + "." + child->text, value++);
             }
         }
         for (const auto &child : node->children)
             collect(child);
     };
-    for (auto &code : codes) {
-        code.syntax = parseGml(code.source, code.name, environment);
-        collect(code.syntax);
+    int preparedCodeCount = 0;
+    for (int i = 0; i < codes.size(); ++i) {
+        // Calls can append whole extension files. Process their directives
+        // before parsing them, and keep no QVector references across imports.
+        while (preparedCodeCount < codes.size())
+            preprocess(codes[preparedCodeCount++]);
+        const auto syntax = parseGml(codes.at(i).source, codes.at(i).name, environment);
+        codes[i].syntax = syntax;
+        collect(syntax);
     }
+    std::function<void(GmlNodePtr &)> fold = [&](GmlNodePtr &node) {
+        for (auto &child : node->children)
+            fold(child);
+        if (node->kind != GmlNodeKind::Binary && node->kind != GmlNodeKind::Unary)
+            return;
+        GmlConstant value;
+        if (!evaluateGmlConstant(node, environment, value))
+            return;
+        // Fold expression nodes only. Assignable names/members/indices must
+        // retain their identity for address generation and constant checks.
+        auto constant = GmlNodePtr::create();
+        constant->kind = GmlNodeKind::Number;
+        constant->line = node->line;
+        constant->isIntegerConstant = value.isInteger;
+        constant->isBooleanConstant = value.isBoolean;
+        constant->text = value.isInteger ? QString::number(value.integer) : QString::number(value.real, 'g', 17);
+        node = constant;
+    };
+    for (auto &code : codes)
+        fold(code.syntax);
 }
 
 void writeVmChunks(DataWriter &file, QVector<VmCode> &codes, const GmlEnvironment &environment)

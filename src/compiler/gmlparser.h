@@ -43,6 +43,8 @@ struct GmlNode
     GmlNodeKind kind = GmlNodeKind::Block;
     QString text;
     int line = 1;
+    bool isIntegerConstant = false;
+    bool isBooleanConstant = false;
     QVector<GmlNodePtr> children;
 };
 GmlNodePtr parseGml(const QString &source, const QString &name, const GmlEnvironment &environment);

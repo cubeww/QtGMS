@@ -4,6 +4,7 @@
 #include "datawriter.h"
 #include <QSet>
 #include <QSharedPointer>
+#include <functional>
 struct GmlNode;
 
 struct VmReference
@@ -29,7 +30,7 @@ struct GmlEnvironment
     QHash<QString, double> constants;
     QHash<QString, QString> macros;
     QSet<QString> functions;
-    QHash<QString, QString> extensionFunctionStubs;
+    QHash<QString, QString> extensionFunctionNames;
     QSet<QString> builtInVariables;
     QSet<QString> builtInGlobalVariables;
     QSet<QString> readOnlyVariables;
@@ -40,7 +41,8 @@ struct GmlEnvironment
 };
 
 void compileGml(VmCode &code, DataWriter &file, const GmlEnvironment &environment);
-void prepareGml(QVector<VmCode> &code, GmlEnvironment &environment);
+void prepareGml(QVector<VmCode> &code, GmlEnvironment &environment,
+    const std::function<void(const QString &)> &includeFunction);
 void writeVmChunks(DataWriter &file, QVector<VmCode> &code, const GmlEnvironment &environment);
 
 #endif

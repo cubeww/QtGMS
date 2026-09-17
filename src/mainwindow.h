@@ -23,7 +23,7 @@ class MainWindow : public EditorWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(const QString &projectPath = QString(), QWidget *parent = nullptr);
     ~MainWindow() override;
 
 protected:
@@ -35,6 +35,7 @@ private:
     void createMenusAndToolbar();
     void openProject();
     void importProject();
+    void importProjectFile(const QString &filePath);
     void rememberProject();
     void refreshRecentProjects();
     void newProject();

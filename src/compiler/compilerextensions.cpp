@@ -21,8 +21,21 @@ void CompilerBuild::extensions()
         if (enabled)
             included.append(extension);
         for (const auto &entry : children(extension.xml.firstChildElement("files"), "file")) {
-            if (enabled && active(entry))
+            if (enabled && active(entry)) {
+                for (const auto &function : children(entry.firstChildElement("functions"), "function")) {
+                    const QString name = text(function, "name");
+                    environment.functions.insert(name);
+                    const QString externalName = text(function, "externalName");
+                    if (number(entry, "kind") == 2 && !externalName.isEmpty())
+                        environment.extensionFunctionNames.insert(name, externalName);
+                }
+                for (const char *key : { "init", "final" }) {
+                    const QString name = text(entry, key);
+                    if (!name.isEmpty())
+                        extensionEntryPoints.append(name);
+                }
                 continue;
+            }
             for (const auto &function : children(entry.firstChildElement("functions"), "function"))
                 disabledFunctions.insert(text(function, "name"), number(function, "returnType", 2) == 1
                         ? QStringLiteral("extension_stubfunc_string")
@@ -44,12 +57,12 @@ void CompilerBuild::extensions()
                 const QString name = text(entry, "filename");
                 const int kind = number(entry, "kind");
                 file.string(name);
-                file.string(text(entry, "final"));
-                file.string(text(entry, "init"));
+                const QString finalFunction = text(entry, "final");
+                const QString initFunction = text(entry, "init");
+                file.string(environment.extensionFunctionNames.value(finalFunction, finalFunction));
+                file.string(environment.extensionFunctionNames.value(initFunction, initFunction));
                 file.u32(kind);
                 const auto functions = children(entry.firstChildElement("functions"), "function");
-                for (const auto &function : functions)
-                    environment.functions.insert(text(function, "name"));
                 file.list(kind == 2 ? 0 : functions.size(), [&](int n) {
                     const auto &function = functions.at(n);
                     file.string(text(function, "name"));
@@ -74,35 +87,12 @@ void CompilerBuild::extensions()
                     throw CompileError(extension.node.name + ": compressed extension archives are not supported yet");
                 if (sourceName.endsWith(".ext", Qt::CaseInsensitive))
                     return;
-                const QByteArray bytes = read(assetPath(extension, extension.node.name + "/" + sourceName));
+                const QString sourcePath = assetPath(extension, extension.node.name + "/" + sourceName);
                 if (kind == 2) {
-                    const QString source = QString::fromUtf8(bytes);
-                    const QRegularExpression define(
-                        QStringLiteral("^\\s*#define\\s+([A-Za-z_][A-Za-z0-9_]*)[^\\r\\n]*"),
-                        QRegularExpression::MultilineOption);
-                    auto matches = define.globalMatch(source);
-                    QVector<QRegularExpressionMatch> sections;
-                    while (matches.hasNext())
-                        sections.append(matches.next());
-                    if (sections.isEmpty() && !source.trimmed().isEmpty())
-                        throw CompileError(extension.node.name + ": GML extension requires #define function sections");
-                    for (int s = 0; s < sections.size(); ++s) {
-                        const auto &section = sections.at(s);
-                        CompilerResource script;
-                        script.node.type = ResourceType::Script;
-                        script.node.name = section.captured(1);
-                        script.node.filePath = assetPath(extension, extension.node.name + "/" + sourceName);
-                        script.embeddedSource = source.mid(section.capturedEnd(),
-                            (s + 1 < sections.size() ? sections.at(s + 1).capturedStart() : source.size())
-                                - section.capturedEnd());
-                        if (script.embeddedSource.trimmed().isEmpty())
-                            script.embeddedSource = "exit;";
-                        environment.functions.insert(script.node.name);
-                        environment.constants.insert(script.node.name, resources[ResourceType::Script].size());
-                        resources[ResourceType::Script].append(script);
-                    }
+                    for (const auto &function : functions)
+                        extensionScriptFiles.insert(text(function, "name"), sourcePath);
                 } else if (!sourceName.endsWith(".ext", Qt::CaseInsensitive))
-                    external(name, bytes);
+                    external(name, read(sourcePath));
             });
         });
         // Product identifiers are metadata; unlicensed extensions use the
@@ -117,7 +107,52 @@ void CompilerBuild::extensions()
     // scripts and built-ins take precedence over disabled extension entries.
     for (auto it = disabledFunctions.cbegin(); it != disabledFunctions.cend(); ++it)
         if (!environment.functions.contains(it.key()))
-            environment.extensionFunctionStubs.insert(it.key(), it.value());
+            environment.extensionFunctionNames.insert(it.key(), it.value());
+}
+
+void CompilerBuild::includeExtensionScript(const QString &functionName)
+{
+    const QString path = extensionScriptFiles.value(functionName);
+    if (path.isEmpty() || includedExtensionScriptFiles.contains(path))
+        return;
+    includedExtensionScriptFiles.insert(path);
+    const QString source = QString::fromUtf8(read(path));
+    const QRegularExpression define(
+        QStringLiteral("^\\s*#define\\s+([A-Za-z_][A-Za-z0-9_]*)[^\\r\\n]*"),
+        QRegularExpression::MultilineOption);
+    auto matches = define.globalMatch(source);
+    QVector<QRegularExpressionMatch> sections;
+    while (matches.hasNext())
+        sections.append(matches.next());
+    if (sections.isEmpty() && !source.trimmed().isEmpty())
+        throw CompileError(path + ": GML extension requires #define function sections");
+    QSet<QString> scriptNames;
+    for (const auto &script : resources[ResourceType::Script])
+        scriptNames.insert(script.node.name);
+    // The original compiler imports every #define in a referenced extension
+    // file, but never parses files whose functions are unused.
+    for (int i = 0; i < sections.size(); ++i) {
+        const auto &section = sections.at(i);
+        CompilerResource script;
+        script.node.type = ResourceType::Script;
+        script.node.name = section.captured(1);
+        script.node.filePath = path;
+        if (scriptNames.contains(script.node.name))
+            throw CompileError(path + ": duplicate script name: " + script.node.name);
+        scriptNames.insert(script.node.name);
+        script.embeddedSource = source.mid(section.capturedEnd(),
+            (i + 1 < sections.size() ? sections.at(i + 1).capturedStart() : source.size()) - section.capturedEnd());
+        if (script.embeddedSource.trimmed().isEmpty())
+            script.embeddedSource = "exit;";
+        // A newly imported script also takes precedence over a disabled
+        // extension's stub with the same name.
+        if (!environment.functions.contains(script.node.name))
+            environment.extensionFunctionNames.remove(script.node.name);
+        environment.functions.insert(script.node.name);
+        environment.constants.insert(script.node.name, resources[ResourceType::Script].size());
+        script.codeIndex = code("gml_Script_" + script.node.name, script.embeddedSource);
+        resources[ResourceType::Script].append(script);
+    }
 }
 
 void CompilerBuild::shaders()

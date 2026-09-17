@@ -18,7 +18,12 @@ void MainWindow::importProject()
         : QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     const QString path = QFileDialog::getOpenFileName(this, tr("Import Project"), directory,
         tr("GameMaker Compressed Projects (*.gmz)"));
-    if (path.isEmpty()) return;
+    if (!path.isEmpty()) importProjectFile(path);
+}
+
+void MainWindow::importProjectFile(const QString &path)
+{
+    if (m_treeBusy || m_building) return;
     if (!path.endsWith(QStringLiteral(".gmz"), Qt::CaseInsensitive)) {
         EditorMessageBox::warning(this, tr("Cannot Import Project"), tr("Only GMZ projects can currently be imported."));
         return;
