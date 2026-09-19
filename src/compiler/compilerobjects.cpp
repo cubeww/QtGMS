@@ -312,7 +312,8 @@ void CompilerBuild::rooms(CompileProfile &profile)
                     "gml_Room_" + resource.node.name + "_Instance_" + QString::number(id), object.attribute("code")));
                 file.f32(attribute(object, "scaleX", 1));
                 file.f32(attribute(object, "scaleY", 1));
-                quint32 color = quint32(attribute(object, "colour", 4294967295.0));
+                // GMX stores ARGB; the Runner expects ABGR for both instances and tiles.
+                const quint32 color = quint32(attribute(object, "colour", 4294967295.0));
                 file.u32((color & 0xff00ff00u) | ((color & 255) << 16) | ((color >> 16) & 255));
                 file.f32(attribute(object, "rotation"));
                 file.u32(-1);
@@ -330,7 +331,8 @@ void CompilerBuild::rooms(CompileProfile &profile)
                 file.u32(nextTile++);
                 file.f32(attribute(tile, "scaleX", 1));
                 file.f32(attribute(tile, "scaleY", 1));
-                file.u32(quint32(attribute(tile, "colour", 4294967295.0)));
+                const quint32 color = quint32(attribute(tile, "colour", 4294967295.0));
+                file.u32((color & 0xff00ff00u) | ((color & 255) << 16) | ((color >> 16) & 255));
             });
         });
     });

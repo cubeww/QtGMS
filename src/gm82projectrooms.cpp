@@ -16,13 +16,13 @@ static QString gm82Coordinate(const QString &value, const QString &context, bool
     throw QObject::tr("%1: Invalid room coordinate: %2").arg(context, value);
 }
 
-static QString gm82Blend(const QString &value, bool instance, const QString &context)
+static QString gm82Blend(const QString &value, const QString &context)
 {
     bool ok;
     quint32 color = value.toUInt(&ok);
     if (!ok) throw QObject::tr("%1: Invalid room blend color: %2").arg(context, value);
-    // GM82 stores both in GML ABGR. GMX instances use ARGB; tiles use ABGR.
-    if (instance) color = (color & 0xff00ff00u) | ((color & 255) << 16) | ((color >> 16) & 255);
+    // GM82 stores both in GML ABGR; GMX instances and tiles both use ARGB.
+    color = (color & 0xff00ff00u) | ((color & 255) << 16) | ((color >> 16) & 255);
     return QString::number(color);
 }
 
@@ -89,7 +89,7 @@ QDomDocument Gm82ProjectImporter::readRoom(const QString &name)
         instance.setAttribute(QStringLiteral("locked"), gm82Coordinate(values.at(4), context).toInt() ? -1 : 0);
         instance.setAttribute(QStringLiteral("scaleX"), values.size() > 5 ? gm82Coordinate(values.at(5), context, true) : QStringLiteral("1"));
         instance.setAttribute(QStringLiteral("scaleY"), values.size() > 6 ? gm82Coordinate(values.at(6), context, true) : QStringLiteral("1"));
-        instance.setAttribute(QStringLiteral("colour"), values.size() > 7 ? gm82Blend(values.at(7), true, context) : QStringLiteral("4294967295"));
+        instance.setAttribute(QStringLiteral("colour"), values.size() > 7 ? gm82Blend(values.at(7), context) : QStringLiteral("4294967295"));
         instance.setAttribute(QStringLiteral("rotation"), values.size() > 8 ? gm82Coordinate(values.at(8), context, true) : QStringLiteral("0"));
         const bool hasCode = values.size() > 9 ? gm82Coordinate(values.at(9), context).toInt() != 0 : !hash.isEmpty();
         if (hasCode && hash.isEmpty()) throw QObject::tr("%1: Instance code has no filename.").arg(context);
@@ -123,7 +123,7 @@ QDomDocument Gm82ProjectImporter::readRoom(const QString &name)
             tile.setAttribute(QStringLiteral("locked"), gm82Coordinate(values.at(7), context).toInt() ? -1 : 0);
             tile.setAttribute(QStringLiteral("scaleX"), values.size() > 8 ? gm82Coordinate(values.at(8), context, true) : QStringLiteral("1"));
             tile.setAttribute(QStringLiteral("scaleY"), values.size() > 9 ? gm82Coordinate(values.at(9), context, true) : QStringLiteral("1"));
-            tile.setAttribute(QStringLiteral("colour"), values.size() > 10 ? gm82Blend(values.at(10), false, context) : QStringLiteral("4294967295"));
+            tile.setAttribute(QStringLiteral("colour"), values.size() > 10 ? gm82Blend(values.at(10), context) : QStringLiteral("4294967295"));
             tiles.appendChild(tile);
         }
     }

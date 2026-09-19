@@ -337,11 +337,24 @@ QPushButton *RoomPropertiesWindow::colorControl(QWidget *parent, RoomPropertySco
     auto *button = new QPushButton(parent); button->setToolTip(tr("Colour")); button->setAutoDefault(false);
     connect(button, &QPushButton::clicked, this, [this, scope, key, alpha] {
         if (scope == RoomPropertyScope::Entity && m_selectedId.isEmpty()) return;
-        const uint bgr = value(scope, key).toUInt(); QColor color(bgr & 255, (bgr >> 8) & 255, (bgr >> 16) & 255, alpha ? bgr >> 24 : 255);
+        const quint32 packed = value(scope, key).toUInt();
+        // GMX entity blends use ARGB; the room background uses GML BGR.
+        QColor color = scope == RoomPropertyScope::Entity ? QColor::fromRgba(packed)
+            : QColor(packed & 255, (packed >> 8) & 255, (packed >> 16) & 255);
+        if (!alpha) color.setAlpha(255);
         color = EditorColorDialog::getColor(color, this, tr("Room Colour"), alpha ? QColorDialog::ShowAlphaChannel : QColorDialog::ColorDialogOptions());
-        if (color.isValid()) setValue(scope, key, QString::number(uint(color.red()) | uint(color.green() << 8) | uint(color.blue() << 16) | (alpha ? uint(color.alpha()) << 24 : 0)));
+        if (color.isValid()) {
+            const quint32 rgb = scope == RoomPropertyScope::Entity ? color.rgb() & 0xffffffu
+                : quint32(color.red()) | (quint32(color.green()) << 8) | (quint32(color.blue()) << 16);
+            setValue(scope, key, QString::number(rgb | (alpha ? quint32(color.alpha()) << 24 : 0)));
+        }
     });
-    m_refreshers.append([this, button, scope, key] { const uint bgr = value(scope, key).toUInt(); const QColor color(bgr & 255, (bgr >> 8) & 255, (bgr >> 16) & 255); button->setStyleSheet(QStringLiteral("QPushButton { background: %1; border: 1px solid #141414; padding: 0; }").arg(color.name())); });
+    m_refreshers.append([this, button, scope, key] {
+        const quint32 packed = value(scope, key).toUInt();
+        const QColor color = scope == RoomPropertyScope::Entity ? QColor::fromRgb(packed)
+            : QColor(packed & 255, (packed >> 8) & 255, (packed >> 16) & 255);
+        button->setStyleSheet(QStringLiteral("QPushButton { background: %1; border: 1px solid #141414; padding: 0; }").arg(color.name()));
+    });
     return button;
 }
 void RoomPropertiesWindow::refresh()
@@ -420,7 +433,7 @@ void RoomPropertiesWindow::editTileProperties(const QString &id)
         form->addRow(i == 0 ? tr("Scale X") : tr("Scale Y"), scales[i]);
     }
     const quint32 packed = record.xml.attribute(QStringLiteral("colour"), QStringLiteral("4294967295")).toUInt();
-    QColor color(packed & 255, (packed >> 8) & 255, (packed >> 16) & 255);
+    QColor color = QColor::fromRgb(packed);
     auto *colorButton = new QPushButton; colorButton->setAutoDefault(false);
     const auto updateColor = [&] { colorButton->setStyleSheet(QStringLiteral("background-color: %1;").arg(color.name())); };
     updateColor(); form->addRow(tr("Colour"), colorButton);
@@ -439,8 +452,8 @@ void RoomPropertiesWindow::editTileProperties(const QString &id)
         if (scales[i]->value() != initialScales[i] || flipped != (original < 0))
             record.xml.setAttribute(QLatin1String(keys[i]), scales[i]->value() * (flipped ? -1 : 1));
     }
-    const quint32 changedColor = quint32(color.red()) | (quint32(color.green()) << 8)
-        | (quint32(color.blue()) << 16) | (quint32(alpha->value()) << 24);
+    color.setAlpha(alpha->value());
+    const quint32 changedColor = color.rgba();
     if (changedColor != packed) record.xml.setAttribute(QStringLiteral("colour"), QString::number(changedColor));
     m_document->editEntities({record}, tr("Edit tile properties"));
 }

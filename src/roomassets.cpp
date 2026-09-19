@@ -126,7 +126,8 @@ QPixmap RoomAssets::colored(const QPixmap &source, quint32 color)
     const QString key = QString::number(source.cacheKey()) + QLatin1Char(':') + QString::number(color & 0xffffff);
     if (auto *cached = m_colorCache.object(key)) return *cached;
     QImage image = source.toImage().convertToFormat(QImage::Format_ARGB32);
-    const int r = color & 255, g = (color >> 8) & 255, b = (color >> 16) & 255;
+    // GMX instance and tile blends are ARGB, matching QRgb.
+    const int r = qRed(color), g = qGreen(color), b = qBlue(color);
     for (int y = 0; y < image.height(); ++y) {
         auto *line = reinterpret_cast<QRgb *>(image.scanLine(y));
         for (int x = 0; x < image.width(); ++x) line[x] = qRgba(qRed(line[x]) * r / 255, qGreen(line[x]) * g / 255, qBlue(line[x]) * b / 255, qAlpha(line[x]));
