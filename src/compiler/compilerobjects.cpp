@@ -246,11 +246,13 @@ void CompilerBuild::objects()
     });
 }
 
-void CompilerBuild::rooms()
+void CompilerBuild::rooms(CompileProfile &profile)
 {
     int nextInstance = 100000, nextTile = 10000000;
     file.chunk("ROOM", [&] {
+        CompileDetailScope timing(profile, QStringLiteral("Room metadata / instances / tiles serialization"));
         const auto &rooms = resources[ResourceType::Room];
+        profile.count(QStringLiteral("Rooms"), rooms.size());
         file.list(rooms.size(), [&](int i) {
             const auto &resource = rooms.at(i);
             const auto &root = resource.xml;
@@ -298,6 +300,7 @@ void CompilerBuild::rooms()
             });
             file.patch(instances, file.position());
             const auto objects = children(root.firstChildElement("instances"), "instance");
+            profile.count(QStringLiteral("Instances"), objects.size());
             file.list(objects.size(), [&](int o) {
                 const auto &object = objects.at(o);
                 file.u32(attribute(object, "x"));
@@ -316,6 +319,7 @@ void CompilerBuild::rooms()
             });
             file.patch(tiles, file.position());
             const auto tileList = children(root.firstChildElement("tiles"), "tile");
+            profile.count(QStringLiteral("Tiles"), tileList.size());
             file.list(tileList.size(), [&](int t) {
                 const auto &tile = tileList.at(t);
                 file.u32(attribute(tile, "x"));
@@ -330,6 +334,7 @@ void CompilerBuild::rooms()
             });
         });
     });
+    CompileDetailScope timing(profile, QStringLiteral("Included File registration"));
     file.chunk("DAFL", [&] { file.u32(0); });
     const auto manifestDocument = xml(request.project.filePath());
     const auto manifest = manifestDocument.documentElement();

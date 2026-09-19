@@ -84,6 +84,10 @@ bool evaluateGmlConstant(const GmlNodePtr &node, const GmlEnvironment &environme
     }
     if (node->kind == GmlNodeKind::Name || node->kind == GmlNodeKind::Member) {
         QString name = node->text;
+        // As values, self and other read the current instance IDs. Their
+        // negative scope selectors are only used to address member variables.
+        if (node->kind == GmlNodeKind::Name && (name == QLatin1String("self") || name == QLatin1String("other")))
+            return false;
         if (node->kind == GmlNodeKind::Member) {
             if (node->children.size() != 1 || node->children.first()->kind != GmlNodeKind::Name)
                 return false;

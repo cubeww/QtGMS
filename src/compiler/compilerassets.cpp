@@ -171,9 +171,13 @@ void CompilerBuild::assets(CompileProfile &profile, const std::function<void(con
             file.u32(1);
             BackgroundDocument document;
             QString error;
-            if (!document.loadFromXml(resource.node.filePath, resource.document, resource.sourceBytes,
-                    request.configuration, error))
-                throw CompileError(resource.node.name + ": " + error);
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Background image loading and decoding"));
+                if (!document.loadFromXml(resource.node.filePath, resource.document, resource.sourceBytes,
+                        request.configuration, error))
+                    throw CompileError(resource.node.name + ": " + error);
+            }
+            profile.count(QStringLiteral("Background resources"));
             const auto &state = document.state();
             if (state.image.isNull()) {
                 file.u32(0);
@@ -185,7 +189,10 @@ void CompilerBuild::assets(CompileProfile &profile, const std::function<void(con
             texture.separate = state.for3D;
             texture.tileHorizontal = state.tileHorizontal;
             texture.tileVertical = state.tileVertical;
-            textures.reference(file, textures.add(state.image, state.textureGroup, texture));
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Background texture registration"));
+                textures.reference(file, textures.add(state.image, state.textureGroup, texture));
+            }
         });
     });
     profile.start(QStringLiteral("Paths / script loading"));

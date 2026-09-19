@@ -37,9 +37,15 @@ CompileResult ProjectCompiler::compile(
             CompilerBuild build(request, transaction);
             profile.start(QStringLiteral("Project / configuration / resource XML loading"));
             stage(QStringLiteral("Reading project and configuration..."));
-            build.load();
-            if (!transaction.openWrite(dataFile, error))
-                throw CompileError(error);
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Resource loading / symbol indexing"));
+                build.load();
+            }
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Previous data.win backup / output opening"));
+                if (!transaction.openWrite(dataFile, error))
+                    throw CompileError(error);
+            }
             build.file = DataWriter(dataFile);
             profile.start(QStringLiteral("Game metadata / extensions"));
             stage(QStringLiteral("Compiling game metadata and extensions..."));
@@ -54,16 +60,19 @@ CompileResult ProjectCompiler::compile(
             build.objects();
             profile.start(QStringLiteral("Rooms / Included Files"));
             stage(QStringLiteral("Compiling rooms and Included Files..."));
-            build.rooms();
+            build.rooms(profile);
             // Resource XML has been serialized. Only script metadata is still
             // needed while discovering extension dependencies and writing SCPT.
-            for (auto it = build.resources.begin(); it != build.resources.end();) {
-                if (it.key() != ResourceType::Script)
-                    it = build.resources.erase(it);
-                else {
-                    for (auto &script : it.value())
-                        script.embeddedSource.clear();
-                    ++it;
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Resource XML release"));
+                for (auto it = build.resources.begin(); it != build.resources.end();) {
+                    if (it.key() != ResourceType::Script)
+                        it = build.resources.erase(it);
+                    else {
+                        for (auto &script : it.value())
+                            script.embeddedSource.clear();
+                        ++it;
+                    }
                 }
             }
             profile.start(QStringLiteral("Texture page packing"));
@@ -96,10 +105,19 @@ CompileResult ProjectCompiler::compile(
                         classifications |= build.environment.functionClassifications.value(reference.name);
             build.file.patch(build.classificationOffset, quint32(classifications));
             build.file.patch(build.classificationOffset + 4, quint32(classifications >> 32));
-            writeVmChunks(build.file, build.codes, build.environment);
-            QVector<VmCode>().swap(build.codes);
-            build.environment = GmlEnvironment();
-            build.file.strings();
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Bytecode / symbol table linking and serialization"));
+                writeVmChunks(build.file, build.codes, build.environment);
+            }
+            {
+                CompileDetailScope timing(profile, QStringLiteral("Code / symbol metadata release"));
+                QVector<VmCode>().swap(build.codes);
+                build.environment = GmlEnvironment();
+            }
+            {
+                CompileDetailScope timing(profile, QStringLiteral("String table serialization / reference patching"));
+                build.file.strings();
+            }
             profile.start(QStringLiteral("Texture PNG encoding / cache"));
             stage(QStringLiteral("Encoding texture pages..."));
             build.textures.writePages(build.file, profile);

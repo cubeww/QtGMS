@@ -389,15 +389,9 @@ private:
                 fail(node, QStringLiteral("Invalid numeric literal"));
             type = value.isBoolean ? 4 : value.isInteger ? 3 : numberType(value.real);
         } else if (node->kind == GmlNodeKind::Name || node->kind == GmlNodeKind::Member) {
-            QString name = node->text;
-            if (node->kind == GmlNodeKind::Member) {
-                if (node->children.first()->kind != GmlNodeKind::Name)
-                    return 5;
-                name = node->children.first()->text + "." + name;
-            }
-            const auto constant = m_environment.constants.constFind(name);
-            if (constant != m_environment.constants.cend())
-                type = numberType(constant.value());
+            GmlConstant value;
+            if (evaluateGmlConstant(node, m_environment, value))
+                type = numberType(value.real);
         } else if (node->kind == GmlNodeKind::Binary) {
             if (bitwiseOpcode(node->text)) {
                 type = 3;
@@ -466,6 +460,11 @@ private:
             instruction(0xc0, 6);
             out().u32(m_file.stringId(node->text));
             convert(6, 5);
+        } else if (node->kind == GmlNodeKind::Name
+            && (node->text == QLatin1String("self") || node->text == QLatin1String("other"))) {
+            // Match GML2VM: an instance value must survive leaving a with block.
+            // Keep the scope selectors in location() for self.member/other.member.
+            variable(QStringLiteral("id"), node->text == QLatin1String("self") ? -1 : -2);
         } else if (node->kind == GmlNodeKind::Name || node->kind == GmlNodeKind::Member
             || node->kind == GmlNodeKind::Index) {
             auto constant = m_environment.constants.cend();

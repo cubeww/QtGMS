@@ -47,7 +47,7 @@ struct CompilerBuild
     void general();
     void assets(CompileProfile &profile, const std::function<void(const QString &)> &progress);
     void objects();
-    void rooms();
+    void rooms(CompileProfile &profile);
     void extensions();
     void includeExtensionScript(const QString &functionName);
     void scripts();
