@@ -200,10 +200,30 @@ void CompilerBuild::externalFile(const QString &name, const QString &sourcePath)
     if (!hasMatchingOutput(externalFiles, normalized, input))
         externalFiles.insert(normalized, QFileInfo(sourcePath).absoluteFilePath());
 }
+void CompilerBuild::externalData(const QString &name, const std::function<void(DataWriter &)> &write)
+{
+    const QString normalized = normalizedOutputName(name);
+    // Generated audio groups own their output names. Detect a collision before
+    // opening the destination, which might also be an Included File's source.
+    for (auto it = externalFiles.cbegin(); it != externalFiles.cend(); ++it)
+        if (it.key().compare(normalized, Qt::CaseInsensitive) == 0)
+            throw CompileError(QStringLiteral("Conflicting output file: %1").arg(name));
+    const QString path = QDir(BuildDirectory::path(request.project)).absoluteFilePath(normalized);
+    QFile output(path);
+    QString error;
+    if (!outputTransaction.openWrite(output, error))
+        throw CompileError(error);
+    DataWriter writer(output);
+    write(writer);
+    if (!output.flush())
+        throw CompileError(QStringLiteral("Cannot save %1: %2").arg(path, output.errorString()));
+    output.close();
+    externalFiles.insert(normalized, path);
+}
 int CompilerBuild::addAudio(int group, const QByteArray &bytes)
 {
     // Keep converted audio on disk until AUDO is assembled. Retaining every
-    // decoded song here duplicates the final data.win buffer in a 32-bit process.
+    // decoded song here exhausts memory in a 32-bit compiler process.
     if (!audioData.isOpen() && !audioData.open())
         throw CompileError(QStringLiteral("Cannot create temporary audio storage: %1").arg(audioData.errorString()));
     CompilerAudioEntry entry;
@@ -299,7 +319,7 @@ void CompilerBuild::load()
 }
 void CompilerBuild::general()
 {
-    file.bytes.append("FORM", 4);
+    file.append("FORM", 4);
     file.u32(0);
     file.chunk("GEN8", [&] {
         QString name = QFileInfo(request.project.filePath()).completeBaseName();

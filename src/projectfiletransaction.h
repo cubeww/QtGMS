@@ -6,6 +6,8 @@
 #include <QMap>
 #include <QTemporaryDir>
 
+class QFile;
+
 // A project edit may update XML and move/copy assets together. Keep recoverable
 // preimages until ProjectLoader has accepted the resulting manifest.
 class ProjectFileTransaction
@@ -14,6 +16,8 @@ public:
     explicit ProjectFileTransaction(const QString &directory);
     ~ProjectFileTransaction();
     bool write(const QString &path, const QByteArray &bytes, QString &error);
+    // Caller must close the file before finishing or rolling back.
+    bool openWrite(QFile &file, QString &error);
     bool remove(const QString &path, QString &error);
     bool copy(const QString &source, const QString &destination, QString &error, bool overwrite = false);
     bool move(const QString &source, const QString &destination, QString &error);

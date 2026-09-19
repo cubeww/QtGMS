@@ -40,7 +40,10 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     m_codePanel->editor()->setCompletionItems(GmlSymbols::instance().items);
     auto *codeEditor = m_codePanel->editor();
     connect(&GmlSymbols::instance(), &GmlSymbols::scriptSignaturesChanged, codeEditor, [this, codeEditor] {
-        if (m_project) codeEditor->setCompletionItems(GmlSymbols::completionItems(*m_project));
+        if (m_project) {
+            m_highlighter->setResources(*m_project);
+            codeEditor->setCompletionItems(GmlSymbols::completionItems(*m_project));
+        }
     }, Qt::QueuedConnection);
     m_codePanel->setCodeTab(tabName);
     m_codePanel->setLineCommentPrefix(QStringLiteral("//"));

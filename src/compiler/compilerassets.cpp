@@ -155,7 +155,7 @@ void CompilerBuild::assets(CompileProfile &profile, const std::function<void(con
                         if (qAlpha(row[x]))
                             bits[y * stride + x / 8] = char(quint8(bits.at(y * stride + x / 8)) | (0x80 >> (x % 8)));
                 }
-                file.bytes.append(bits);
+                file.append(bits);
             }
             file.align(4);
         });

@@ -66,6 +66,9 @@ public:
     explicit RoomTilePicker(QWidget *parent = nullptr) : QWidget(parent) { setMinimumHeight(150); setMaximumHeight(200); }
     RoomVisual visual;
     QRect selected;
+    QSize roomGrid = QSize(32, 32);
+    QSize selectionSize() const { return visual.tileset ? visual.tileSize : roomGrid; }
+    QPoint selectionOffset() const { return visual.tileset ? visual.tileOffset : QPoint(); }
     std::function<void(const QRect &)> changed;
     void paintEvent(QPaintEvent *) override
     {
@@ -76,28 +79,55 @@ public:
     }
     void mousePressEvent(QMouseEvent *event) override
     {
-        if (event->button() != Qt::LeftButton || visual.image.isNull()) return;
-        m_anchor = selected.topLeft();
+        if (event->button() != Qt::LeftButton) return;
+        m_selecting = false;
+        if (visual.image.isNull()) return;
+        m_anchor = imagePosition(event->pos());
+        if (!visual.image.rect().contains(m_anchor)) return;
+        m_selecting = true;
         selectAt(event);
     }
     void mouseMoveEvent(QMouseEvent *event) override
     {
-        if ((event->buttons() & Qt::LeftButton) && !visual.image.isNull()) selectAt(event);
+        if (m_selecting && (event->buttons() & Qt::LeftButton) && !visual.image.isNull()) selectAt(event);
+    }
+    void mouseReleaseEvent(QMouseEvent *event) override
+    {
+        if (event->button() == Qt::LeftButton) m_selecting = false;
     }
 private:
+    QPoint imagePosition(const QPoint &position) const
+    {
+        const QPointF point = QPointF(position) / imageScale();
+        return QPoint(int(std::floor(point.x())), int(std::floor(point.y())));
+    }
     void selectAt(QMouseEvent *event)
     {
-        const QPoint point = (QPointF(event->pos()) / imageScale()).toPoint(); const QPoint step = QPoint(visual.tileSize.width(), visual.tileSize.height()) + visual.tileSeparation;
-        const int x = visual.tileOffset.x() + int(std::floor(double(point.x() - visual.tileOffset.x()) / qMax(1, step.x()))) * step.x();
-        const int y = visual.tileOffset.y() + int(std::floor(double(point.y() - visual.tileOffset.y()) / qMax(1, step.y()))) * step.y();
-        QRect tile(QPoint(x, y), visual.tileSize);
-        if (event->modifiers() & Qt::ControlModifier) {
-            const QPoint end = event->modifiers() & Qt::AltModifier ? point : tile.bottomRight();
-            tile = QRect(m_anchor, end).normalized().intersected(visual.image.rect());
+        const QPoint point = imagePosition(event->pos());
+        QRect tile;
+        if (event->modifiers() & Qt::AltModifier) {
+            // Alt resizes freely on its own, and takes precedence over Ctrl.
+            tile = QRect(m_anchor, point).normalized().intersected(visual.image.rect());
+        } else if (event->modifiers() & Qt::ControlModifier) {
+            // Snap both ends of this drag to the room grid, independently of
+            // the previous selection and the tileset's offsets/separation.
+            const auto cell = [this](const QPoint &position) {
+                const int x = int(std::floor(double(position.x()) / roomGrid.width())) * roomGrid.width();
+                const int y = int(std::floor(double(position.y()) / roomGrid.height())) * roomGrid.height();
+                return QRect(QPoint(x, y), roomGrid);
+            };
+            tile = cell(m_anchor).united(cell(point)).intersected(visual.image.rect());
+        } else {
+            const QSize size = selectionSize(); const QPoint offset = selectionOffset();
+            const QPoint step = QPoint(size.width(), size.height()) + (visual.tileset ? visual.tileSeparation : QPoint());
+            const int x = offset.x() + int(std::floor(double(point.x() - offset.x()) / qMax(1, step.x()))) * step.x();
+            const int y = offset.y() + int(std::floor(double(point.y() - offset.y()) / qMax(1, step.y()))) * step.y();
+            tile = QRect(QPoint(x, y), size);
         }
         if (!tile.isEmpty() && visual.image.rect().contains(tile)) { selected = tile; if (changed) changed(tile); update(); }
     }
     QPoint m_anchor;
+    bool m_selecting = false;
     qreal imageScale() const { return qMin(1.0, qMin(double(width()) / qMax(1, visual.image.width()), double(height()) / qMax(1, visual.image.height()))); }
 };
 class RoomNumberEdit : public QDoubleSpinBox
@@ -166,6 +196,10 @@ RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *proj
     }
     auto *isometric = menu->addAction(tr("Isometric grid")); isometric->setCheckable(true); connect(isometric, &QAction::toggled, this, [this](bool enabled) { setValue(RoomPropertyScope::Room, QStringLiteral("isometric"), enabled ? QStringLiteral("-1") : QStringLiteral("0")); });
     m_refreshers.append([this, isometric] { isometric->setChecked(value(RoomPropertyScope::Room, QStringLiteral("isometric")).toInt() != 0); });
+    auto *showCode = menu->addAction(tr("Instance creation code"));
+    showCode->setCheckable(true); showCode->setShortcut(QKeySequence(Qt::Key_C));
+    showCode->setShortcutContext(Qt::WidgetWithChildrenShortcut); m_canvas->addAction(showCode);
+    connect(showCode, &QAction::toggled, this, [this](bool enabled) { m_canvas->setDisplay(QStringLiteral("code"), enabled); });
     show->setMenu(menu); toolbar->addWidget(show); toolbar->addSeparator();
     connect(toolbar->addAction(QIcon(QStringLiteral(":/images/room/zoomout.png")), tr("Zoom out")), &QAction::triggered, this, [this] { m_canvas->zoomBy(0.8); });
     connect(toolbar->addAction(QIcon(QStringLiteral(":/images/room/zoomreset.png")), tr("Reset zoom")), &QAction::triggered, m_canvas, &RoomCanvas::resetZoom);
@@ -229,6 +263,7 @@ RoomPropertiesWindow::RoomPropertiesWindow(RoomDocument *document, Project *proj
     connect(m_canvas, &RoomCanvas::cursorMoved, this, [this](const QPointF &point) { m_status->setText(tr("x: %1    y: %2    Selected: %3").arg(qRound(point.x())).arg(qRound(point.y())).arg(m_selectionCount)); });
     connect(m_canvas, &RoomCanvas::selectionChanged, this, &RoomPropertiesWindow::refreshSelection);
     connect(m_canvas, &RoomCanvas::creationCodeRequested, this, &RoomPropertiesWindow::editCode);
+    connect(m_canvas, &RoomCanvas::tilePropertiesRequested, this, &RoomPropertiesWindow::editTileProperties);
     connect(m_canvas, &RoomCanvas::openObjectRequested, this, [this](const QString &name) { for (const auto &node : ActionXml::resourceList(*m_project, ResourceType::Object)) if (node.name == name) { emit openResourceRequested(ResourceType::Object, node.filePath); break; } });
     connect(document, &RoomDocument::settingsChanged, this, &RoomPropertiesWindow::refresh);
     connect(document->undoStack(), &QUndoStack::cleanChanged, this, [this] { setWindowTitle(tr("Room Properties: %1%2").arg(m_document->name(), m_document->isModified() ? QStringLiteral(" *") : QString())); });
@@ -361,6 +396,53 @@ void RoomPropertiesWindow::changeLock(bool locked)
 void RoomPropertiesWindow::editCode(const QString &id)
 {
     showCode(id, -1, 0);
+}
+void RoomPropertiesWindow::editTileProperties(const QString &id)
+{
+    m_canvas->finishInteraction();
+    auto record = m_document->entity(id);
+    if (record.xml.isNull() || !record.tile || record.xml.attribute(QStringLiteral("locked")).toInt()) return;
+    EditorDialog dialog(this); dialog.setWindowTitle(tr("Tile Properties: %1").arg(record.xml.attribute(QStringLiteral("name"))));
+    dialog.resize(310, 250);
+    auto *form = new QFormLayout(dialog.bodyWidget());
+    auto *flips = new QHBoxLayout;
+    auto *flipX = new QCheckBox(tr("Flip X")), *flipY = new QCheckBox(tr("Flip Y"));
+    flips->addWidget(flipX); flips->addWidget(flipY); form->addRow(flips);
+    QDoubleSpinBox *scales[2];
+    double initialScales[2];
+    const char *keys[] = {"scaleX", "scaleY"};
+    for (int i = 0; i < 2; ++i) {
+        scales[i] = new RoomNumberEdit(dialog.bodyWidget()); scales[i]->setDecimals(6); scales[i]->setRange(0, 10000000);
+        scales[i]->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        const double scale = record.xml.attribute(QLatin1String(keys[i]), QStringLiteral("1")).toDouble();
+        scales[i]->setValue(qAbs(scale)); (i == 0 ? flipX : flipY)->setChecked(scale < 0);
+        initialScales[i] = scales[i]->value();
+        form->addRow(i == 0 ? tr("Scale X") : tr("Scale Y"), scales[i]);
+    }
+    const quint32 packed = record.xml.attribute(QStringLiteral("colour"), QStringLiteral("4294967295")).toUInt();
+    QColor color(packed & 255, (packed >> 8) & 255, (packed >> 16) & 255);
+    auto *colorButton = new QPushButton; colorButton->setAutoDefault(false);
+    const auto updateColor = [&] { colorButton->setStyleSheet(QStringLiteral("background-color: %1;").arg(color.name())); };
+    updateColor(); form->addRow(tr("Colour"), colorButton);
+    connect(colorButton, &QPushButton::clicked, &dialog, [&] {
+        const QColor selected = EditorColorDialog::getColor(color, &dialog, tr("Tile Colour"));
+        if (selected.isValid()) { color = selected; updateColor(); }
+    });
+    auto *alpha = new QSpinBox; alpha->setRange(0, 255); alpha->setValue(packed >> 24);
+    alpha->setButtonSymbols(QAbstractSpinBox::NoButtons); form->addRow(tr("Alpha"), alpha);
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel); form->addRow(buttons);
+    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept); connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    if (dialog.exec() != QDialog::Accepted) return;
+    for (int i = 0; i < 2; ++i) {
+        const bool flipped = (i == 0 ? flipX : flipY)->isChecked();
+        const double original = record.xml.attribute(QLatin1String(keys[i]), QStringLiteral("1")).toDouble();
+        if (scales[i]->value() != initialScales[i] || flipped != (original < 0))
+            record.xml.setAttribute(QLatin1String(keys[i]), scales[i]->value() * (flipped ? -1 : 1));
+    }
+    const quint32 changedColor = quint32(color.red()) | (quint32(color.green()) << 8)
+        | (quint32(color.blue()) << 16) | (quint32(alpha->value()) << 24);
+    if (changedColor != packed) record.xml.setAttribute(QStringLiteral("colour"), QString::number(changedColor));
+    m_document->editEntities({record}, tr("Edit tile properties"));
 }
 void RoomPropertiesWindow::showCode(const QString &id, int offset, int length)
 {
@@ -540,6 +622,15 @@ QWidget *RoomPropertiesWindow::createTilesPage()
     auto *under = new QCheckBox(tr("Delete underlying"), page); under->setChecked(true); under->setGeometry(12, 264, 155, 18);
     connect(under, &QCheckBox::toggled, this, [this](bool enabled) { if (m_pages->currentIndex() == 2) m_canvas->setDeleteUnderlying(enabled); });
     connect(m_pages, &QStackedWidget::currentChanged, this, [this, under](int index) { if (index == 2) m_canvas->setDeleteUnderlying(under->isChecked()); });
+    m_refreshers.append([this, updateStamp] {
+        const bool singleTile = m_tileSource.size() == m_tilePicker->selectionSize();
+        const QSize grid(qMax(1, value(RoomPropertyScope::Room, QStringLiteral("hsnap")).toInt()),
+            qMax(1, value(RoomPropertyScope::Room, QStringLiteral("vsnap")).toInt()));
+        if (m_tilePicker->roomGrid != grid) {
+            m_tilePicker->roomGrid = grid;
+            if (singleTile) { m_tileSource.setSize(m_tilePicker->selectionSize()); updateStamp(); }
+        }
+    });
     auto *hint = roomLabel(page, tr("In tile selection:\nLeft Mouse Button = select tile\n                 + <Ctrl> = resize selection\n                 + <Alt> = no snap resize"), 12, 287, 215, 65);
     hint->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     roomLabel(page, tr("Current Tile Layer:"), 12, 354, 142);
@@ -570,7 +661,7 @@ QWidget *RoomPropertiesWindow::createTilesPage()
     });
     connect(m_tileChoice, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [this, updateStamp] {
         m_tilePicker->visual = m_assets->background(m_tileChoice->currentData().toString());
-        m_tileSource = QRect(m_tilePicker->visual.tileOffset, m_tilePicker->visual.tileSize); updateStamp(); refresh();
+        m_tileSource = QRect(m_tilePicker->selectionOffset(), m_tilePicker->selectionSize()); updateStamp(); refresh();
     });
     m_tilePicker->changed = [this, updateStamp](const QRect &rect) { m_tileSource = rect; updateStamp(); refresh(); };
     refreshTileLayers();

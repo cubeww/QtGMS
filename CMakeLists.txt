@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(QtGMS VERSION 0.2.2 LANGUAGES CXX)
+project(QtGMS VERSION 0.2.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -191,6 +191,8 @@ add_executable(QtGMS WIN32
     src/codefindpanel.h
     src/gmlhighlighter.cpp
     src/gmlhighlighter.h
+    src/gmldeclarations.cpp
+    src/gmldeclarations.h
     src/scripteditorwindow.cpp
     src/scripteditorwindow.h
     src/shaderdocument.cpp

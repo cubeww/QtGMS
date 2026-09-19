@@ -189,11 +189,13 @@ bool SpriteDocument::loadFromXml(const QString &filePath, const QDomDocument &do
         bool validIndex;
         const int index = entry.attribute(QStringLiteral("index")).toInt(&validIndex);
         if (!validIndex || index < 0 || orderedFrames.contains(index)) { error = tr("Invalid or duplicate subimage index."); return false; }
+        if (state.size.isEmpty()) { error = tr("Invalid sprite dimensions."); return false; }
         const QString path = directory.absoluteFilePath(QString(entry.text().trimmed()).replace(QLatin1Char('\\'), QLatin1Char('/')));
         QImageReader reader(path);
         QImage image = reader.read();
         if (image.isNull()) { error = tr("Cannot read subimage %1:\n%2").arg(path, reader.errorString()); return false; }
-        if (image.size() != state.size) { error = tr("Subimage dimensions do not match the sprite: %1").arg(path); return false; }
+        // GMX frames may differ from the declared sprite size. Keep their pixels
+        // intact for texture compilation; only collision masks use state.size.
         SpriteFrame frame = createFrame(image);
         frame.modified = false;
         frame.filePath = QDir::cleanPath(path);
@@ -249,10 +251,12 @@ QRect SpriteDocument::boundingBox(int frame) const
     for (int i = 0; i < m_state.frames.size(); ++i) {
         if (frame >= 0 && m_state.separateMasks && i != frame) continue;
         const QImage &image = m_state.frames.at(i).image;
-        int left = image.width(), right = -1, top = image.height(), bottom = -1;
-        for (int y = 0; y < image.height(); ++y) {
+        const int width = qMin(image.width(), m_state.size.width());
+        const int height = qMin(image.height(), m_state.size.height());
+        int left = width, right = -1, top = height, bottom = -1;
+        for (int y = 0; y < height; ++y) {
             const QRgb *row = reinterpret_cast<const QRgb *>(image.constScanLine(y));
-            for (int x = 0; x < image.width(); ++x) {
+            for (int x = 0; x < width; ++x) {
                 if (qAlpha(row[x]) > m_state.alphaTolerance) {
                     left = qMin(left, x); right = qMax(right, x);
                     top = qMin(top, y); bottom = qMax(bottom, y);
@@ -276,13 +280,17 @@ QImage SpriteDocument::collisionMask(int frame) const
         QRgb *row = reinterpret_cast<QRgb *>(mask.scanLine(y));
         for (int x = bounds.left(); x <= bounds.right(); ++x) {
             bool solid = false;
-            if (m_state.collisionKind == 0) {
-                for (int i = 0; i < m_state.frames.size(); ++i) {
-                    if (m_state.separateMasks && i != frame) continue;
-                    if (qAlpha(m_state.frames.at(i).image.pixel(x, y)) > m_state.alphaTolerance) { solid = true; break; }
+            for (int i = 0; i < m_state.frames.size(); ++i) {
+                if (m_state.separateMasks && i != frame) continue;
+                const QImage &image = m_state.frames.at(i).image;
+                // Missing pixels in smaller frames are transparent. Larger
+                // frames are clipped to the declared collision canvas by bounds.
+                if (!image.valid(x, y)) continue;
+                if (m_state.collisionKind != 0 || qAlpha(image.pixel(x, y)) > m_state.alphaTolerance) {
+                    solid = true; break;
                 }
-            } else if (m_state.collisionKind == 1 || m_state.collisionKind == 5) solid = true;
-            else {
+            }
+            if (solid && m_state.collisionKind != 0 && m_state.collisionKind != 1 && m_state.collisionKind != 5) {
                 const qreal dx = (x - cx) / (bounds.width() / 2.0);
                 const qreal dy = (y - cy) / (bounds.height() / 2.0);
                 solid = m_state.collisionKind == 2 ? dx * dx + dy * dy <= 1 : qAbs(dx) + qAbs(dy) <= 1;

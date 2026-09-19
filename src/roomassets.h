@@ -10,6 +10,7 @@ struct RoomVisual {
     QPoint origin;
     int depth = 0;
     bool visible = true;
+    bool tileset = false;
     QSize tileSize = QSize(16, 16);
     QPoint tileOffset, tileSeparation;
 };

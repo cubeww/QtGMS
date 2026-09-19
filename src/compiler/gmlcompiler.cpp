@@ -915,7 +915,7 @@ void writeVmChunks(DataWriter &file, QVector<VmCode> &codes, const GmlEnvironmen
             file.u32(0);
         for (auto &code : codes) {
             code.address = file.position();
-            file.bytes.append(code.bytecode.bytes);
+            file.append(code.bytecode.bytes());
         }
         for (int i = 0; i < codes.size(); ++i) {
             const auto &code = codes.at(i);
@@ -928,6 +928,10 @@ void writeVmChunks(DataWriter &file, QVector<VmCode> &codes, const GmlEnvironmen
             file.u32(0);
         }
     });
+    // CODE now owns the serialized instructions. Linking only needs their
+    // file addresses, references and local-variable metadata.
+    for (auto &code : codes)
+        code.bytecode = DataWriter();
     struct Symbol
     {
         QString name;

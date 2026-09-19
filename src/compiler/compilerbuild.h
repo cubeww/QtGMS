@@ -57,6 +57,7 @@ struct CompilerBuild
     int option(const char *key, int fallback = 0) const;
     QString actionCode(const QDomElement &event);
     void external(const QString &name, const QByteArray &bytes);
+    void externalData(const QString &name, const std::function<void(DataWriter &)> &write);
     void externalFile(const QString &name, const QString &sourcePath);
     int addAudio(int group, const QByteArray &bytes);
     static QByteArray read(const QString &path);

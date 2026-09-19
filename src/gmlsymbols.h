@@ -20,6 +20,7 @@ public:
     static QVector<CodeCompletionItem> completionItems(const Project &project);
     void watchScript(TextFileDocument *document);
     QVector<CodeCompletionItem> scriptItems(const QString &name, const QString &path);
+    QSet<QString> scriptConstants(const QString &path);
     QSet<QString> keywords;
     QSet<QString> constants;
     QSet<QString> variables;
@@ -29,10 +30,13 @@ signals:
     void scriptSignaturesChanged();
 private:
     GmlSymbols();
+    QString scriptSource(const QString &path);
     struct ScriptHeader {
         QDateTime modified;
         qint64 size = -1;
         QString text;
+        QString declarationSource;
+        QSet<QString> constantNames;
     };
     QHash<QString, ScriptHeader> m_scriptHeaders;
     QHash<TextFileDocument *, QString> m_openScripts;

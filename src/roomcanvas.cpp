@@ -28,6 +28,7 @@ class RoomGraphicsItem : public QGraphicsItem
 {
 public:
     QString id;
+    QString creationCode;
     bool tile = false, locked = false;
     int depth = 0;
     QPixmap image, sourceImage;
@@ -61,7 +62,12 @@ public:
         resizeVisual(roomNumber(xml, QStringLiteral("scaleX"), 1), roomNumber(xml, QStringLiteral("scaleY"), 1));
         setPos(roomNumber(xml, QStringLiteral("x")), roomNumber(xml, QStringLiteral("y")));
         setZValue(-(tile ? roomNumber(xml, QStringLiteral("depth")) : visual.depth) + record.order * 0.000000001);
-        setToolTip(xml.attribute(tile ? QStringLiteral("bgName") : QStringLiteral("objName")) + QLatin1Char('\n') + id.mid(2));
+        creationCode = tile ? QString() : xml.attribute(QStringLiteral("code"));
+        QString tooltip = xml.attribute(tile ? QStringLiteral("bgName") : QStringLiteral("objName")).toHtmlEscaped()
+            + QStringLiteral("<br>") + id.mid(2).toHtmlEscaped();
+        if (!creationCode.trimmed().isEmpty())
+            tooltip += QStringLiteral("<pre>") + creationCode.toHtmlEscaped() + QStringLiteral("</pre>");
+        setToolTip(QStringLiteral("<qt>") + tooltip + QStringLiteral("</qt>"));
         update();
     }
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override
@@ -215,6 +221,17 @@ void RoomCanvas::drawEditingOverlay(QPainter *painter, const QRectF &rect)
     if (!m_ghostRect.isEmpty() && m_ghostRect.intersects(rect)) {
         painter->save(); painter->setOpacity(0.45); painter->drawPixmap(m_ghostRect, m_ghostImage, m_ghostSource); painter->restore();
     }
+    if (m_showCreationCode) {
+        painter->save();
+        QPen marker(QColor(255, 48, 48)); marker.setCosmetic(true); marker.setWidth(2);
+        painter->setPen(marker); painter->setBrush(QColor(255, 48, 48, 35));
+        for (auto *raw : scene()->items(rect, Qt::IntersectsItemBoundingRect)) {
+            auto *item = static_cast<RoomGraphicsItem *>(raw);
+            if (item->isVisible() && !item->tile && !item->creationCode.trimmed().isEmpty())
+                painter->drawPolygon(item->mapToScene(item->bounds));
+        }
+        painter->restore();
+    }
     painter->save(); QPen pen(QColor(0, 180, 255)); pen.setCosmetic(true);
     painter->setPen(pen); painter->setBrush(QColor(35, 35, 35));
     const qreal radius = 3.5 / transform().m11();
@@ -335,6 +352,7 @@ void RoomCanvas::setDisplay(const QString &key, bool visible)
     else if (key == QStringLiteral("backgrounds")) m_showBackgrounds = visible;
     else if (key == QStringLiteral("foregrounds")) m_showForegrounds = visible;
     else if (key == QStringLiteral("views")) m_showViews = visible;
+    else if (key == QStringLiteral("code")) m_showCreationCode = visible;
     if (key == QStringLiteral("objects") || key == QStringLiteral("tiles")) updateItemVisibility();
     if (key == QStringLiteral("backgrounds") || key == QStringLiteral("foregrounds")) refreshBackgroundImages();
     viewport()->update();
@@ -574,7 +592,13 @@ void RoomCanvas::finishInteraction()
     m_dragPositions.clear(); m_document->editEntities(changes, tr("Move room items")); emit selectionChanged();
 }
 void RoomCanvas::mouseDoubleClickEvent(QMouseEvent *event)
-{ if (auto *item = itemAtRoom(event->pos())) { if (!item->tile) emit creationCodeRequested(item->id); } else QGraphicsView::mouseDoubleClickEvent(event); }
+{
+    if (auto *item = itemAtRoom(event->pos())) {
+        const QString id = item->id;
+        if (item->tile) emit tilePropertiesRequested(id);
+        else emit creationCodeRequested(id);
+    } else QGraphicsView::mouseDoubleClickEvent(event);
+}
 void RoomCanvas::expandNavigationBounds(const QRectF &visibleArea)
 {
     if (sceneRect().contains(visibleArea)) return;
@@ -689,6 +713,7 @@ void RoomCanvas::contextMenuEvent(QContextMenuEvent *event)
     if (item) {
         const QString id = item->id; menu.addSeparator();
         if (!item->tile) { menu.addAction(tr("Creation Code..."), this, [this, id] { emit creationCodeRequested(id); }); menu.addAction(tr("Edit Object"), this, [this, id] { emit openObjectRequested(m_document->entity(id).xml.attribute(QStringLiteral("objName"))); }); }
+        else menu.addAction(tr("Tile Properties..."), this, [this, id] { emit tilePropertiesRequested(id); });
         auto *lock = menu.addAction(tr("Locked")); lock->setCheckable(true); lock->setChecked(item->locked);
         connect(lock, &QAction::triggered, this, [this, id](bool enabled) { auto record = m_document->entity(id); record.xml.setAttribute(QStringLiteral("locked"), enabled ? -1 : 0); m_document->editEntities({record}, tr("Lock room item")); });
     }

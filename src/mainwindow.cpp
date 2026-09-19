@@ -457,14 +457,18 @@ void MainWindow::openResource(ResourceType type, const QString &filePath)
             return;
         }
         if (savedType == ResourceType::Macro) { m_resourceBrowser->refreshMacros(m_project); return; }
-        m_project.updateThumbnail(savedType, path, thumbnail);
-        m_roomAssets->invalidate(savedType, path);
-        m_resourceBrowser->refreshIcons(m_project);
+        const bool visualResource = savedType == ResourceType::Object || savedType == ResourceType::Sprite || savedType == ResourceType::Background;
+        if (visualResource) {
+            m_project.updateThumbnail(savedType, path, thumbnail);
+            m_roomAssets->invalidate(savedType, path);
+            m_resourceBrowser->refreshResourceIcons(m_project, savedType, path);
+        }
         for (const auto &editor : m_resourceEditors) {
-            if (savedType == ResourceType::Room || savedType == ResourceType::Object || savedType == ResourceType::Sprite || savedType == ResourceType::Background)
+            if (savedType == ResourceType::Room || visualResource)
                 if (auto *pathWindow = qobject_cast<PathPropertiesWindow *>(editor.data())) pathWindow->updateResources();
-            if (auto *objectWindow = qobject_cast<ObjectPropertiesWindow *>(editor.data())) objectWindow->updateResources();
-            if (savedType == ResourceType::Object || savedType == ResourceType::Sprite || savedType == ResourceType::Background)
+            if (savedType == ResourceType::Object || savedType == ResourceType::Sprite)
+                if (auto *objectWindow = qobject_cast<ObjectPropertiesWindow *>(editor.data())) objectWindow->updateResources();
+            if (visualResource)
                 if (auto *room = qobject_cast<RoomPropertiesWindow *>(editor.data())) room->updateResources();
         }
     });
@@ -881,7 +885,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.2.2\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.2.3\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

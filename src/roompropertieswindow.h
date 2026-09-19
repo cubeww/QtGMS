@@ -55,6 +55,7 @@ private:
     void refreshSelection();
     void refreshObjectPreview();
     void editCode(const QString &id);
+    void editTileProperties(const QString &id);
     void changeLock(bool locked);
     RoomDocument *m_document;
     Project *m_project;

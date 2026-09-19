@@ -55,6 +55,13 @@ bool ProjectFileTransaction::write(const QString &path, const QByteArray &bytes,
     error = QObject::tr("Cannot save %1:\n%2").arg(path, file.errorString()); return false;
 }
 
+bool ProjectFileTransaction::openWrite(QFile &file, QString &error)
+{
+    if (!remember(file.fileName(), error)) return false;
+    if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) return true;
+    error = QObject::tr("Cannot save %1:\n%2").arg(file.fileName(), file.errorString()); return false;
+}
+
 bool ProjectFileTransaction::remove(const QString &path, QString &error)
 {
     if (!remember(path, error)) return false;

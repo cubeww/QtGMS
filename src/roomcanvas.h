@@ -42,6 +42,7 @@ signals:
     void selectionChanged();
     void cursorMoved(const QPointF &position);
     void creationCodeRequested(const QString &id);
+    void tilePropertiesRequested(const QString &id);
     void openObjectRequested(const QString &name);
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -91,6 +92,7 @@ private:
     bool m_deleteUnderlying = false, m_panning = false, m_space = false;
     bool m_hideOtherTileLayers = false;
     bool m_viewsPageActive = false;
+    bool m_showCreationCode = false;
     bool m_grid = true, m_showObjects = true, m_showTiles = true, m_showBackgrounds = true, m_showForegrounds = true, m_showViews = false;
     QPointF m_panAnchor;
     Qt::MouseButton m_panButton = Qt::NoButton;

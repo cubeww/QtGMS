@@ -3,6 +3,7 @@
 
 #include <QSyntaxHighlighter>
 #include <QSet>
+#include "gmldeclarations.h"
 
 class Project;
 
@@ -15,6 +16,9 @@ public:
 protected:
     void highlightBlock(const QString &text) override;
 private:
+    void updateDeclarations();
+    QString m_declarationSource;
+    GmlDeclarations m_declarations;
     QSet<QString> m_keywords;
     QSet<QString> m_constants;
     QSet<QString> m_variables;

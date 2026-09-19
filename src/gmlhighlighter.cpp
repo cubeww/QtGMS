@@ -5,6 +5,9 @@
 #include "gmlsymbols.h"
 #include <QStringList>
 #include <QRegularExpression>
+#include <QTextBlock>
+#include <QTextDocument>
+#include <QTimer>
 
 static void collectGmlResourceNames(const QList<ResourceNode> &nodes, QSet<QString> &names)
 {
@@ -29,18 +32,36 @@ GmlHighlighter::GmlHighlighter(QTextDocument *document) : QSyntaxHighlighter(doc
     m_commentFormat.setForeground(CodeEditorColors::Comment);
     m_numberFormat.setForeground(CodeEditorColors::Value);
     m_resourceFormat.setForeground(CodeEditorColors::Resource);
+    auto *declarationsTimer = new QTimer(this);
+    declarationsTimer->setSingleShot(true); declarationsTimer->setInterval(120);
+    connect(document, &QTextDocument::contentsChange, this, [declarationsTimer](int, int removed, int added) {
+        if (removed || added) declarationsTimer->start();
+    });
+    connect(declarationsTimer, &QTimer::timeout, this, &GmlHighlighter::updateDeclarations);
+    declarationsTimer->start();
+}
+void GmlHighlighter::updateDeclarations()
+{
+    const QString source = document()->toPlainText();
+    if (source == m_declarationSource) return;
+    m_declarationSource = source;
+    const auto declarations = GmlDeclarations::fromCode(source);
+    if (declarations.names == m_declarations.names && declarations.positions == m_declarations.positions) return;
+    m_declarations = declarations;
+    rehighlight();
 }
 void GmlHighlighter::setResources(const Project &project)
 {
-    QSet<QString> scripts, resources;
+    QSet<QString> scripts, resources, constants;
     for (const auto &item : GmlSymbols::completionItems(project))
         if (item.kind == CodeCompletionItem::Kind::Script) scripts.insert(item.name);
+        else if (item.kind == CodeCompletionItem::Kind::Constant) constants.insert(item.name);
     for (ResourceType type : {ResourceType::Sprite, ResourceType::Sound, ResourceType::Background,
                              ResourceType::Path, ResourceType::Shader, ResourceType::Font,
                              ResourceType::Timeline, ResourceType::Object, ResourceType::Room})
         collectGmlResourceNames(project.resources(type), resources);
-    if (scripts == m_scripts && resources == m_resources) return;
-    m_scripts = scripts; m_resources = resources; rehighlight();
+    if (scripts == m_scripts && resources == m_resources && constants == m_constants) return;
+    m_scripts = scripts; m_resources = resources; m_constants = constants; rehighlight();
 }
 void GmlHighlighter::highlightBlock(const QString &text)
 {
@@ -72,14 +93,29 @@ void GmlHighlighter::highlightBlock(const QString &text)
             setFormat(position, text.size() - position, m_commentFormat); break;
         }
         const QChar ch = text.at(position);
+        if (ch == QLatin1Char('#') && text.midRef(position, 6) == QLatin1String("#macro")
+            && (position + 6 == text.size() || text.at(position + 6).isSpace())) {
+            setFormat(position, 6, m_keywordFormat); position += 6; continue;
+        }
         if (ch == QLatin1Char('{') || ch == QLatin1Char('}')) {
             setFormat(position++, 1, m_keywordFormat); continue;
         }
         if (ch.isLetter() || ch == QLatin1Char('_')) {
             while (++position < text.size() && (text.at(position).isLetterOrNumber() || text.at(position) == QLatin1Char('_'))) {}
             const QString word = text.mid(start, position - start);
+            // Qualified enum members are constants; a similarly named ordinary
+            // variable elsewhere must retain its normal colour.
+            static const QRegularExpression Member(QStringLiteral("^\\s*\\.\\s*([A-Za-z_][A-Za-z_0-9]*)"));
+            const auto member = Member.match(text.mid(position));
+            if (member.hasMatch()) {
+                const QString qualified = word + QLatin1Char('.') + member.captured(1);
+                if (m_constants.contains(qualified) || m_declarations.names.contains(qualified)) {
+                    position += member.capturedLength(); setFormat(start, position - start, m_constantFormat); continue;
+                }
+            }
             if (m_keywords.contains(word)) setFormat(start, position - start, m_keywordFormat);
-            else if (m_constants.contains(word)) setFormat(start, position - start, m_constantFormat);
+            else if (m_constants.contains(word) || m_declarations.names.contains(word)
+                || m_declarations.positions.contains(currentBlock().position() + start)) setFormat(start, position - start, m_constantFormat);
             else if (m_variables.contains(word)) setFormat(start, position - start, m_variableFormat);
             else if (m_functions.contains(word)) setFormat(start, position - start, m_functionFormat);
             else if (m_scripts.contains(word)) setFormat(start, position - start, m_functionFormat);

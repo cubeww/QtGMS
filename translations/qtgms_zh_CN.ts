@@ -3519,9 +3519,9 @@ References will be cleared and matching room instances or tiles removed. Open ed
             <translation>关于 QtGMS</translation>
         </message>
         <message>
-            <source>QtGMS 0.2.2
+            <source>QtGMS 0.2.3
 A GameMaker Studio-style editor.</source>
-            <translation>QtGMS 0.2.2
+            <translation>QtGMS 0.2.3
 GameMaker Studio 风格的编辑器。</translation>
         </message>
         <message>
@@ -7147,6 +7147,10 @@ Cannot remove the unregistered information file: %1</source>
             <source>Reset Zoom</source>
             <translation>重置缩放</translation>
         </message>
+        <message>
+            <source>Tile Properties...</source>
+            <translation>图块属性...</translation>
+        </message>
     </context>
     <context>
         <name>RoomDocument</name>
@@ -7624,6 +7628,26 @@ layers</source>
         <message>
             <source>Delete tile layer</source>
             <translation>删除图块层</translation>
+        </message>
+        <message>
+            <source>Instance creation code</source>
+            <translation>实例创建代码</translation>
+        </message>
+        <message>
+            <source>Tile Properties: %1</source>
+            <translation>图块属性：%1</translation>
+        </message>
+        <message>
+            <source>Scale Y</source>
+            <translation>Y 缩放</translation>
+        </message>
+        <message>
+            <source>Tile Colour</source>
+            <translation>图块颜色</translation>
+        </message>
+        <message>
+            <source>Edit tile properties</source>
+            <translation>编辑图块属性</translation>
         </message>
     </context>
     <context>

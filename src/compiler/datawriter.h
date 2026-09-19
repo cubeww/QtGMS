@@ -7,6 +7,8 @@
 #include <QVector>
 #include <functional>
 
+class QIODevice;
+
 struct CompileError
 {
     QString message;
@@ -21,8 +23,12 @@ struct CompileError
 class DataWriter
 {
 public:
-    QByteArray bytes;
-    int position() const { return bytes.size(); }
+    DataWriter() = default;
+    explicit DataWriter(QIODevice &device);
+    const QByteArray &bytes() const { return m_bytes; }
+    int position() const;
+    void append(const char *data, int size);
+    void append(const QByteArray &data) { append(data.constData(), data.size()); }
     void u8(quint8 value);
     void u16(qint64 value);
     void u32(qint64 value);
@@ -41,6 +47,10 @@ public:
     void finish();
 
 private:
+    // Small bytecode/WAV buffers use memory. Final game files use a borrowed,
+    // seekable device so their size does not determine compiler memory usage.
+    QIODevice *m_device = nullptr;
+    QByteArray m_bytes;
     QStringList m_strings;
     QHash<QString, int> m_stringIds;
     QVector<QVector<int>> m_stringPatches;

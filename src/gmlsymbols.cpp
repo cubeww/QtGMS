@@ -2,6 +2,7 @@
 #include "project.h"
 #include "textfiledocument.h"
 #include "scriptsource.h"
+#include "gmldeclarations.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
@@ -69,6 +70,8 @@ static QString scriptHeaders(const QString &source)
     QString result;
     for (const auto &section : ScriptSource::sections(source, QString()))
         result += section.name + QLatin1Char('\n') + section.code.section(QLatin1Char('\n'), 0, 0) + QLatin1Char('\n');
+    QStringList declarations = GmlDeclarations::fromCode(source).names.toList();
+    declarations.sort(); result += declarations.join(QLatin1Char('\n'));
     return result;
 }
 
@@ -95,7 +98,7 @@ void GmlSymbols::watchScript(TextFileDocument *document)
     emit scriptSignaturesChanged();
 }
 
-QVector<CodeCompletionItem> GmlSymbols::scriptItems(const QString &name, const QString &path)
+QString GmlSymbols::scriptSource(const QString &path)
 {
     QString source;
     bool open = false;
@@ -115,6 +118,23 @@ QVector<CodeCompletionItem> GmlSymbols::scriptItems(const QString &name, const Q
         }
         source = cached.text;
     }
+    return source;
+}
+
+QSet<QString> GmlSymbols::scriptConstants(const QString &path)
+{
+    const QString source = scriptSource(path);
+    auto &cached = m_scriptHeaders[path];
+    if (cached.declarationSource != source) {
+        cached.declarationSource = source;
+        cached.constantNames = GmlDeclarations::fromCode(source).names;
+    }
+    return cached.constantNames;
+}
+
+QVector<CodeCompletionItem> GmlSymbols::scriptItems(const QString &name, const QString &path)
+{
+    const QString source = scriptSource(path);
     static const QRegularExpression Declaration(QStringLiteral("^\\s*///\\s*[A-Za-z_][A-Za-z_0-9]*\\s*(\\([^\\r\\n]*\\))\\s*$"));
     QVector<CodeCompletionItem> result;
     for (const auto &section : ScriptSource::sections(source, name)) {
@@ -134,6 +154,12 @@ static void appendCompletionResources(const QList<ResourceNode> &nodes, QVector<
         if (node.isGroup) { appendCompletionResources(node.children, items); continue; }
         if (node.type == ResourceType::Script) {
             items += GmlSymbols::instance().scriptItems(node.name, node.filePath);
+            QStringList names = GmlSymbols::instance().scriptConstants(node.filePath).toList();
+            names.sort();
+            for (const auto &name : names) {
+                CodeCompletionItem item; item.name = name; item.detail = name;
+                item.kind = CodeCompletionItem::Kind::Constant; items.append(item);
+            }
             continue;
         }
         CodeCompletionItem item; item.name = node.name;
@@ -151,5 +177,7 @@ QVector<CodeCompletionItem> GmlSymbols::completionItems(const Project &project)
                              ResourceType::Path, ResourceType::Script, ResourceType::Shader, ResourceType::Font,
                              ResourceType::Timeline, ResourceType::Object, ResourceType::Room, ResourceType::Macro})
         appendCompletionResources(project.resources(type), items);
+    for (const auto &configuration : project.configurations())
+        appendCompletionResources(configuration.macros, items);
     return items;
 }

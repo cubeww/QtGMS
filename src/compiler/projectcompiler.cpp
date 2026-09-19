@@ -7,7 +7,6 @@
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFileInfo>
-#include <limits>
 
 CompileResult ProjectCompiler::compile(
     const CompileRequest &request, const std::function<void(const QString &, int, int)> &progress)
@@ -31,10 +30,17 @@ CompileResult ProjectCompiler::compile(
         ProjectFileTransaction transaction(output.absolutePath());
         QString error;
         try {
+            // Both the writer and its file are destroyed before the catch
+            // handlers restore previous output files on failure.
+            const QString data = output.absoluteFilePath(QStringLiteral("data.win"));
+            QFile dataFile(data);
             CompilerBuild build(request, transaction);
             profile.start(QStringLiteral("Project / configuration / resource XML loading"));
             stage(QStringLiteral("Reading project and configuration..."));
             build.load();
+            if (!transaction.openWrite(dataFile, error))
+                throw CompileError(error);
+            build.file = DataWriter(dataFile);
             profile.start(QStringLiteral("Game metadata / extensions"));
             stage(QStringLiteral("Compiling game metadata and extensions..."));
             build.general();
@@ -49,6 +55,17 @@ CompileResult ProjectCompiler::compile(
             profile.start(QStringLiteral("Rooms / Included Files"));
             stage(QStringLiteral("Compiling rooms and Included Files..."));
             build.rooms();
+            // Resource XML has been serialized. Only script metadata is still
+            // needed while discovering extension dependencies and writing SCPT.
+            for (auto it = build.resources.begin(); it != build.resources.end();) {
+                if (it.key() != ResourceType::Script)
+                    it = build.resources.erase(it);
+                else {
+                    for (auto &script : it.value())
+                        script.embeddedSource.clear();
+                    ++it;
+                }
+            }
             profile.start(QStringLiteral("Texture page packing"));
             stage(QStringLiteral("Packing texture pages..."));
             build.textures.write(build.file, qBound(256, build.option("windows_texture_page", 2048), 8192));
@@ -59,10 +76,17 @@ CompileResult ProjectCompiler::compile(
             prepareGml(build.codes, build.environment,
                 [&](const QString &function) { build.includeExtensionScript(function); });
             build.scripts();
+            build.resources.clear();
+            build.extensionScriptFiles.clear();
+            build.includedExtensionScriptFiles.clear();
+            build.extensionEntryPoints.clear();
             profile.start(QStringLiteral("GML bytecode generation"));
             stage(QStringLiteral("Generating GML bytecode..."));
-            for (auto &code : build.codes)
+            for (auto &code : build.codes) {
                 compileGml(code, build.file, build.environment);
+                code.syntax.clear();
+                code.source.clear();
+            }
             profile.start(QStringLiteral("Bytecode linking / string table"));
             stage(QStringLiteral("Linking bytecode and strings..."));
             quint64 classifications = 0;
@@ -73,6 +97,8 @@ CompileResult ProjectCompiler::compile(
             build.file.patch(build.classificationOffset, quint32(classifications));
             build.file.patch(build.classificationOffset + 4, quint32(classifications >> 32));
             writeVmChunks(build.file, build.codes, build.environment);
+            QVector<VmCode>().swap(build.codes);
+            build.environment = GmlEnvironment();
             build.file.strings();
             profile.start(QStringLiteral("Texture PNG encoding / cache"));
             stage(QStringLiteral("Encoding texture pages..."));
@@ -81,17 +107,6 @@ CompileResult ProjectCompiler::compile(
             stage(QStringLiteral("Assembling audio groups..."));
             const auto writeAudio = [&](DataWriter &file, int group) {
                 const auto &entries = build.audio[group];
-                // Reserve the exact final size once instead of growing a large
-                // QByteArray through several overlapping allocations.
-                qint64 finalSize = qint64(file.position()) + 12 + qint64(entries.size()) * 4;
-                for (const auto &entry : entries) {
-                    finalSize = (finalSize + 3) & ~qint64(3);
-                    finalSize += 4 + qint64(entry.size);
-                }
-                finalSize = (finalSize + 15) & ~qint64(15);
-                if (finalSize >= std::numeric_limits<int>::max())
-                    throw CompileError(QStringLiteral("Compiled audio group %1 exceeds the 2 GiB output buffer limit.").arg(group));
-                file.bytes.reserve(int(finalSize));
                 file.chunk("AUDO", [&] {
                     file.u32(entries.size());
                     int table = file.position();
@@ -109,7 +124,7 @@ CompileResult ProjectCompiler::compile(
                             const QByteArray block = build.audioData.read(qMin(remaining, 1024 * 1024));
                             if (block.isEmpty() || build.audioData.error() != QFile::NoError)
                                 throw CompileError(QStringLiteral("Cannot read compiled audio: %1").arg(build.audioData.errorString()));
-                            file.bytes.append(block);
+                            file.append(block);
                             remaining -= block.size();
                         }
                     }
@@ -117,13 +132,16 @@ CompileResult ProjectCompiler::compile(
             };
             writeAudio(build.file, 0);
             build.file.finish();
+            if (!dataFile.flush())
+                throw CompileError(QStringLiteral("Cannot save %1: %2").arg(data, dataFile.errorString()));
+            dataFile.close();
             for (int group = 1; group < request.project.audioGroups().size(); ++group) {
-                DataWriter audio;
-                audio.bytes.append("FORM", 4);
-                audio.u32(0);
-                writeAudio(audio, group);
-                audio.finish();
-                build.external(QStringLiteral("audiogroup%1.dat").arg(group), audio.bytes);
+                build.externalData(QStringLiteral("audiogroup%1.dat").arg(group), [&](DataWriter &audio) {
+                    audio.append("FORM", 4);
+                    audio.u32(0);
+                    writeAudio(audio, group);
+                    audio.finish();
+                });
             }
             profile.start(QStringLiteral("Output file writing / transaction"));
             stage(QStringLiteral("Writing data.win and companion files..."));
@@ -147,8 +165,17 @@ CompileResult ProjectCompiler::compile(
                 build.externalFile(name == QStringLiteral("Runner.exe") ? QFileInfo(executablePath).fileName() : name,
                     runtime.filePath(name));
             QString iconPath = build.options.value(QStringLiteral("option_windows_game_icon")).trimmed();
-            if (!iconPath.isEmpty())
+            if (!iconPath.isEmpty()) {
                 iconPath = QFileInfo(request.project.filePath()).absoluteDir().absoluteFilePath(iconPath.replace('\\', '/'));
+                // A missing optional project icon leaves the freshly copied
+                // Runner's built-in icon intact. Existing invalid icons still
+                // report their read/format errors when replaced below.
+                if (!QFileInfo::exists(iconPath)) {
+                    progress(QStringLiteral("WARNING: Game icon not found: %1. Using the Runner's default icon.")
+                            .arg(iconPath), completedStages - 1, StageCount);
+                    iconPath.clear();
+                }
+            }
             // The Windows Runner checks for splash.png on startup. Omitting a
             // disabled splash from this build must also remove the previous one.
             bool hasSplash = false;
@@ -162,9 +189,6 @@ CompileResult ProjectCompiler::compile(
                     throw CompileError(error);
                 result.files.append(path);
             }
-            const QString data = output.absoluteFilePath("data.win");
-            if (!transaction.write(data, build.file.bytes, error))
-                throw CompileError(error);
             if (!iconPath.isEmpty() && !RunnerIcon::replace(executablePath, iconPath, error))
                 throw CompileError(error);
             result.files.prepend(data);

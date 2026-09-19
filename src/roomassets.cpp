@@ -114,6 +114,7 @@ RoomVisual RoomAssets::background(const QString &name)
     if (cached != m_visualCache.constEnd()) return cached.value();
     const ResourceNode node = m_backgrounds.value(name); const QDomElement root = readRoomAsset(node.filePath);
     RoomVisual visual; visual.image = roomAssetImage(node.filePath, ActionXml::text(root, QStringLiteral("data")));
+    visual.tileset = ActionXml::text(root, QStringLiteral("istileset")).toInt() != 0;
     visual.tileSize = QSize(qMax(1, ActionXml::text(root, QStringLiteral("tilewidth")).toInt()), qMax(1, ActionXml::text(root, QStringLiteral("tileheight")).toInt()));
     visual.tileOffset = QPoint(ActionXml::text(root, QStringLiteral("tilexoff")).toInt(), ActionXml::text(root, QStringLiteral("tileyoff")).toInt());
     visual.tileSeparation = QPoint(ActionXml::text(root, QStringLiteral("tilehsep")).toInt(), ActionXml::text(root, QStringLiteral("tilevsep")).toInt());

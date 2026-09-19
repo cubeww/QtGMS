@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QRect>
 #include <QMap>
+#include <QTemporaryFile>
 class CompileProfile;
 
 struct TextureSettings
@@ -17,7 +18,7 @@ struct TextureSettings
 
 struct CompiledTextureEntry
 {
-    QImage image;
+    qint64 pixelOffset = 0;
     QSize original;
     QRect crop;
     QPoint position;
@@ -50,6 +51,7 @@ private:
     QVector<CompiledTextureEntry> m_entries;
     QVector<CompiledTexturePage> m_pages;
     QHash<QByteArray, int> m_duplicates;
+    QTemporaryFile m_pixelData;
     QMap<QString, QString> m_options;
     QString m_cacheDirectory;
     void pack(int pageSize);

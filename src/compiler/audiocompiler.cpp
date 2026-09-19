@@ -40,9 +40,9 @@ struct AudioEncoderState
 static DataWriter createWaveHeader(int channels, int sampleRate, int bitDepth)
 {
     DataWriter wave;
-    wave.bytes.append("RIFF", 4);
+    wave.append("RIFF", 4);
     wave.u32(0);
-    wave.bytes.append("WAVEfmt ", 8);
+    wave.append("WAVEfmt ", 8);
     wave.u32(16);
     wave.u16(1);
     wave.u16(channels);
@@ -50,7 +50,7 @@ static DataWriter createWaveHeader(int channels, int sampleRate, int bitDepth)
     wave.u32(sampleRate * channels * bitDepth / 8);
     wave.u16(channels * bitDepth / 8);
     wave.u16(bitDepth);
-    wave.bytes.append("data", 4);
+    wave.append("data", 4);
     wave.u32(0);
     return wave;
 }
@@ -72,7 +72,7 @@ QByteArray compileAudio(
         for (int channel = 0; channel < channels; ++channel)
             silent.u16(0);
         finishWave(silent);
-        return compileAudio(silent.bytes, encoding, channels, sampleRate, bitRate, bitDepth);
+        return compileAudio(silent.bytes(), encoding, channels, sampleRate, bitRate, bitDepth);
     }
     AudioEncoderState state;
     const ma_decoder_config config
@@ -104,7 +104,7 @@ QByteArray compileAudio(
             }
         }
         finishWave(wave);
-        return wave.bytes;
+        return wave.bytes();
     }
     if (encoding == AudioEncoding::Mp3) {
         state.mp3 = lame_init();

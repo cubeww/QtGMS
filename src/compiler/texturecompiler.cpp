@@ -74,11 +74,18 @@ int TextureCompiler::add(const QImage &source, int group, const TextureSettings 
         }
         entry.crop = right < left ? QRect(0, 0, 1, 1) : QRect(QPoint(left, top), QPoint(right, bottom));
     }
-    entry.image = image.copy(entry.crop);
-    if (entry.image.isNull())
+    const QImage cropped = image.copy(entry.crop);
+    if (cropped.isNull())
         throw CompileError(QStringLiteral("Cannot allocate a cropped texture (%1 x %2).")
                 .arg(entry.crop.width())
                 .arg(entry.crop.height()));
+    // Keep only packing metadata in memory. Decoded pixels from all resources
+    // can exceed the 32-bit address space before the first page is assembled.
+    if (!m_pixelData.isOpen() && !m_pixelData.open())
+        throw CompileError(QStringLiteral("Cannot create temporary texture storage: %1").arg(m_pixelData.errorString()));
+    entry.pixelOffset = m_pixelData.pos();
+    if (m_pixelData.write(reinterpret_cast<const char *>(cropped.constBits()), cropped.byteCount()) != cropped.byteCount())
+        throw CompileError(QStringLiteral("Cannot store compiled texture pixels: %1").arg(m_pixelData.errorString()));
     const int index = m_entries.size();
     m_entries.append(entry);
     m_duplicates.insert(key, index);
@@ -100,13 +107,13 @@ void TextureCompiler::pack(int pageSize)
         const auto &left = m_entries.at(a), &right = m_entries.at(b);
         if (left.settings.separate != right.settings.separate)
             return left.settings.separate;
-        return left.group != right.group ? left.group < right.group : left.image.height() > right.image.height();
+        return left.group != right.group ? left.group < right.group : left.crop.height() > right.crop.height();
     });
     int currentGroup = -1, page = -1, x = 0, y = 0, rowHeight = 0;
     for (int index : order) {
         auto &entry = m_entries[index];
-        const int border = entry.border, width = entry.image.width() + 2 * border,
-                  height = entry.image.height() + 2 * border;
+        const int border = entry.border, width = entry.crop.width() + 2 * border,
+                  height = entry.crop.height() + 2 * border;
         int size = pageSize;
         while (size < qMax(width, height) && size < 8192)
             size *= 2;
@@ -147,8 +154,8 @@ void TextureCompiler::pack(int pageSize)
     QVector<QSize> used(m_pages.size(), QSize(1, 1));
     for (const auto &entry : m_entries)
         used[entry.page] = used.at(entry.page)
-                               .expandedTo(QSize(entry.position.x() + entry.image.width() + entry.border,
-                                   entry.position.y() + entry.image.height() + entry.border));
+                               .expandedTo(QSize(entry.position.x() + entry.crop.width() + entry.border,
+                                   entry.position.y() + entry.crop.height() + entry.border));
     for (int i = 0; i < m_pages.size(); ++i) {
         int width = 1, height = 1;
         while (width < used.at(i).width())
@@ -172,14 +179,21 @@ QImage TextureCompiler::renderPage(int pageIndex)
                 .arg(qint64(page.size.width()) * page.size.height() * 4 / (1024.0 * 1024.0), 0, 'f', 1));
     image.fill(Qt::transparent);
     for (int index : page.entries) {
-        auto &entry = m_entries[index];
+        const auto &entry = m_entries.at(index);
+        QImage pixels(entry.crop.size(), QImage::Format_ARGB32);
+        if (pixels.isNull())
+            throw CompileError(QStringLiteral("Cannot allocate texture pixels (%1 x %2).")
+                    .arg(entry.crop.width()).arg(entry.crop.height()));
+        if (!m_pixelData.seek(entry.pixelOffset)
+            || m_pixelData.read(reinterpret_cast<char *>(pixels.bits()), pixels.byteCount()) != pixels.byteCount())
+            throw CompileError(QStringLiteral("Cannot read compiled texture pixels: %1").arg(m_pixelData.errorString()));
         const int border = entry.border;
         QPainter painter(&image);
         painter.setCompositionMode(QPainter::CompositionMode_Source);
-        painter.drawImage(entry.position, entry.image);
+        painter.drawImage(entry.position, pixels);
         // Tiled axes wrap; other axes repeat the nearest edge. Draw only the
         // border so the hot path remains a single image copy per frame.
-        const int w = entry.image.width(), h = entry.image.height();
+        const int w = pixels.width(), h = pixels.height();
         painter.end();
         const auto sourceX = [&](int coordinate) {
             return entry.settings.tileHorizontal ? (coordinate % w + w) % w : qBound(0, coordinate, w - 1);
@@ -189,7 +203,7 @@ QImage TextureCompiler::renderPage(int pageIndex)
         };
         for (int row = -border; !entry.settings.emptyBorder && row < h + border; ++row) {
             auto *destination = reinterpret_cast<QRgb *>(image.scanLine(entry.position.y() + row)) + entry.position.x();
-            const auto *source = reinterpret_cast<const QRgb *>(entry.image.constScanLine(sourceY(row)));
+            const auto *source = reinterpret_cast<const QRgb *>(pixels.constScanLine(sourceY(row)));
             if (row < 0 || row >= h) {
                 for (int column = -border; column < w + border; ++column)
                     destination[column] = source[sourceX(column)];
@@ -199,8 +213,6 @@ QImage TextureCompiler::renderPage(int pageIndex)
                     destination[w + column - 1] = source[sourceX(w + column - 1)];
                 }
         }
-        // TPAG has already been written; this source image is no longer needed.
-        entry.image = QImage();
     }
     return image;
 }
@@ -212,8 +224,8 @@ void TextureCompiler::write(DataWriter &file, int pageSize)
             const auto &entry = m_entries.at(i);
             for (int patch : entry.patches)
                 file.patch(patch, file.position());
-            for (int value : { entry.position.x(), entry.position.y(), entry.image.width(), entry.image.height(),
-                     entry.crop.x(), entry.crop.y(), entry.image.width(), entry.image.height(), entry.original.width(),
+            for (int value : { entry.position.x(), entry.position.y(), entry.crop.width(), entry.crop.height(),
+                     entry.crop.x(), entry.crop.y(), entry.crop.width(), entry.crop.height(), entry.original.width(),
                      entry.original.height(), entry.page })
                 file.u16(value);
         });
@@ -251,7 +263,7 @@ void TextureCompiler::writePages(DataWriter &file, CompileProfile &profile)
             CompileDetailScope timing(profile, QStringLiteral("PNG data serialization"));
             file.align(128);
             file.patch(pointers.at(i), file.position());
-            file.bytes.append(png);
+            file.append(png);
         }
     });
 }

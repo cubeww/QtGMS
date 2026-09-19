@@ -25,6 +25,7 @@ public:
     void setProject(const Project &project);
     void setConfiguration(const ProjectConfiguration *configuration);
     void refreshIcons(const Project &project);
+    void refreshResourceIcons(const Project &project, ResourceType type, const QString &filePath);
     QList<int> selectedGroupPath(ResourceType type) const;
     void addResource(const ResourceNode &resource, const QList<int> &groupPath);
     void refreshInformation(const Project &project);

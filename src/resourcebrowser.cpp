@@ -501,6 +501,25 @@ void ResourceBrowser::refreshIcons(const Project &project)
     updateActions();
 }
 
+void ResourceBrowser::refreshResourceIcons(const Project &project, ResourceType type, const QString &filePath)
+{
+    if (type != ResourceType::Sprite && type != ResourceType::Background && type != ResourceType::Object) return;
+    QHash<QString, const ResourceNode *> byPath;
+    indexResourceNodes(project.resources(type), byPath);
+    const ResourceNode *savedResource = byPath.value(filePath, nullptr);
+    if (!savedResource) return;
+    // Saving an image can replace pixels without changing its path. An object
+    // only changes its sprite reference and can reuse the cached thumbnail.
+    if (type != ResourceType::Object) m_thumbnailIcons.remove(savedResource->thumbnailPath);
+    if (type == ResourceType::Sprite) indexResourceNodes(project.resources(ResourceType::Object), byPath);
+    for (QTreeWidgetItemIterator it(m_resourceTree); *it; ++it) {
+        const ResourceNode *node = byPath.value((*it)->data(0, FilePathRole).toString(), nullptr);
+        if (node && (node == savedResource || (type == ResourceType::Sprite
+                && node->type == ResourceType::Object && node->spriteName == savedResource->name)))
+            (*it)->setIcon(0, resourceIcon(*node));
+    }
+}
+
 void ResourceBrowser::relocatePaths(const QString &oldDirectory, const QString &newDirectory)
 {
     for (QTreeWidgetItemIterator it(m_resourceTree); *it; ++it) {
