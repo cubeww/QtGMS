@@ -241,10 +241,20 @@ void CodeCompletion::accept(const QModelIndex &index)
     if (!token(query, start, end) || query != m_query || start != m_start) { dismiss(); return; }
     const int itemIndex = index.data(ItemIndexRole).toInt();
     if (itemIndex < 0 || itemIndex >= m_items.size()) return;
-    const QString name = m_items.at(itemIndex).name;
+    const auto item = m_items.at(itemIndex);
+    const QString name = item.name;
     dismiss();
-    QTextCursor cursor = m_editor->textCursor(); cursor.beginEditBlock();
-    cursor.setPosition(start); cursor.setPosition(end, QTextCursor::KeepAnchor); cursor.insertText(name);
+    QTextCursor cursor = m_editor->textCursor();
+    const QString snippet = item.kind == CodeCompletionItem::Kind::Keyword ? m_editor->codeSnippet(name) : QString();
+    const QString line = cursor.block().text();
+    const int blockStart = cursor.block().position();
+    cursor.setPosition(start); cursor.setPosition(end, QTextCursor::KeepAnchor);
+    // Completing inside existing code must preserve its condition and body.
+    if (!snippet.isEmpty() && line.left(start - blockStart).trimmed().isEmpty()
+        && line.mid(end - blockStart).trimmed().isEmpty()) {
+        m_editor->setTextCursor(cursor); m_editor->insertCodeSnippet(snippet); return;
+    }
+    cursor.beginEditBlock(); cursor.insertText(name);
     cursor.endEditBlock(); m_editor->setTextCursor(cursor); m_editor->ensureCursorVisible();
 }
 
@@ -274,6 +284,9 @@ bool CodeCompletion::eventFilter(QObject *watched, QEvent *event)
     if (watched == m_completer->popup() && event->type() == QEvent::KeyPress) {
         const auto *key = static_cast<QKeyEvent *>(event);
         const auto modifiers = key->modifiers() & ~Qt::KeypadModifier;
+        if (key->key() == Qt::Key_F2 && modifiers == Qt::NoModifier && m_editor->hasCodeSnippets()) {
+            dismiss(); m_editor->showCodeSnippets(); event->accept(); return true;
+        }
         if (key->key() == Qt::Key_Delete && modifiers == Qt::ShiftModifier) {
             dismiss(); m_editor->deleteLines(); event->accept(); return true;
         }
@@ -297,6 +310,7 @@ bool CodeCompletion::eventFilter(QObject *watched, QEvent *event)
     if ((watched == m_editor || watched == m_completer->popup()) && event->type() == QEvent::ShortcutOverride) {
         const auto *key = static_cast<QKeyEvent *>(event);
         const auto modifiers = key->modifiers() & ~Qt::KeypadModifier;
+        if (key->key() == Qt::Key_F2 && modifiers == Qt::NoModifier && m_editor->hasCodeSnippets()) { event->accept(); return true; }
         if (key->key() == Qt::Key_Delete && modifiers == Qt::ShiftModifier) { event->accept(); return true; }
         if ((key->key() == Qt::Key_Up || key->key() == Qt::Key_Down)
             && (modifiers == Qt::AltModifier || modifiers == (Qt::AltModifier | Qt::ShiftModifier))) {

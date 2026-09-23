@@ -1,5 +1,6 @@
 #include "editorstandarddialogs.h"
 #include "resourcebrowser.h"
+#include "resourcemimedata.h"
 
 #include "resourceitemdelegate.h"
 
@@ -58,7 +59,10 @@ protected:
         auto *item = currentItem();
         if (!item || !(item->flags() & Qt::ItemIsDragEnabled) || item->data(0, ResourceTypeRole).toInt() >= static_cast<int>(ResourceType::Macro)) return;
         m_dragged = indexFromItem(item);
-        QDrag drag(this); drag.setMimeData(mimeData({item})); drag.setPixmap(item->icon(0).pixmap(16, 16));
+        auto *data = mimeData({item});
+        if (static_cast<ResourceItemKind>(item->data(0, ItemKindRole).toInt()) == ResourceItemKind::Resource)
+            data->setData(QLatin1String(ResourceReferenceMime), item->data(0, FilePathRole).toString().toUtf8());
+        QDrag drag(this); drag.setMimeData(data); drag.setPixmap(item->icon(0).pixmap(16, 16));
         drag.exec(Qt::MoveAction | Qt::CopyAction, Qt::MoveAction); m_dragged = QPersistentModelIndex();
     }
     bool destination(const QPoint &position, QTreeWidgetItem *&parent, int &row) {

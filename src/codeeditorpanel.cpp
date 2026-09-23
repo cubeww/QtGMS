@@ -109,6 +109,12 @@ CodeEditorPanel::CodeEditorPanel(QTextDocument *document, QWidget *parent)
             this, [this] { m_findPanel->find(true); });
     menu->addSeparator();
     connect(action(tr("Indent"), QString(), QKeySequence(), false), &QAction::triggered, this, [this] { m_editor->indentSelection(); });
+    auto *snippets = menu->addAction(tr("Code Snippets") + QStringLiteral("\tF2"));
+    connect(snippets, &QAction::triggered, m_editor, &CodeEditor::showCodeSnippets);
+    connect(menu, &QMenu::aboutToShow, this, [this, snippets] {
+        snippets->setVisible(m_editor->hasCodeSnippets());
+        snippets->setEnabled(!m_editor->isReadOnly());
+    });
     connect(action(tr("Unindent"), QString(), QKeySequence(), false), &QAction::triggered, this, [this] { m_editor->indentSelection(true); });
     connect(action(tr("Toggle Line Comment"), QString(), QKeySequence(Qt::CTRL | Qt::Key_Slash), false), &QAction::triggered,
             this, [this] { m_editor->toggleLineComment(m_lineCommentPrefix); });

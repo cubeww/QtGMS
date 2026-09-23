@@ -457,6 +457,10 @@
     <context>
         <name>CodeEditorPanel</name>
         <message>
+            <source>Code Snippets</source>
+            <translation>代码片段</translation>
+        </message>
+        <message>
             <source>%1 pt</source>
             <translation>%1 pt</translation>
         </message>

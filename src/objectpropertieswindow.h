@@ -31,7 +31,10 @@ signals:
     void createSpriteRequested();
 protected:
     void closeEvent(QCloseEvent *event) override;
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
 private:
+    void selectEventIndex(int index);
     void refresh();
     void refreshResources();
     void refreshEventIcons();

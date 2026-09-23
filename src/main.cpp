@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     }
     application.setApplicationName(QStringLiteral("QtGMS"));
     application.setOrganizationName(QStringLiteral("QtGMS"));
-    application.setApplicationVersion(QStringLiteral("0.2.5"));
+    application.setApplicationVersion(QStringLiteral("0.2.6"));
     application.setWindowIcon(QIcon(QStringLiteral(":/images/application.ico")));
     EditorLanguage::install(application);
     EditorTheme::apply(application);

@@ -4,6 +4,7 @@
 #include <QPlainTextEdit>
 #include "codecompletionitem.h"
 #include "codeeditorsettings.h"
+#include "codesnippets.h"
 #include <QVector>
 
 class CodeCompletion;
@@ -22,6 +23,11 @@ public:
     void goToLine(int line);
     void setCompletionItems(const QVector<CodeCompletionItem> &items);
     void requestCompletion();
+    void showCodeSnippets();
+    void insertCodeSnippet(const QString &text);
+    void setCodeSnippets(const QVector<CodeSnippet> &snippets) { m_snippets = snippets; }
+    bool hasCodeSnippets() const { return !m_snippets.isEmpty(); }
+    QString codeSnippet(const QString &keyword) const;
     void moveLines(bool down);
     void duplicateLines(bool down);
     void deleteLines();
@@ -30,6 +36,7 @@ signals:
     void insertModeChanged(bool overwrite);
     void signatureHelpChanged(const QString &text, int parameterStart, int parameterLength);
 protected:
+    bool event(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -52,6 +59,7 @@ private:
     QList<QTextEdit::ExtraSelection> m_searchHighlights;
     int m_indentSize;
     CodeEditorOptions m_options;
+    QVector<CodeSnippet> m_snippets;
     bool m_highlightsPending = false;
     CodeCompletion *m_completion = nullptr;
     CodeSignatureHelp *m_signatureHelp;

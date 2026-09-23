@@ -3,6 +3,7 @@
 #include "project.h"
 #include <QComboBox>
 #include <QMenu>
+class QMimeData;
 
 class ResourceSelectionMenu : public QMenu
 {
@@ -22,7 +23,10 @@ public:
                       const QStringList &excluded = QStringList());
     void showPopup() override;
     void showPopupAt(const QPoint &globalPosition);
+    int droppedResourceIndex(const QMimeData *data) const;
 protected:
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 private:

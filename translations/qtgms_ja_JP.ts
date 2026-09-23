@@ -457,6 +457,10 @@
     <context>
         <name>CodeEditorPanel</name>
         <message>
+            <source>Code Snippets</source>
+            <translation>コードスニペット</translation>
+        </message>
+        <message>
             <source>%1 pt</source>
             <translation>%1 pt</translation>
         </message>

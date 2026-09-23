@@ -30,6 +30,7 @@ ScriptEditorWindow::ScriptEditorWindow(TextFileDocument *document, const Project
     m_codePanel->setCodeTab(document->name());
     m_codePanel->setFormatDescription(document->formatDescription());
     m_codePanel->editor()->setCompletionItems(GmlSymbols::completionItems(project));
+    m_codePanel->editor()->setCodeSnippets(CodeSnippets::items());
     // Closing a script unregisters its document during widget destruction.
     // Refresh surviving controls on the next event-loop turn; Qt drops the
     // queued call if this editor has been deleted in the meantime.

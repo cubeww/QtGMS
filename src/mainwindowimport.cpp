@@ -127,7 +127,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     while (ancestor && ancestor != this) ancestor = ancestor->parentWidget();
     if (!ancestor) return EditorWindow::eventFilter(watched, event);
     auto *drop = static_cast<QDropEvent *>(event);
-    if (!drop->mimeData()->hasUrls()) return EditorWindow::eventFilter(watched, event);
+    if (drop->source() || !drop->mimeData()->hasUrls()) return EditorWindow::eventFilter(watched, event);
 
     // Consume external URLs before child text/graphics views or the resource tree
     // interpret them. Internal resource/action drags retain their existing handlers.

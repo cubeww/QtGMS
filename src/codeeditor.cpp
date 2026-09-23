@@ -313,6 +313,9 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
 {
     if (m_completion && m_completion->handleKeyPress(event)) { event->accept(); return; }
     const Qt::KeyboardModifiers modifiers = event->modifiers() & ~Qt::KeypadModifier;
+    if (event->key() == Qt::Key_F2 && modifiers == Qt::NoModifier && hasCodeSnippets()) {
+        showCodeSnippets(); event->accept(); return;
+    }
     if (event->key() == Qt::Key_Delete && modifiers == Qt::ShiftModifier) {
         deleteLines(); event->accept(); return;
     }
@@ -349,6 +352,19 @@ void CodeEditor::keyPressEvent(QKeyEvent *event)
         insertIndentedLine(); event->accept(); return;
     }
     QPlainTextEdit::keyPressEvent(event);
+}
+
+bool CodeEditor::event(QEvent *event)
+{
+    // F2 belongs to snippets while editing code, rather than the enclosing
+    // resource window's Rename shortcut.
+    if (event->type() == QEvent::ShortcutOverride) {
+        const auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_F2 && key->modifiers() == Qt::NoModifier && hasCodeSnippets()) {
+            event->accept(); return true;
+        }
+    }
+    return QPlainTextEdit::event(event);
 }
 
 void CodeEditor::moveLines(bool down) { editLines(down, false); }

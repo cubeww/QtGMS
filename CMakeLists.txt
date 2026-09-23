@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(QtGMS VERSION 0.2.5 LANGUAGES CXX)
+project(QtGMS VERSION 0.2.6 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -45,6 +45,7 @@ add_library(qtgmscompiler STATIC
     src/compiler/texturecompiler.cpp
     src/compiler/projectcompiler.cpp
     src/compiler/runnericon.cpp
+    src/compiler/runnerversion.cpp
     src/compiler/compilejob.cpp
     src/compiler/compilercache.cpp
     src/compiler/fasthash.cpp
@@ -78,6 +79,7 @@ add_executable(QtGMS WIN32
     src/project.cpp
     src/resourceselector.cpp
     src/resourceselector.h
+    src/resourcemimedata.h
     src/resourcereferences.cpp
     src/resourcereferences.h
     src/projectfiletransaction.cpp
@@ -174,6 +176,9 @@ add_executable(QtGMS WIN32
     src/textfiledocument.cpp
     src/textfiledocument.h
     src/codeeditor.cpp
+    src/codeeditorsnippets.cpp
+    src/codesnippets.cpp
+    src/codesnippets.h
     src/codeeditor.h
     src/codeblockdata.h
     src/codecompletionitem.h

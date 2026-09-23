@@ -3,6 +3,7 @@
 #include "builddirectory.h"
 #include "projectfiletransaction.h"
 #include "runnericon.h"
+#include "runnerversion.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
@@ -208,6 +209,8 @@ CompileResult ProjectCompiler::compile(
                 result.files.append(path);
             }
             if (!iconPath.isEmpty() && !RunnerIcon::replace(executablePath, iconPath, error))
+                throw CompileError(error);
+            if (!RunnerVersion::replace(executablePath, build.options, error))
                 throw CompileError(error);
             result.files.prepend(data);
             profile.start(QStringLiteral("Releasing compiler data"));

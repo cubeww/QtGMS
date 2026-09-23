@@ -38,6 +38,7 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     m_codePanel = new CodeEditorPanel(m_document, this);
     connect(m_codePanel->editor(), &CodeEditor::identifierActivated, this, &EditorWindow::resourceNameActivated);
     m_codePanel->editor()->setCompletionItems(GmlSymbols::instance().items);
+    m_codePanel->editor()->setCodeSnippets(CodeSnippets::items());
     auto *codeEditor = m_codePanel->editor();
     connect(&GmlSymbols::instance(), &GmlSymbols::scriptSignaturesChanged, codeEditor, [this, codeEditor] {
         if (m_project) {

@@ -17,6 +17,8 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGridLayout>
@@ -65,17 +67,39 @@ static bool sameObjectEvent(QDomElement a, QDomElement b)
         && a.attribute(QStringLiteral("enumb")) == b.attribute(QStringLiteral("enumb"))
         && a.attribute(QStringLiteral("ename")) == b.attribute(QStringLiteral("ename"));
 }
+
+static QStringList objectEventKey(QDomElement event)
+{
+    return {event.attribute(QStringLiteral("eventtype")), event.attribute(QStringLiteral("enumb")),
+        event.attribute(QStringLiteral("ename"))};
+}
+
+class ObjectEventItem : public QListWidgetItem
+{
+public:
+    bool operator<(const QListWidgetItem &other) const override
+    {
+        const QStringList left = data(Qt::UserRole + 1).toStringList();
+        const QStringList right = other.data(Qt::UserRole + 1).toStringList();
+        if (left.at(0).toInt() != right.at(0).toInt()) return left.at(0).toInt() < right.at(0).toInt();
+        if (left.at(1).toInt() != right.at(1).toInt()) return left.at(1).toInt() < right.at(1).toInt();
+        const int comparison = QString::compare(left.at(2), right.at(2), Qt::CaseInsensitive);
+        return comparison ? comparison < 0 : left.at(2) < right.at(2);
+    }
+};
+
 ObjectPropertiesWindow::ObjectPropertiesWindow(ObjectDocument *document, Project *project, ActionLibraryManager *libraries, QWidget *parent)
     : ResourceEditorWindow(parent), m_document(document), m_project(project), m_libraries(libraries),
       m_events(new QListWidget), m_actionEditor(new ActionEditorPanel(project, libraries, document->undoStack())),
       m_sprite(new ObjectSpriteComboBox), m_parent(new ResourceComboBox), m_mask(new ResourceComboBox), m_depth(new QSpinBox), m_spritePreview(new QLabel), m_children(new QListWidget)
 {
-    document->setParent(this); setAttribute(Qt::WA_DeleteOnClose); editorMenuBar()->hide(); resize(814, 378); setMinimumSize(720, 376);
+    document->setParent(this); setAttribute(Qt::WA_DeleteOnClose); setAcceptDrops(true); editorMenuBar()->hide(); resize(814, 378); setMinimumSize(720, 376);
     auto *body = new QWidget; auto *layout = new QHBoxLayout(body); layout->setContentsMargins(0, 0, 0, 0); layout->setSpacing(3);
     auto *properties = new QWidget; properties->setObjectName(QStringLiteral("objectProperties")); properties->setFixedWidth(165); properties->setMinimumHeight(342);
     properties->setStyleSheet(QStringLiteral("QCheckBox::indicator { width: 10px; height: 10px; } QCheckBox { spacing: 3px; } QLineEdit, QSpinBox { border: 1px solid #777773; padding: 0; } QComboBox { border: 1px solid #aaaaa0; padding: 0; background: #383838; } QComboBox::drop-down { width: 0; border: none; } QComboBox::down-arrow { image: none; }"));
     const auto place = [properties](QWidget *widget, int x, int y, int width, int height) { widget->setParent(properties); widget->setGeometry(x, y, width, height); };
     auto *name = new QLineEdit(document->name()); enableResourceRenaming(name, ResourceType::Object); auto *nameLabel = new QLabel(tr("&Name:")); nameLabel->setBuddy(name);
+    name->setAcceptDrops(false);
     place(nameLabel, 5, 8, 39, 19); place(name, 46, 8, 113, 19);
     auto *spriteGroup = new QGroupBox(tr("Sprite")); place(spriteGroup, 5, 32, 154, 74);
     m_spritePreview->setParent(spriteGroup); m_spritePreview->setGeometry(6, 20, 17, 17);
@@ -194,13 +218,24 @@ void ObjectPropertiesWindow::refresh()
     m_mask->setCurrentIndex(m_mask->findData(ActionXml::text(root, QStringLiteral("maskName")))); m_depth->setValue(ActionXml::text(root, QStringLiteral("depth")).toInt());
     for (auto it = m_flags.constBegin(); it != m_flags.constEnd(); ++it) it.value()->setChecked(ActionXml::text(root, it.key()).toInt() != 0);
     m_spritePreview->setPixmap(m_sprite->itemIcon(m_sprite->currentIndex()).pixmap(17, 17));
-    const int row = m_events->currentRow(); m_events->clear();
+    const int row = m_events->currentRow();
+    const QStringList selectedKey = m_events->currentItem() ? m_events->currentItem()->data(Qt::UserRole + 1).toStringList() : QStringList();
+    m_events->clear();
+    int sourceIndex = 0;
+    QListWidgetItem *selected = nullptr;
     for (QDomElement event : ActionXml::elements(root.firstChildElement(QStringLiteral("events")), QStringLiteral("event"))) {
-        auto *item = new QListWidgetItem(ObjectEventDialog::eventName(event), m_events); item->setSizeHint(QSize(0, 20));
+        auto *item = new ObjectEventItem;
+        item->setText(ObjectEventDialog::eventName(event)); item->setSizeHint(QSize(0, 20));
+        item->setData(Qt::UserRole, sourceIndex++);
+        item->setData(Qt::UserRole + 1, objectEventKey(event));
         item->setIcon(ObjectEventDialog::eventIcon(event));
+        m_events->addItem(item);
+        if (objectEventKey(event) == selectedKey) selected = item;
     }
+    m_events->sortItems();
     refreshEventIcons();
-    if (m_events->count()) m_events->setCurrentRow(qBound(0, row, m_events->count() - 1));
+    if (selected) m_events->setCurrentItem(selected);
+    else if (m_events->count()) m_events->setCurrentRow(qBound(0, row, m_events->count() - 1));
     m_refreshing = false; refreshActions();
 }
 void ObjectPropertiesWindow::refreshEventIcons()
@@ -211,7 +246,7 @@ void ObjectPropertiesWindow::refreshEventIcons()
     const auto events = ActionXml::elements(m_document->xml().documentElement().firstChildElement(QStringLiteral("events")), QStringLiteral("event"));
     const qreal ratio = m_events->devicePixelRatioF();
     for (int row = 0; row < events.size() && row < m_events->count(); ++row) {
-        const auto &event = events.at(row);
+        const auto &event = events.at(m_events->item(row)->data(Qt::UserRole).toInt());
         if (event.attribute(QStringLiteral("eventtype")).toInt() != 4) continue;
         const QString target = event.attribute(QStringLiteral("ename"));
         QIcon spriteIcon;
@@ -234,7 +269,8 @@ void ObjectPropertiesWindow::refreshEventIcons()
 }
 QDomElement ObjectPropertiesWindow::selectedEvent(QDomDocument &xml) const
 {
-    const auto events = ActionXml::elements(xml.documentElement().firstChildElement(QStringLiteral("events")), QStringLiteral("event")); const int row = m_events->currentRow();
+    const auto events = ActionXml::elements(xml.documentElement().firstChildElement(QStringLiteral("events")), QStringLiteral("event"));
+    const int row = m_events->currentItem() ? m_events->currentItem()->data(Qt::UserRole).toInt() : -1;
     return row >= 0 && row < events.size() ? events.at(row) : QDomElement();
 }
 void ObjectPropertiesWindow::refreshActions()
@@ -245,9 +281,18 @@ void ObjectPropertiesWindow::refreshActions()
 void ObjectPropertiesWindow::showAction(int eventIndex, int actionIndex, int offset, int length, int argument)
 {
     if (eventIndex < 0 || eventIndex >= m_events->count()) return;
-    m_events->setCurrentRow(eventIndex);
+    selectEventIndex(eventIndex);
     refreshActions();
     m_actionEditor->openAction(actionIndex, offset, length, argument);
+}
+void ObjectPropertiesWindow::selectEventIndex(int index)
+{
+    for (int row = 0; row < m_events->count(); ++row) {
+        if (m_events->item(row)->data(Qt::UserRole).toInt() == index) {
+            m_events->setCurrentRow(row);
+            return;
+        }
+    }
 }
 void ObjectPropertiesWindow::applyProperties()
 {
@@ -268,7 +313,7 @@ void ObjectPropertiesWindow::editEvent(bool change, bool duplicate)
     for (QDomElement existing : ActionXml::elements(events, QStringLiteral("event"))) {
         if (sameObjectEvent(existing, event) && (!change || existing != previous)) { EditorMessageBox::information(this, tr("Object Event"), tr("This event already exists.")); return; }
     }
-    int row = m_events->currentRow();
+    int row = m_events->currentItem() ? m_events->currentItem()->data(Qt::UserRole).toInt() : -1;
     if (change || duplicate) {
         QDomElement copy = previous.cloneNode(true).toElement(); copy.setAttribute(QStringLiteral("eventtype"), event.attribute(QStringLiteral("eventtype")));
         copy.removeAttribute(QStringLiteral("enumb")); copy.removeAttribute(QStringLiteral("ename"));
@@ -276,7 +321,7 @@ void ObjectPropertiesWindow::editEvent(bool change, bool duplicate)
     }
     if (change) events.replaceChild(event, previous); else { row = ActionXml::elements(events, QStringLiteral("event")).size(); events.appendChild(event); }
     if (duplicate) ActionXml::clearEditorIds(event);
-    m_document->edit(xml, change ? tr("Change event") : duplicate ? tr("Duplicate event") : tr("Add event")); m_events->setCurrentRow(row);
+    m_document->edit(xml, change ? tr("Change event") : duplicate ? tr("Duplicate event") : tr("Add event")); selectEventIndex(row);
 }
 void ObjectPropertiesWindow::deleteEvent()
 {
@@ -310,6 +355,25 @@ void ObjectPropertiesWindow::updateResources()
 void ObjectPropertiesWindow::setSpriteName(const QString &name)
 {
     updateResources(); m_sprite->setCurrentIndex(m_sprite->findData(name));
+}
+void ObjectPropertiesWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if ((event->possibleActions() & Qt::CopyAction)
+        && (m_sprite->droppedResourceIndex(event->mimeData()) >= 0 || m_parent->droppedResourceIndex(event->mimeData()) >= 0)) {
+        event->setDropAction(Qt::CopyAction); event->accept();
+    } else event->ignore();
+}
+void ObjectPropertiesWindow::dropEvent(QDropEvent *event)
+{
+    if (!(event->possibleActions() & Qt::CopyAction)) { event->ignore(); return; }
+    for (auto *combo : {m_sprite, m_parent}) {
+        const int index = combo->droppedResourceIndex(event->mimeData());
+        if (index < 0) continue;
+        combo->setCurrentIndex(index);
+        event->setDropAction(Qt::CopyAction); event->accept();
+        return;
+    }
+    event->ignore();
 }
 void ObjectPropertiesWindow::showInformation()
 {

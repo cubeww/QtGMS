@@ -1,4 +1,5 @@
 #include "resourceselector.h"
+#include "resourcemimedata.h"
 #include <QKeyEvent>
 #include <QPointer>
 #include <QSet>
@@ -7,6 +8,10 @@
 #include <QImageReader>
 #include <QFileInfo>
 #include <QDateTime>
+#include <QDir>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QPixmapCache>
 #include <QPainter>
 #include <QStandardItemModel>
@@ -46,6 +51,7 @@ static QIcon resourceMenuIcon(const ResourceNode &node)
 }
 
 static const int ResourceThumbnailRole = Qt::UserRole + 1;
+static const int ResourcePathRole = Qt::UserRole + 2;
 
 static void configureResourceMenu(QMenu *menu)
 {
@@ -96,6 +102,7 @@ ResourceSelectionMenu::ResourceSelectionMenu(const QList<ResourceNode> &resource
 
 ResourceComboBox::ResourceComboBox(QWidget *parent) : QComboBox(parent)
 {
+    setAcceptDrops(true);
     setMinimumContentsLength(8); setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     connect(this, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &ResourceComboBox::updateCurrentIcon);
@@ -126,7 +133,10 @@ void ResourceComboBox::setResources(const Project &project, ResourceType type, c
     std::function<void(const QList<ResourceNode> &)> append = [&](const QList<ResourceNode> &nodes) {
         for (const auto &node : nodes) {
             if (node.isGroup) append(node.children);
-            else if (!excluded.contains(node.name)) appendChoice(node.name, node.name, node.thumbnailPath, true);
+            else if (!excluded.contains(node.name)) {
+                appendChoice(node.name, node.name, node.thumbnailPath, true);
+                choices->item(choices->rowCount() - 1)->setData(QDir::cleanPath(node.filePath), ResourcePathRole);
+            }
         }
     };
     append(m_resources);
@@ -189,3 +199,37 @@ void ResourceComboBox::keyPressEvent(QKeyEvent *event)
 }
 
 void ResourceComboBox::wheelEvent(QWheelEvent *event) { event->ignore(); }
+
+int ResourceComboBox::droppedResourceIndex(const QMimeData *data) const
+{
+    const QByteArray reference = data->data(QLatin1String(ResourceReferenceMime));
+    if (reference.isEmpty()) return -1;
+    const QString path = QDir::cleanPath(QString::fromUtf8(reference));
+    // Match only resources in this selector's project and type. Excluded
+    // resources (including the object itself as a parent) have no model row.
+    for (int index = 0; index < count(); ++index) {
+        if (itemData(index, ResourcePathRole).toString().compare(path, Qt::CaseInsensitive) == 0)
+            return index;
+    }
+    return -1;
+}
+
+void ResourceComboBox::dragEnterEvent(QDragEnterEvent *event)
+{
+    if ((event->possibleActions() & Qt::CopyAction) && droppedResourceIndex(event->mimeData()) >= 0) {
+        event->setDropAction(Qt::CopyAction); event->accept();
+    } else event->ignore();
+}
+
+void ResourceComboBox::dropEvent(QDropEvent *event)
+{
+    const int index = droppedResourceIndex(event->mimeData());
+    if (index < 0 || !(event->possibleActions() & Qt::CopyAction)) { event->ignore(); return; }
+    event->setDropAction(Qt::CopyAction); event->accept();
+    const QPointer<ResourceComboBox> guard(this);
+    const QString text = itemText(index);
+    setCurrentIndex(index);
+    if (!guard) return;
+    emit activated(index);
+    if (guard) emit activated(text);
+}
