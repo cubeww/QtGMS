@@ -556,8 +556,8 @@ void MainWindow::renameResource(ResourceType type, const QString &filePath, cons
 
 bool MainWindow::closeResourceEditors()
 {
-    // A code transaction runs a nested event loop and commits to its host on
-    // return. Resource-wide operations must not delete that host underneath it.
+    // Modal code editors run a nested event loop with callbacks into their host.
+    // Resource-wide operations must not delete that host underneath them.
     for (auto *code : findChildren<CodeSnippetEditorWindow *>()) {
         if (code->isVisible() && code->windowModality() != Qt::NonModal) {
             EditorMessageBox::information(QApplication::activeModalWidget(), tr("Code Editor"),
@@ -885,7 +885,7 @@ void MainWindow::createMenusAndToolbar()
     connect(aboutAction, &QAction::triggered, this, [this] {
         EditorMessageBox::about(this, tr("About QtGMS"),
             QStringLiteral("<p>%1</p><p><a href=\"https://github.com/cubeww/QtGMS\">https://github.com/cubeww/QtGMS</a></p>")
-                .arg(tr("QtGMS 0.2.7\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
+                .arg(tr("QtGMS 0.2.8\nA GameMaker Studio-style editor.").toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"))));
     });
 
     auto *toolbar = new QToolBar(tr("Main Toolbar"), this);

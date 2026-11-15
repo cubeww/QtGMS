@@ -2,6 +2,7 @@
 #define QTGMS_ACTIONEDITORPANEL_H
 #include <QWidget>
 #include <QDomDocument>
+#include <functional>
 class Project;
 class ActionLibraryManager;
 struct LibraryAction;
@@ -23,12 +24,14 @@ public:
 signals:
     void actionsEdited(const QDomElement &container, const QString &description);
     void codeActionRequested(int row, int offset, int length);
+    void saveProjectRequested();
 private:
     void refreshActions();
     void commit(const QDomDocument &xml, const QString &description);
     void addAction(int libraryId, int actionId, int before = -1);
     void editAction();
     QDomElement editActionValues(QDomElement action, const LibraryAction *definition, int row,
+                                const std::function<void(QDomElement)> &apply,
                                 int offset = -1, int length = 0, int argument = -1);
     void deleteActions();
     void copyActions();

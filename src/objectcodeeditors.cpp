@@ -37,6 +37,7 @@ void ObjectPropertiesWindow::openCodeAction(int row, int offset, int length)
         editor = new CodeActionEditorWindow(action, *m_project, context, this);
         editor->setAttribute(Qt::WA_DeleteOnClose);
         m_codeEditors.insert(id, editor);
+        connect(editor, &CodeSnippetEditorWindow::saveProjectRequested, this, &ObjectPropertiesWindow::saveProjectRequested);
         editor->setCommitHandler([this, id, editor](QDomElement original, QDomElement edited) {
             QDomDocument xml = m_document->xml();
             auto current = findCodeAction(xml, id);

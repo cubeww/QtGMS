@@ -74,8 +74,17 @@ void ActionEditorPanel::addAction(int libraryId, int actionId, int before)
     }
     if (definition.kind == 7 || definition.interfaceKind == 5 || (definition.interfaceKind != 1 &&
         (definition.canApplyTo || definition.allowRelative || definition.question || !definition.arguments.isEmpty()))) {
-        const QDomElement edited = editActionValues(action, &definition, before); if (edited.isNull()) return;
-        action = xml.importNode(edited, true).toElement();
+        const auto apply = [&](QDomElement edited) {
+            const auto replacement = xml.importNode(edited, true).toElement();
+            if (!action.parentNode().isNull()) event.replaceChild(replacement, action);
+            else if (before < actions.size()) event.insertBefore(replacement, actions.at(before));
+            else event.appendChild(replacement);
+            action = replacement;
+            commit(xml, tr("Add action")); m_actions->setCurrentRow(before);
+        };
+        const QDomElement edited = editActionValues(action, &definition, before, apply);
+        if (!edited.isNull()) apply(edited);
+        return;
     }
     if (before < actions.size()) event.insertBefore(action, actions.at(before)); else event.appendChild(action);
     commit(xml, tr("Add action")); m_actions->setCurrentRow(before);
@@ -87,7 +96,7 @@ void ActionEditorPanel::editAction()
 void ActionEditorPanel::openAction(int row, int offset, int length, int argument)
 {
     QDomDocument xml = m_xml.cloneNode(true).toDocument(); QDomElement event = xml.documentElement(); const auto actions = ActionXml::elements(event, QStringLiteral("action"));
-    if (row < 0 || row >= actions.size()) return; const QDomElement action = actions.at(row);
+    if (row < 0 || row >= actions.size()) return; QDomElement action = actions.at(row);
     m_actions->setCurrentRow(row);
     const LibraryAction *found = m_libraries->action(ActionXml::text(action, QStringLiteral("libid")).toInt(), ActionXml::text(action, QStringLiteral("id")).toInt());
     LibraryAction definition; if (found) definition = *found;
@@ -95,8 +104,13 @@ void ActionEditorPanel::openAction(int row, int offset, int length, int argument
         emit codeActionRequested(row, argument == 0 ? offset : -1, length);
         return;
     }
-    const QDomElement edited = editActionValues(action, found ? &definition : nullptr, row, offset, length, argument); if (edited.isNull()) return;
-    event.replaceChild(xml.importNode(edited, true), action); commit(xml, tr("Edit action"));
+    const auto apply = [&](QDomElement edited) {
+        const auto replacement = xml.importNode(edited, true).toElement();
+        event.replaceChild(replacement, action); action = replacement;
+        commit(xml, tr("Edit action"));
+    };
+    const QDomElement edited = editActionValues(action, found ? &definition : nullptr, row, apply, offset, length, argument);
+    if (!edited.isNull()) apply(edited);
 }
 void ActionEditorPanel::openFirstCodeAction()
 {
@@ -118,10 +132,17 @@ void ActionEditorPanel::openFirstCodeAction()
     }
     addAction(1, 603, actions.size());
 }
-QDomElement ActionEditorPanel::editActionValues(QDomElement action, const LibraryAction *definition, int row, int offset, int length, int argument)
+QDomElement ActionEditorPanel::editActionValues(QDomElement action, const LibraryAction *definition, int row,
+    const std::function<void(QDomElement)> &apply, int offset, int length, int argument)
 {
     if (ActionXml::text(action, QStringLiteral("kind")).toInt() == 7 || (definition && definition->interfaceKind == 5)) {
         CodeActionEditorWindow editor(action, *m_project, m_contextName + QStringLiteral("_%1").arg(row + 1), this);
+        editor.setCommitHandler([apply](QDomElement, QDomElement edited) { apply(edited); return true; });
+        connect(&editor, &CodeSnippetEditorWindow::saveProjectRequested, this, [this, &editor, apply] {
+            // An unchanged new action still needs inserting before saving.
+            apply(editor.action());
+            emit saveProjectRequested();
+        });
         if (offset >= 0 && argument == 0) editor.selectRange(offset, length);
         return editor.exec() ? editor.action() : QDomElement();
     }

@@ -192,9 +192,17 @@ void ExtensionPropertiesWindow::editSource()
     if (!m_document->fileData(name, bytes, error)) { EditorMessageBox::critical(this, tr("Cannot Open GML"), error); return; }
     const QString source = QTextCodec::codecForUtfText(bytes, QTextCodec::codecForName("UTF-8"))->toUnicode(bytes);
     CodeSnippetEditorWindow editor(tr("Extension Code: %1").arg(name), name, source, QFileInfo(name).completeBaseName(), this);
-    if (!editor.exec() || editor.code() == source) return;
-    if (!m_document->stageFile(state, name, editor.code().toUtf8(), error)) { EditorMessageBox::critical(this, tr("Cannot Edit GML"), error); return; }
-    m_document->edit(state, tr("Edit extension GML"));
+    editor.setCodeCommitHandler([this, name, &editor](const QString &code) {
+        auto state = m_document->state();
+        QString error;
+        if (!m_document->stageFile(state, name, code.toUtf8(), error)) {
+            EditorMessageBox::critical(&editor, tr("Cannot Edit GML"), error); return false;
+        }
+        m_document->edit(state, tr("Edit extension GML"));
+        return true;
+    });
+    connect(&editor, &CodeSnippetEditorWindow::saveProjectRequested, this, &ExtensionPropertiesWindow::saveProjectRequested);
+    editor.exec();
 }
 QString ExtensionPropertiesWindow::filePath() const { return m_document->filePath(); }
 void ExtensionPropertiesWindow::relocate(const QString &oldDirectory, const QString &newDirectory) { m_document->relocate(oldDirectory, newDirectory); refresh(); }

@@ -468,10 +468,18 @@ void RoomPropertiesWindow::showCode(const QString &id, int offset, int length)
     if (offset >= 0) editor.selectRange(offset, length);
     const bool locked = !id.isEmpty() && entity.xml.attribute(QStringLiteral("locked")).toInt();
     editor.setReadOnly(locked);
-    if (!editor.exec() || editor.code() == source) return;
-    if (locked) return;
-    if (id.isEmpty()) setValue(RoomPropertyScope::Room, QStringLiteral("code"), editor.code());
-    else { entity.xml.setAttribute(QStringLiteral("code"), editor.code()); m_document->editEntities({entity}, tr("Edit instance creation code")); }
+    editor.setCodeCommitHandler([this, id, locked](const QString &code) {
+        if (locked) return false;
+        if (id.isEmpty()) setValue(RoomPropertyScope::Room, QStringLiteral("code"), code);
+        else {
+            auto entity = m_document->entity(id);
+            entity.xml.setAttribute(QStringLiteral("code"), code);
+            m_document->editEntities({entity}, tr("Edit instance creation code"));
+        }
+        return true;
+    });
+    connect(&editor, &CodeSnippetEditorWindow::saveProjectRequested, this, &RoomPropertiesWindow::saveProjectRequested);
+    editor.exec();
 }
 QString RoomPropertiesWindow::filePath() const { return m_document->filePath(); }
 void RoomPropertiesWindow::relocate(const QString &oldDirectory, const QString &newDirectory) { m_document->relocate(oldDirectory, newDirectory); updateResources(); }

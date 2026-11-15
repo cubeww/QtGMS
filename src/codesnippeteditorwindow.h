@@ -2,6 +2,7 @@
 #define QTGMS_CODESNIPPETEDITORWINDOW_H
 
 #include "editorwindow.h"
+#include <functional>
 class QTextDocument;
 class CodeEditorPanel;
 class GmlHighlighter;
@@ -19,10 +20,12 @@ public:
     void setResources(const Project &project);
     void selectRange(int offset, int length);
     void setReadOnly(bool readOnly);
+    void setCodeCommitHandler(const std::function<bool(const QString &)> &handler);
     virtual bool commitChanges();
     virtual bool hasChanges() const;
 signals:
     void finished();
+    void saveProjectRequested();
 protected:
     void changeEvent(QEvent *event) override;
     void resetCode(const QString &code);
@@ -37,6 +40,7 @@ private:
     void exportCode();
     QString m_contextName;
     QString m_originalCode;
+    std::function<bool(const QString &)> m_codeCommitHandler;
     bool m_accepted = false;
 };
 #endif

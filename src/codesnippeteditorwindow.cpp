@@ -55,7 +55,6 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     QToolBar *toolbar = m_codePanel->toolBar();
     QAction *first = toolbar->actions().first();
     auto *ok = new QAction(QIcon(QStringLiteral(":/images/editor/ok.png")), tr("OK, Save changes"), this);
-    ok->setShortcut(QKeySequence::Save);
     addAction(ok); toolbar->insertAction(first, ok);
     connect(ok, &QAction::triggered, this, &CodeSnippetEditorWindow::accept);
     toolbar->insertSeparator(first);
@@ -72,6 +71,10 @@ CodeSnippetEditorWindow::CodeSnippetEditorWindow(const QString &title, const QSt
     check->setEnabled(false);
     connect(completion, &QAction::triggered, m_codePanel->editor(), &CodeEditor::requestCompletion);
 
+    auto *saveShortcut = new QShortcut(QKeySequence::Save, this);
+    connect(saveShortcut, &QShortcut::activated, this, [this] {
+        if (commitChanges()) emit saveProjectRequested();
+    });
     auto *cancel = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     connect(cancel, &QShortcut::activated, this, [this] { close(); });
 }
@@ -91,7 +94,7 @@ bool CodeSnippetEditorWindow::exec()
 {
     QEventLoop loop;
     connect(this, &CodeSnippetEditorWindow::finished, &loop, &QEventLoop::quit);
-    // The resource host commits the accepted text as one undoable change.
+    // Keep the resource host alive until the modal editing session finishes.
     setWindowModality(Qt::ApplicationModal);
     show(); m_codePanel->editor()->setFocus(); loop.exec(QEventLoop::DialogExec);
     return m_accepted;
@@ -100,7 +103,16 @@ bool CodeSnippetEditorWindow::exec()
 QString CodeSnippetEditorWindow::code() const
 { return m_document->isModified() ? m_document->toPlainText() : m_originalCode; }
 bool CodeSnippetEditorWindow::hasChanges() const { return code() != m_originalCode; }
-bool CodeSnippetEditorWindow::commitChanges() { return true; }
+void CodeSnippetEditorWindow::setCodeCommitHandler(const std::function<bool(const QString &)> &handler)
+{ m_codeCommitHandler = handler; }
+bool CodeSnippetEditorWindow::commitChanges()
+{
+    if (!m_codeCommitHandler || !hasChanges()) return true;
+    const QString edited = code();
+    if (!m_codeCommitHandler(edited)) return false;
+    resetCode(edited);
+    return true;
+}
 void CodeSnippetEditorWindow::resetCode(const QString &code)
 {
     if (this->code() != code) m_document->setPlainText(code);

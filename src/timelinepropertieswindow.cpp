@@ -71,6 +71,7 @@ TimelinePropertiesWindow::TimelinePropertiesWindow(TimelineDocument *document, P
         m_document->edit(xml, description, m_document->selectedStep());
     });
     connect(document, &TimelineDocument::changed, this, &TimelinePropertiesWindow::refresh);
+    connect(m_actionEditor, &ActionEditorPanel::saveProjectRequested, this, &TimelinePropertiesWindow::saveProjectRequested);
     connect(document->undoStack(), &QUndoStack::cleanChanged, this, [this] { setWindowTitle(tr("Time Line Properties: %1%2").arg(m_document->name(), m_document->isModified() ? QStringLiteral(" *") : QString())); });
     connect(document, &TimelineDocument::saved, this, [this] { emit resourceSaved(ResourceType::Timeline, filePath(), QString()); });
     auto *saveShortcut = new QShortcut(QKeySequence::Save, this); connect(saveShortcut, &QShortcut::activated, this, &TimelinePropertiesWindow::saveProjectRequested);
