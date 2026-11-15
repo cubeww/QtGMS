@@ -371,7 +371,7 @@ void SpriteFramesWindow::editFrame()
         for (int index = 0; index < images.size(); ++index) {
             SpriteFrame &frame = state.frames[index];
             if (frame.image == images.at(index)) continue;
-            frame.image = images.at(index); frame.modified = true; changed = true;
+            frame.image = images.at(index); changed = true;
         }
         if (!changed) return;
         state.size = images.first().size();

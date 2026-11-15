@@ -115,7 +115,7 @@ void SpriteFramesWindow::insertFrames(const QList<SpriteFrame> &imported, bool r
     ImageOperationSettings settings; settings.size = mode == 2 ? largest : state.size; settings.anchor = anchor;
     if (mode == 2 && largest != state.size) {
         for (SpriteFrame &frame : state.frames) {
-            frame.image = ImageOperations::apply(frame.image, ImageOperations::Operation::Resize, settings); frame.modified = true;
+            frame.image = ImageOperations::apply(frame.image, ImageOperations::Operation::Resize, settings);
             if (frame.image.isNull()) { EditorMessageBox::critical(this, title, tr("Not enough memory to resize the images.")); return; }
         }
         state.origin += QPoint((largest.width() - state.size.width()) * (anchor % 3) / 2,
@@ -152,7 +152,7 @@ void SpriteFramesWindow::eraseFrames()
     const QList<int> rows = selectedRows();
     for (int index = 0; index < state.frames.size(); ++index) {
         if (!all->isChecked() && !rows.contains(index)) continue;
-        state.frames[index].image.fill(color); state.frames[index].modified = true;
+        state.frames[index].image.fill(color);
     }
     m_document->edit(state, tr("Erase images"));
 }
@@ -202,7 +202,7 @@ void SpriteFramesWindow::applyOperation(ImageOperations::Operation operation, co
         SpriteFrame &frame = state.frames[index];
         const QImage result = operation == Operation::Trim ? frame.image.copy(trimBounds) : ImageOperations::apply(frame.image, operation, settings);
         if (result.isNull()) { EditorMessageBox::critical(this, title, tr("Not enough memory to process the images.")); return; }
-        frame.image = result; frame.modified = true;
+        frame.image = result;
     }
     if (sizeChange) {
         const QSize oldSize = state.size; state.size = state.frames.first().image.size();
@@ -232,7 +232,6 @@ void SpriteFramesWindow::premultiplyAlpha()
                     (qBlue(row[x]) * alpha + 127) / 255, alpha);
             }
         }
-        state.frames[index].modified = true;
     }
     m_document->edit(state, tr("Pre-multiply alpha"));
 }
@@ -343,7 +342,6 @@ void SpriteFramesWindow::blendAnimation(bool morph)
             state.frames.size() == 1 ? 1.0 : double(index) / (state.frames.size() - 1));
         else { QPainter painter(&frame.image); painter.drawImage(QPoint(), target); }
         if (frame.image.isNull()) { EditorMessageBox::critical(this, title, tr("Not enough memory to process the animation.")); return; }
-        frame.modified = true;
     }
     m_document->edit(state, title);
 }

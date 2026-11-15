@@ -27,6 +27,7 @@ struct CompilerBuild
     CompilerBuild(const CompileRequest &request, ProjectFileTransaction &outputTransaction);
     const CompileRequest &request;
     ProjectFileTransaction &outputTransaction;
+    const qint64 buildTimestampMilliseconds;
     DataWriter file;
     TextureCompiler textures;
     GmlEnvironment environment;

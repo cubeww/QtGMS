@@ -1,4 +1,5 @@
 #include "spritedocument.h"
+#include "projectfiletransaction.h"
 
 #include <QDir>
 #include <QFile>
@@ -6,7 +7,7 @@
 #include <QImageReader>
 #include <QMap>
 #include <QRegularExpression>
-#include <QSaveFile>
+#include <QSet>
 #include <QTemporaryFile>
 #include <QUuid>
 #include <QtMath>
@@ -63,6 +64,7 @@ void SpriteDocument::relocate(const QString &oldDirectory, const QString &newDir
 {
     m_filePath = relocatedSpritePath(m_filePath, oldDirectory, newDirectory);
     relocateSpriteState(m_state, oldDirectory, newDirectory);
+    relocateSpriteState(m_savedState, oldDirectory, newDirectory);
     for (int i = 0; i < m_undoStack.count(); ++i) {
         auto *command = const_cast<SpriteChangeCommand *>(static_cast<const SpriteChangeCommand *>(m_undoStack.command(i)));
         command->relocate(oldDirectory, newDirectory);
@@ -121,7 +123,6 @@ SpriteFrame SpriteDocument::createFrame(const QImage &image)
     SpriteFrame frame;
     frame.id = QUuid::createUuid().toString();
     frame.image = image.convertToFormat(QImage::Format_ARGB32);
-    frame.modified = true;
     return frame;
 }
 int SpriteDocument::frameIndex(const QString &id) const
@@ -136,7 +137,6 @@ void SpriteDocument::replaceFrame(const QString &id, const QImage &image)
     if (index < 0 || image.isNull() || image.size() != m_state.size || m_state.frames.at(index).image == image) return;
     SpriteState next = m_state;
     next.frames[index].image = image.convertToFormat(QImage::Format_ARGB32);
-    next.frames[index].modified = true;
     edit(next, tr("Edit subimage"));
 }
 
@@ -197,7 +197,6 @@ bool SpriteDocument::loadFromXml(const QString &filePath, const QDomDocument &do
         // GMX frames may differ from the declared sprite size. Keep their pixels
         // intact for texture compilation; only collision masks use state.size.
         SpriteFrame frame = createFrame(image);
-        frame.modified = false;
         frame.filePath = QDir::cleanPath(path);
         orderedFrames.insert(index, frame);
     }
@@ -208,6 +207,7 @@ bool SpriteDocument::loadFromXml(const QString &filePath, const QDomDocument &do
     m_filePath = QFileInfo(filePath).absoluteFilePath();
     m_xml = document;
     m_sourceBytes = source;
+    m_savedState = state;
     m_undoStack.clear();
     applyState(state);
     return true;
@@ -314,23 +314,28 @@ bool SpriteDocument::save(QString &error)
     source.close();
     QDomDocument document = m_xml.cloneNode(true).toDocument();
     SpriteState savedState = m_state;
-    QDir directory = QFileInfo(m_filePath).absoluteDir();
-    QStringList createdFiles;
+    const QDir directory = QFileInfo(m_filePath).absoluteDir();
+    const QDir images(directory.filePath(QStringLiteral("images")));
+    ProjectFileTransaction transaction(directory.absolutePath());
+    QSet<QString> retainedFiles;
     for (int i = 0; i < savedState.frames.size(); ++i) {
         SpriteFrame &frame = savedState.frames[i];
-        if (!frame.modified) continue;
-        if (!directory.mkpath(QStringLiteral("images"))) { error = tr("Cannot create the sprite images directory."); break; }
-        QString token = QUuid::createUuid().toString();
-        token.remove(QLatin1Char('{')).remove(QLatin1Char('}')).remove(QLatin1Char('-'));
-        const QString path = directory.absoluteFilePath(QStringLiteral("images/%1_%2_%3.png").arg(name(), token).arg(i));
-        QSaveFile output(path);
-        if (!output.open(QIODevice::WriteOnly) || !frame.image.save(&output, "PNG") || !output.commit()) {
+        const QString path = images.absoluteFilePath(QStringLiteral("%1_%2.png").arg(name()).arg(i));
+        frame.filePath = path;
+        retainedFiles.insert(path.toCaseFolded());
+        // Undo snapshots retain their pixels, not a promise that their old
+        // filenames still contain those pixels. Compare against the last save.
+        if (i < m_savedState.frames.size()) {
+            const auto &saved = m_savedState.frames.at(i);
+            if (saved.filePath.compare(path, Qt::CaseInsensitive) == 0 && saved.image == frame.image
+                && QFileInfo::exists(path)) continue;
+        }
+        QFile output(path);
+        if (!transaction.openWrite(output, error)) break;
+        if (!frame.image.save(&output, "PNG") || !output.flush()) {
             error = tr("Cannot save subimage %1:\n%2").arg(path, output.errorString());
             break;
         }
-        createdFiles.append(path);
-        frame.filePath = path;
-        frame.modified = false;
     }
     if (error.isEmpty()) {
         const QRect bounds = boundingBox();
@@ -371,20 +376,29 @@ bool SpriteDocument::save(QString &error)
             frames.appendChild(frame);
         }
         const QByteArray bytes = document.toByteArray(2);
-        QSaveFile output(m_filePath);
-        if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit())
-            error = tr("Cannot save sprite:\n%1").arg(output.errorString());
-        else {
+        if (transaction.write(m_filePath, bytes, error)) {
+            // Remove only previously referenced, sprite-owned images. Never
+            // sweep the shared images directory or delete external source art.
+            for (const auto &frame : m_savedState.frames) {
+                const QFileInfo old(frame.filePath);
+                if (retainedFiles.contains(frame.filePath.toCaseFolded())
+                    || old.absolutePath().compare(images.absolutePath(), Qt::CaseInsensitive) != 0
+                    || !old.fileName().startsWith(name() + QLatin1Char('_'), Qt::CaseInsensitive)
+                    || !QFileInfo::exists(frame.filePath)) continue;
+                if (!transaction.remove(frame.filePath, error)) break;
+            }
+        }
+        if (error.isEmpty() && transaction.finish(error)) {
             m_xml = document;
             m_sourceBytes = bytes;
             m_state = savedState;
+            m_savedState = savedState;
             m_undoStack.setClean();
             emit changed();
             emit saved();
             return true;
         }
     }
-    // Only files created by this save attempt are removed on failure.
-    for (const QString &path : createdFiles) QFile::remove(path);
+    transaction.rollback(error);
     return false;
 }

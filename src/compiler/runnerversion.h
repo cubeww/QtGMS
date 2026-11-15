@@ -7,6 +7,7 @@
 class RunnerVersion
 {
 public:
+    static QString versionString(const QMap<QString, QString> &options, QString &error);
     static bool replace(const QString &executablePath, const QMap<QString, QString> &options, QString &error);
 };
 

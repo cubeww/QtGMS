@@ -3,6 +3,7 @@
 #include "actionxml.h"
 #include "projectfiletransaction.h"
 #include "scriptsource.h"
+#include "runnerversion.h"
 #include <QBuffer>
 #include <QDateTime>
 #include <QDir>
@@ -14,6 +15,7 @@
 
 CompilerBuild::CompilerBuild(const CompileRequest &input, ProjectFileTransaction &transaction)
     : request(input), outputTransaction(transaction)
+    , buildTimestampMilliseconds(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch())
 {
 }
 QByteArray CompilerBuild::read(const QString &path)
@@ -243,6 +245,15 @@ void CompilerBuild::load()
         throw CompileError(QStringLiteral("Open a project and select a configuration first."));
     const auto &config = request.project.configurations().at(request.configuration);
     options = config.options;
+    QString versionError;
+    const QString gameVersion = RunnerVersion::versionString(options, versionError);
+    if (gameVersion.isEmpty()) throw CompileError(versionError);
+    // GMS injects GM_version as a string-valued compile-time macro. Use the
+    // same Windows version as the executable's VERSIONINFO resource.
+    environment.macros.insert(QStringLiteral("GM_version"), QLatin1Char('"') + gameVersion + QLatin1Char('"'));
+    // GML dates count days since 1899-12-30; the fractional part is UTC time.
+    const double buildDate = buildTimestampMilliseconds / 86400000.0 + 25569.0;
+    environment.macros.insert(QStringLiteral("GM_build_date"), QString::number(buildDate, 'g', 17));
     textures.configure(options, QDir(BuildDirectory::path(request.project)).filePath(QStringLiteral(".cache")));
     environment.shortCircuit = option("shortcircuit", 1) != 0;
     const auto constants = QJsonDocument::fromJson(read(QStringLiteral(":/gmlconstants.json"))).object();
@@ -373,7 +384,7 @@ void CompilerBuild::general()
         file.u32(flags);
         for (int i = 0; i < 5; ++i)
             file.u32(0);
-        file.u64(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() / 1000);
+        file.u64(buildTimestampMilliseconds / 1000);
         file.string(options.value("option_display_name", name));
         file.u64(2);
         classificationOffset = file.position();

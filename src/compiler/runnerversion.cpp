@@ -42,6 +42,23 @@ static QByteArray versionBlock(const QString &key, bool text, const QByteArray &
     return bytes;
 }
 
+QString RunnerVersion::versionString(const QMap<QString, QString> &options, QString &error)
+{
+    const QStringList components = {QStringLiteral("major"), QStringLiteral("mainor"), QStringLiteral("release"), QStringLiteral("build")};
+    QStringList numbers;
+    for (int index = 0; index < components.size(); ++index) {
+        bool valid = false;
+        const uint value = options.value(QStringLiteral("option_windows_%1_version").arg(components.at(index)),
+            index == 0 ? QStringLiteral("1") : QStringLiteral("0")).toUInt(&valid);
+        if (!valid || value > 65535) {
+            error = QObject::tr("Invalid Windows game version: each component must be between 0 and 65535.");
+            return QString();
+        }
+        numbers.append(QString::number(value));
+    }
+    return numbers.join(QLatin1Char('.'));
+}
+
 bool RunnerVersion::replace(const QString &executablePath, const QMap<QString, QString> &options, QString &error)
 {
     // Match the language of the bundled Runner's RT_VERSION/1 resource, so
@@ -49,19 +66,12 @@ bool RunnerVersion::replace(const QString &executablePath, const QMap<QString, Q
     const WORD VersionLanguage = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_UK);
     const WORD UnicodeCodePage = 1200;
     QByteArray resource;
+    const QString version = versionString(options, error);
+    if (version.isEmpty()) return false;
     try {
-        const QStringList components = {QStringLiteral("major"), QStringLiteral("mainor"), QStringLiteral("release"), QStringLiteral("build")};
-        quint32 version[4];
-        QStringList numbers;
-        for (int index = 0; index < 4; ++index) {
-            bool valid = false;
-            version[index] = options.value(QStringLiteral("option_windows_%1_version").arg(components.at(index)),
-                index == 0 ? QStringLiteral("1") : QStringLiteral("0")).toUInt(&valid);
-            if (!valid || version[index] > 65535) throw QObject::tr("Invalid Windows game version: each component must be between 0 and 65535.");
-            numbers.append(QString::number(version[index]));
-        }
-        const quint32 high = (version[0] << 16) | version[1];
-        const quint32 low = (version[2] << 16) | version[3];
+        const QStringList numbers = version.split(QLatin1Char('.'));
+        const quint32 high = (numbers.at(0).toUInt() << 16) | numbers.at(1).toUInt();
+        const quint32 low = (numbers.at(2).toUInt() << 16) | numbers.at(3).toUInt();
         const quint32 fields[] = {VS_FFI_SIGNATURE, VS_FFI_STRUCVERSION, high, low, high, low,
             VS_FFI_FILEFLAGSMASK, 0, VOS_NT_WINDOWS32, VFT_APP, 0, 0, 0};
         QByteArray fixed(sizeof(fields), '\0');
@@ -77,8 +87,8 @@ bool RunnerVersion::replace(const QString &executablePath, const QMap<QString, Q
         addString(QStringLiteral("ProductName"), options.value(QStringLiteral("option_windows_product_info")));
         addString(QStringLiteral("LegalCopyright"), options.value(QStringLiteral("option_windows_copyright_info")));
         addString(QStringLiteral("FileDescription"), options.value(QStringLiteral("option_windows_description_info")));
-        addString(QStringLiteral("FileVersion"), numbers.join(QLatin1Char('.')));
-        addString(QStringLiteral("ProductVersion"), numbers.join(QLatin1Char('.')));
+        addString(QStringLiteral("FileVersion"), version);
+        addString(QStringLiteral("ProductVersion"), version);
         addString(QStringLiteral("InternalName"), QFileInfo(executablePath).completeBaseName());
         addString(QStringLiteral("OriginalFilename"), QFileInfo(executablePath).fileName());
 

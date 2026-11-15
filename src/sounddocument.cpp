@@ -1,12 +1,11 @@
 #include "sounddocument.h"
+#include "projectfiletransaction.h"
 #include "audiopreview.h"
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
-#include <QSaveFile>
 #include <QTemporaryFile>
-#include <QUuid>
 #include <QtMath>
 
 class SoundChangeCommand : public QUndoCommand
@@ -196,23 +195,25 @@ bool SoundDocument::save(QString &error)
     if (source.readAll() != m_sourceBytes) { error = tr("The sound file changed outside the editor. Reopen it before saving."); return false; }
     source.close();
     const QDir directory = QFileInfo(m_filePath).absoluteDir();
-    QString audioPath = m_audioPath; bool created = false;
-    if (m_state.audio.isEmpty()) audioPath.clear();
-    else if (m_state.audio != m_savedAudio || QFileInfo(audioPath).suffix().compare(m_state.extension.mid(1), Qt::CaseInsensitive) != 0) {
-        if (!directory.mkpath(QStringLiteral("audio"))) { error = tr("Cannot create the audio directory."); return false; }
-        QString token = QUuid::createUuid().toString(); token.remove(QLatin1Char('{')).remove(QLatin1Char('}')).remove(QLatin1Char('-'));
-        audioPath = directory.absoluteFilePath(QStringLiteral("audio/%1_%2%3").arg(name(), token, m_state.extension));
-        QSaveFile output(audioPath);
-        if (!output.open(QIODevice::WriteOnly) || output.write(m_state.audio) != m_state.audio.size() || !output.commit()) { error = output.errorString(); return false; }
-        created = true;
+    const QDir audio(directory.filePath(QStringLiteral("audio")));
+    const QString audioPath = m_state.audio.isEmpty() ? QString() : audio.absoluteFilePath(name() + m_state.extension);
+    ProjectFileTransaction transaction(directory.absolutePath());
+    if (!audioPath.isEmpty() && (m_state.audio != m_savedAudio
+        || audioPath.compare(m_audioPath, Qt::CaseInsensitive) != 0 || !QFileInfo::exists(audioPath))) {
+        if (!transaction.write(audioPath, m_state.audio, error)) { transaction.rollback(error); return false; }
     }
     QDomDocument document = m_xml.cloneNode(true).toDocument();
     writeSoundState(document, m_state, m_configurationIndex, audioPath.isEmpty() ? QString()
         : QDir::toNativeSeparators(QDir(directory.filePath(QStringLiteral("audio"))).relativeFilePath(audioPath)));
-    const QByteArray bytes = document.toByteArray(2); QSaveFile output(m_filePath);
-    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit()) {
-        error = output.errorString(); if (created) QFile::remove(audioPath); return false;
-    }
+    const QByteArray bytes = document.toByteArray(2);
+    if (!transaction.write(m_filePath, bytes, error)) { transaction.rollback(error); return false; }
+    const QFileInfo old(m_audioPath);
+    if (!m_audioPath.isEmpty() && m_audioPath.compare(audioPath, Qt::CaseInsensitive) != 0
+        && old.absolutePath().compare(audio.absolutePath(), Qt::CaseInsensitive) == 0
+        && (old.completeBaseName().compare(name(), Qt::CaseInsensitive) == 0
+            || old.fileName().startsWith(name() + QLatin1Char('_'), Qt::CaseInsensitive))
+        && old.exists() && !transaction.remove(m_audioPath, error)) { transaction.rollback(error); return false; }
+    transaction.finish(error);
     m_audioPath = audioPath; m_savedAudio = m_state.audio; m_sourceBytes = bytes; m_xml = document;
     m_undoStack.setClean(); emit saved(); return true;
 }

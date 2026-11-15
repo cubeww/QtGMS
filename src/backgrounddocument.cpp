@@ -1,13 +1,12 @@
 #include "backgrounddocument.h"
+#include "projectfiletransaction.h"
 
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QMap>
-#include <QSaveFile>
 #include <QTemporaryFile>
-#include <QUuid>
 
 class BackgroundChangeCommand : public QUndoCommand
 {
@@ -174,30 +173,30 @@ bool BackgroundDocument::save(QString &error)
     if (source.readAll() != m_sourceBytes) { error = tr("The background file changed outside the editor. Reopen it before saving."); return false; }
     source.close();
     const QDir directory = QFileInfo(m_filePath).absoluteDir();
-    QString imagePath = m_imagePath;
-    bool createdImage = false;
-    if (m_state.image.isNull()) {
-        imagePath.clear();
-    } else if (m_state.image != m_savedImage) {
-        if (!directory.mkpath(QStringLiteral("images"))) { error = tr("Cannot create the background images directory."); return false; }
-        QString token = QUuid::createUuid().toString();
-        token.remove(QLatin1Char('{')).remove(QLatin1Char('}')).remove(QLatin1Char('-'));
-        imagePath = directory.absoluteFilePath(QStringLiteral("images/%1_%2.png").arg(name(), token));
-        QSaveFile output(imagePath);
-        if (!output.open(QIODevice::WriteOnly) || !m_state.image.save(&output, "PNG") || !output.commit()) {
-            error = tr("Cannot save background image:\n%1").arg(output.errorString()); return false;
+    const QDir images(directory.filePath(QStringLiteral("images")));
+    const QString imagePath = m_state.image.isNull() ? QString() : images.absoluteFilePath(name() + QStringLiteral(".png"));
+    ProjectFileTransaction transaction(directory.absolutePath());
+    if (!imagePath.isEmpty() && (m_state.image != m_savedImage
+        || imagePath.compare(m_imagePath, Qt::CaseInsensitive) != 0 || !QFileInfo::exists(imagePath))) {
+        QFile output(imagePath);
+        if (transaction.openWrite(output, error)) {
+            if (!m_state.image.save(&output, "PNG") || !output.flush())
+                error = tr("Cannot save background image:\n%1").arg(output.errorString());
+            output.close();
         }
-        createdImage = true;
+        if (!error.isEmpty()) { transaction.rollback(error); return false; }
     }
     QDomDocument document = m_xml.cloneNode(true).toDocument();
     writeBackgroundState(document, m_state, imagePath.isEmpty() ? QString() : QDir::toNativeSeparators(directory.relativeFilePath(imagePath)), m_configurationIndex);
     const QByteArray bytes = document.toByteArray(2);
-    QSaveFile output(m_filePath);
-    if (!output.open(QIODevice::WriteOnly) || output.write(bytes) != bytes.size() || !output.commit()) {
-        error = tr("Cannot save background:\n%1").arg(output.errorString());
-        if (createdImage) QFile::remove(imagePath);
-        return false;
-    }
+    if (!transaction.write(m_filePath, bytes, error)) { transaction.rollback(error); return false; }
+    const QFileInfo old(m_imagePath);
+    if (!m_imagePath.isEmpty() && m_imagePath.compare(imagePath, Qt::CaseInsensitive) != 0
+        && old.absolutePath().compare(images.absolutePath(), Qt::CaseInsensitive) == 0
+        && (old.completeBaseName().compare(name(), Qt::CaseInsensitive) == 0
+            || old.fileName().startsWith(name() + QLatin1Char('_'), Qt::CaseInsensitive))
+        && old.exists() && !transaction.remove(m_imagePath, error)) { transaction.rollback(error); return false; }
+    transaction.finish(error);
     m_imagePath = imagePath;
     m_savedImage = m_state.image;
     m_xml = document;

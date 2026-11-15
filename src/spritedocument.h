@@ -10,7 +10,6 @@ struct SpriteFrame {
     QString id;
     QString filePath;
     QImage image;
-    bool modified = false;
 };
 
 struct SpriteState {
@@ -65,6 +64,7 @@ private:
     QByteArray m_sourceBytes;
     QDomDocument m_xml;
     SpriteState m_state;
+    SpriteState m_savedState;
     QUndoStack m_undoStack;
 };
 
